@@ -1,22 +1,26 @@
 package chess.model.piece;
 
-import chess.model.position.ChessPosition;
+import chess.model.evaluation.PawnValue;
+import chess.model.evaluation.PieceValue;
+import chess.model.position.Position;
 import chess.model.position.Movement;
 import chess.model.position.Path;
 import chess.model.position.Rank;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 public class Pawn extends Piece {
-    private static final Map<Side, Pawn> CACHE = Arrays.stream(Side.values())
+    private static final Map<Side, Pawn> CACHE = Side.colors()
+            .stream()
             .collect(toMap(identity(), Pawn::new));
 
     private static final int DISPLACEMENT = 1;
     private static final int INITIAL_SPECIAL_DISPLACEMENT = 2;
+    private static final double VALUE = 1;
+    private static final double UNFAVORABLE_VALUE = 0.5;
 
     private Pawn(Side side) {
         super(side);
@@ -27,7 +31,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public Path findPath(ChessPosition sourcePosition, ChessPosition targetPosition, Piece targetPiece) {
+    public Path findPath(Position sourcePosition, Position targetPosition, Piece targetPiece) {
         Movement movement = targetPosition.calculateMovement(sourcePosition);
         validateForwardPath(sourcePosition, targetPiece, movement);
         if (canOrthogonalMove(sourcePosition, movement) || canDiagonalMove(targetPiece, movement)) {
@@ -36,13 +40,13 @@ public class Pawn extends Piece {
         return Path.empty();
     }
 
-    private void validateForwardPath(ChessPosition source, Piece targetPiece, Movement movement) {
+    private void validateForwardPath(Position source, Piece targetPiece, Movement movement) {
         if (!targetPiece.equals(Blank.INSTANCE) && canOrthogonalMove(source, movement)) {
             throw new IllegalArgumentException("타겟 위치에 기물이 존재하여 전진할 수 없습니다.");
         }
     }
 
-    private boolean canOrthogonalMove(ChessPosition source, Movement movement) {
+    private boolean canOrthogonalMove(Position source, Movement movement) {
         if (isPawnInitialPosition(source)) {
             return canMoveForwardWith(movement, DISPLACEMENT) ||
                     canMoveForwardWith(movement, INITIAL_SPECIAL_DISPLACEMENT);
@@ -50,15 +54,15 @@ public class Pawn extends Piece {
         return canMoveForwardWith(movement, DISPLACEMENT);
     }
 
-    private boolean isPawnInitialPosition(ChessPosition source) {
-        if (isSameSide(from(Side.WHITE))) {
+    private boolean isPawnInitialPosition(Position source) {
+        if (isSameSide(Side.WHITE)) {
             return source.hasRank(Rank.TWO);
         }
         return source.hasRank(Rank.SEVEN);
     }
 
     private boolean canMoveForwardWith(Movement movement, int displacement) {
-        boolean isUpperSide = isSameSide(from(Side.BLACK));
+        boolean isUpperSide = isSameSide(Side.BLACK);
         return movement.isForward(isUpperSide) && movement.hasLengthOf(displacement);
     }
 
@@ -74,5 +78,10 @@ public class Pawn extends Piece {
 
     private boolean isPossibleDiagonal(Movement movement) {
         return movement.isDiagonal() && movement.hasLengthOf(DISPLACEMENT);
+    }
+
+    @Override
+    public PieceValue value() {
+        return new PawnValue(VALUE, UNFAVORABLE_VALUE);
     }
 }

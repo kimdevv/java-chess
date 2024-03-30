@@ -17,6 +17,10 @@ public abstract class Piece {
 
     public abstract int getMaxUnitMove();
 
+    public abstract boolean isKing();
+
+    public abstract boolean isPawn();
+
     public boolean isMovable(Position source, Position destination) {
         Direction direction = Direction.calculateBetween(source, destination);
         return matchesDirection(direction) &&

@@ -1,6 +1,7 @@
 package chess.domain.piece;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,5 +41,32 @@ class PieceTest {
         boolean result = piece.hasColorOf(Color.WHITE);
         // then
         assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("Piece가 King 인지 테스트한다")
+    void isKingTest() {
+        // given
+        Piece piece = new King(Color.WHITE);
+        // when
+        boolean result = piece.isKing();
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("Piece가 Pawn 인지 테스트한다")
+    void isPawnTest() {
+        // given
+        Piece initPawn = new InitPawn(Color.WHITE);
+        Piece movedPawn = new MovedPawn(Color.WHITE);
+        // when
+        boolean isInitPawn = initPawn.isPawn();
+        boolean isMovedPawn = movedPawn.isPawn();
+        // then
+        assertAll(
+                () -> assertThat(isInitPawn).isTrue(),
+                () -> assertThat(isMovedPawn).isTrue()
+        );
     }
 }

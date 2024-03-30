@@ -1,10 +1,17 @@
 package chess.domain.board;
 
+import chess.domain.piece.Color;
+import chess.domain.piece.Empty;
 import chess.domain.piece.MovedPawn;
 import chess.domain.piece.Piece;
+import chess.domain.position.File;
 import chess.domain.position.Position;
+import chess.domain.score.PieceScore;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Board {
 
@@ -14,7 +21,7 @@ public class Board {
         this.pieces = pieces;
     }
 
-    public void move(Position source, Position destination) {
+    public Piece move(Position source, Position destination) {
         validatePieceExistsAt(source);
         validateAllyPieceNotOnDestination(source, destination);
         validateNoPiecesBetween(source, destination);
@@ -22,11 +29,11 @@ public class Board {
         Piece piece = pieces.get(source);
         if (hasEnemyPieceOn(destination, piece)) {
             validateAttackable(source, destination, piece);
-            replacePiece(source, destination, piece);
-            return;
+            return replacePiece(source, destination, piece);
         }
         validateMovable(source, destination, piece);
         replacePiece(source, destination, piece);
+        return new Empty();
     }
 
     private void validatePieceExistsAt(Position source) {
@@ -73,13 +80,52 @@ public class Board {
         }
     }
 
-    private void replacePiece(Position source, Position destination, Piece piece) {
+    private Piece replacePiece(Position source, Position destination, Piece piece) {
         pieces.remove(source);
+        Piece removePiece = pieces.get(destination);
         if (piece.isInitPawn()) {
             pieces.put(destination, new MovedPawn(piece.getColor()));
-            return;
+            return removePiece;
         }
         pieces.put(destination, piece);
+        return removePiece;
+    }
+
+    public double calculateScoreByColor(Color color) {
+        List<Piece> survivePiece = survivePieceByColor(color);
+        int countPawnInSameFile = countPawnInSameFile(color);
+        double totalScore = survivePiece.stream()
+                .mapToDouble(PieceScore::addScore)
+                .sum();
+        return totalScore - (countPawnInSameFile * 0.5);
+    }
+
+    private List<Piece> survivePieceByColor(Color color) {
+        return pieces.values().stream()
+                .filter(piece -> piece.hasColorOf(color))
+                .collect(Collectors.toList());
+    }
+
+    private int countPawnInSameFile(Color color) {
+        return Arrays.stream(File.values())
+                .mapToInt(file -> countDuplicatePawnInFile(file, color))
+                .sum();
+    }
+
+    private int countDuplicatePawnInFile(File file, Color color) {
+        List<Position> positionsSameFile = Position.getPositionsSameFile(file);
+        int countPawn = countPawn(positionsSameFile, color);
+        if (countPawn >= 2) {
+            return countPawn;
+        }
+        return 0;
+    }
+
+    private int countPawn(List<Position> positionsSameFile, Color color) {
+        return (int) positionsSameFile.stream()
+                .map(position -> pieces.getOrDefault(position, new Empty()))
+                .filter(piece -> piece.isPawn() && piece.hasColorOf(color))
+                .count();
     }
 
     public Map<Position, Piece> pieces() {

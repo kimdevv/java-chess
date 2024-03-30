@@ -22,6 +22,10 @@ public enum Rank {
         return findRank(convertValueToIndex(value));
     }
 
+    public static Rank from(int index) {
+        return findRank(index);
+    }
+
     private static Rank findRank(int index) {
         return Arrays.stream(values())
                 .filter(rank -> rank.index == index)
@@ -47,17 +51,17 @@ public enum Rank {
 
     public Rank update(int value) {
         int index = this.index + value;
-        if (index >= values().length) {
+        if (index > values().length) {
             throw new IllegalArgumentException("보드판 밖으로 이동할 수 없습니다.");
         }
         return findRank(index);
     }
 
     public int subtractRank(Rank rank) {
-        return ordinal() - rank.ordinal();
+        return index - rank.index;
     }
 
     public int findDirection(Rank rank) {
-        return Integer.compare(rank.ordinal(), ordinal());
+        return Integer.compare(rank.index, index);
     }
 }

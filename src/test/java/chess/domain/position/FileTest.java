@@ -36,9 +36,8 @@ public class FileTest {
     void File_Throw_exception_when_move_out_of_board() {
         File file = File.b;
 
-        assertThatThrownBy(() -> {
-            file.update(7);
-        }).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> file.update(7))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
 

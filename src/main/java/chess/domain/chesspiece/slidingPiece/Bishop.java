@@ -1,16 +1,14 @@
 package chess.domain.chesspiece.slidingPiece;
 
-import static chess.domain.chesspiece.Role.BLACK_BISHOP;
-import static chess.domain.chesspiece.Role.WHITE_BISHOP;
-
-import chess.domain.chesspiece.Role;
+import chess.domain.chesspiece.Score;
 import chess.domain.chesspiece.Team;
 import chess.domain.position.Position;
 
 public class Bishop extends SlidingPiece {
+    private static final Score BISHOP_SCORE = new Score(3);
 
     public Bishop(Team team) {
-        super(team);
+        super(team, BISHOP_SCORE);
     }
 
     @Override
@@ -20,13 +18,5 @@ public class Bishop extends SlidingPiece {
         if (fileDistance != columnDistance) {
             throw new IllegalArgumentException("이동할 수 없습니다.");
         }
-    }
-
-    @Override
-    public Role getRole() {
-        if (getTeam().isWhite()) {
-            return WHITE_BISHOP;
-        }
-        return BLACK_BISHOP;
     }
 }

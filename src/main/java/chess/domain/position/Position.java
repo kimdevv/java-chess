@@ -49,6 +49,10 @@ public class Position {
         return rank.findDirection(target.rank);
     }
 
+    public boolean hasFile(File file) {
+        return this.file == file;
+    }
+
     public Rank getRank() {
         return rank;
     }

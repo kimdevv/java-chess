@@ -30,21 +30,4 @@ class DirectionTest {
 
         assertThat(direction).isEqualTo(inputDirection);
     }
-
-    @ParameterizedTest
-    @CsvSource(value = {
-            "a, 1, a, 2, true",
-            "b, 3, b, 1, true",
-            "a, 3, b, 2, false"})
-    void Direction_Check_up_and_down_with_position(String file1,
-                                                   String rank1,
-                                                   String file2,
-                                                   String rank2,
-                                                   boolean isUpDown) {
-        Position source = new Position(file1, rank1);
-        Position target = new Position(file2, rank2);
-        var result = Direction.isUpDown(source, target);
-
-        assertThat(result).isEqualTo(isUpDown);
-    }
 }

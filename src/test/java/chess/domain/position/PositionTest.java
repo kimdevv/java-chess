@@ -19,9 +19,8 @@ public class PositionTest {
     @Test
     @DisplayName("잘못된 Position을 넘기면 에러가 발생한다.")
     void wrongValueTest() {
-        assertThatThrownBy(() -> {
-            new Position("x", "5");
-        }).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Position("x", "5"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @ParameterizedTest

@@ -20,9 +20,8 @@ public class RankTest {
     @Test
     @DisplayName("1~8이 아닌 숫자로 만들어진 세로는 존재하지 않는다.")
     void Rank_validate_with_range_number() {
-        assertThatThrownBy(() -> {
-            Rank.from("10");
-        }).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Rank.from("10"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -38,9 +37,8 @@ public class RankTest {
     void Rank_Throw_exception_when_move_out_of_board() {
         Rank rank = Rank.TWO;
 
-        assertThatThrownBy(() -> {
-            rank.update(7);
-        }).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> rank.update(7))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

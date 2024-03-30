@@ -1,6 +1,7 @@
 package chess.domain.chesspiece.slidingPiece;
 
 import chess.domain.chesspiece.Piece;
+import chess.domain.chesspiece.Score;
 import chess.domain.chesspiece.Team;
 import chess.domain.position.Direction;
 import chess.domain.position.Position;
@@ -10,12 +11,12 @@ import java.util.List;
 
 public abstract class SlidingPiece extends Piece {
 
-    public SlidingPiece(Team team) {
-        super(team);
+    public SlidingPiece(Team team, Score score) {
+        super(team, score);
     }
 
     @Override
-    public List<Position> findRoute(Position source, Position target, Piece targetPiece) {
+    public List<Position> findRoute(Position source, Position target, boolean isEmpty) {
         List<Position> route = new ArrayList<>();
         validateMovingRule(source, target);
 
@@ -37,5 +38,10 @@ public abstract class SlidingPiece extends Piece {
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    @Override
+    public Score calculateScore(Score score, boolean hasSameFilePawn) {
+        return score.sum(getScore());
     }
 }

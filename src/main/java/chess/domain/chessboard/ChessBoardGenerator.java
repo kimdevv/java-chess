@@ -3,7 +3,6 @@ package chess.domain.chessboard;
 import static chess.domain.chesspiece.Team.BLACK;
 import static chess.domain.chesspiece.Team.WHITE;
 
-import chess.domain.chesspiece.Empty;
 import chess.domain.chesspiece.Knight;
 import chess.domain.chesspiece.Piece;
 import chess.domain.chesspiece.Team;
@@ -16,16 +15,15 @@ import chess.domain.chesspiece.slidingPiece.Rook;
 import chess.domain.position.File;
 import chess.domain.position.Position;
 import chess.domain.position.Rank;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ChessBoardGenerator {
 
     public static Map<Position, Piece> initializeBoard() {
-        Map<Position, Piece> board = new LinkedHashMap<>();
+        Map<Position, Piece> board = new HashMap<>();
         initializeBackRank(board, Rank.EIGHT, BLACK);
         initializeBlackPawnRank(board);
-        initializeEmptyRanks(board);
         initializeWhitePawnRank(board);
         initializeBackRank(board, Rank.ONE, WHITE);
         return board;
@@ -50,15 +48,8 @@ public class ChessBoardGenerator {
         initializeFiles(board, Rank.TWO, new WhitePawn());
     }
 
-    private static void initializeEmptyRanks(Map<Position, Piece> board) {
-        initializeFiles(board, Rank.SIX, new Empty());
-        initializeFiles(board, Rank.FIVE, new Empty());
-        initializeFiles(board, Rank.FOUR, new Empty());
-        initializeFiles(board, Rank.THREE, new Empty());
-    }
-
     private static void initializeFiles(Map<Position, Piece> board, Rank rank, Piece piece) {
-        for(File file : File.values()) {
+        for (File file : File.values()) {
             board.put(new Position(file, rank), piece);
         }
     }

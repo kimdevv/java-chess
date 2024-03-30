@@ -1,6 +1,7 @@
 package chess.domain.chesspiece.pawn;
 
 import chess.domain.chesspiece.Piece;
+import chess.domain.chesspiece.Score;
 import chess.domain.chesspiece.Team;
 import chess.domain.position.Direction;
 import chess.domain.position.Position;
@@ -9,9 +10,11 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class Pawn extends Piece {
+    private static final Score PAWN_MAX_SCORE = new Score(1);
+    private static final Score PAWN_MIN_SCORE = new Score(0.5);
 
     public Pawn(Team team) {
-        super(team);
+        super(team, PAWN_MAX_SCORE);
     }
 
     protected abstract int calculatePawnRankDistance(Position source, Position target);
@@ -19,8 +22,8 @@ public abstract class Pawn extends Piece {
     protected abstract boolean isStartPosition(Position source);
 
     @Override
-    public List<Position> findRoute(Position source, Position target, Piece targetPiece) {
-        if(targetPiece.isEmpty()) {
+    public List<Position> findRoute(Position source, Position target, boolean isEmpty) {
+        if (isEmpty) {
             return findMovingRoute(source, target);
         }
 
@@ -86,5 +89,13 @@ public abstract class Pawn extends Piece {
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    @Override
+    public Score calculateScore(Score score, boolean hasSameFilePawn) {
+        if (hasSameFilePawn) {
+            return score.sum(PAWN_MIN_SCORE);
+        }
+        return score.sum(getScore());
     }
 }

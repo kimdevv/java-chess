@@ -35,11 +35,6 @@ public enum Direction {
         return value.fileDirection == fileDirection && value.rankDirection == rankDirection;
     }
 
-    public static boolean isUpDown(Position source, Position target) {
-        Direction direction = findDirection(source, target);
-        return direction == UP || direction == DOWN;
-    }
-
     public int getFileDirection() {
         return fileDirection;
     }

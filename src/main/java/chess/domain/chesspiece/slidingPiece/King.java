@@ -1,16 +1,14 @@
 package chess.domain.chesspiece.slidingPiece;
 
-import static chess.domain.chesspiece.Role.BLACK_KING;
-import static chess.domain.chesspiece.Role.WHITE_KING;
-
-import chess.domain.chesspiece.Role;
+import chess.domain.chesspiece.Score;
 import chess.domain.chesspiece.Team;
 import chess.domain.position.Position;
 
 public class King extends SlidingPiece {
+    private static final Score KING_SCORE = new Score(0);
 
     public King(Team team) {
-        super(team);
+        super(team, KING_SCORE);
     }
 
     @Override
@@ -23,10 +21,7 @@ public class King extends SlidingPiece {
     }
 
     @Override
-    public Role getRole() {
-        if (getTeam().isWhite()) {
-            return WHITE_KING;
-        }
-        return BLACK_KING;
+    public boolean isKing() {
+        return true;
     }
 }

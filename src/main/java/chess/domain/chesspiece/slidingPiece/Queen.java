@@ -1,16 +1,14 @@
 package chess.domain.chesspiece.slidingPiece;
 
-import static chess.domain.chesspiece.Role.BLACK_QUEEN;
-import static chess.domain.chesspiece.Role.WHITE_QUEEN;
-
-import chess.domain.chesspiece.Role;
+import chess.domain.chesspiece.Score;
 import chess.domain.chesspiece.Team;
 import chess.domain.position.Position;
 
 public class Queen extends SlidingPiece {
+    private static final Score QUEEN_SCORE = new Score(9);
 
     public Queen(Team team) {
-        super(team);
+        super(team, QUEEN_SCORE);
     }
 
     @Override
@@ -21,13 +19,5 @@ public class Queen extends SlidingPiece {
                 && fileDistance != columnDistance) {
             throw new IllegalArgumentException("이동할 수 없습니다.");
         }
-    }
-
-    @Override
-    public Role getRole() {
-        if (getTeam().isWhite()) {
-            return WHITE_QUEEN;
-        }
-        return BLACK_QUEEN;
     }
 }

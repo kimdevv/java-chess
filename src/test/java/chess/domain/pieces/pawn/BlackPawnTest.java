@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import chess.domain.pieces.piece.Color;
 import chess.domain.pieces.piece.Piece;
+import chess.domain.square.File;
 import chess.domain.square.Movement;
+import chess.domain.square.Rank;
 import chess.domain.square.Square;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,16 @@ import org.junit.jupiter.api.Test;
 
 @DisplayName("검은 폰")
 class BlackPawnTest {
+
+    @DisplayName("폰이 맞는지 검증한다")
+    @Test
+    void isPawn() {
+        //given
+        Piece pawn = Pawn.of(Color.BLACK);
+
+        //when & then
+        assertThat(pawn.isPawn()).isTrue();
+    }
 
     @DisplayName("움직일 수 있는 경우")
     @Nested
@@ -29,8 +41,8 @@ class BlackPawnTest {
         @Test
         void canMoveTwoStep() {
             //given
-            Square blackSource = Square.from("a7");
-            Square blackTarget = Square.from("a5");
+            Square blackSource = Square.of(File.A, Rank.SEVEN);
+            Square blackTarget = Square.of(File.A, Rank.FIVE);
             Movement blackMovement = new Movement(blackSource, blackTarget);
 
             //when
@@ -44,8 +56,8 @@ class BlackPawnTest {
         @Test
         void canMoveOneStep() {
             //given
-            Square blackSource = Square.from("a6");
-            Square blackTarget = Square.from("a5");
+            Square blackSource = Square.of(File.A, Rank.SIX);
+            Square blackTarget = Square.of(File.A, Rank.FIVE);
             Movement blackMovement = new Movement(blackSource, blackTarget);
 
             //when
@@ -59,8 +71,8 @@ class BlackPawnTest {
         @Test
         void canAttack() {
             //given
-            Square blackSource = Square.from("d7");
-            Square blackTarget = Square.from("c6");
+            Square blackSource = Square.of(File.D, Rank.SEVEN);
+            Square blackTarget = Square.of(File.C, Rank.SIX);
             Movement blackMovement = new Movement(blackSource, blackTarget);
 
             //when
@@ -86,8 +98,8 @@ class BlackPawnTest {
         @Test
         void canNotMoveTwoStep() {
             //given
-            Square blackSource = Square.from("a5");
-            Square blackTarget = Square.from("a3");
+            Square blackSource = Square.of(File.A, Rank.FIVE);
+            Square blackTarget = Square.of(File.A, Rank.THREE);
             Movement blackMovement = new Movement(blackSource, blackTarget);
 
             //when
@@ -101,8 +113,8 @@ class BlackPawnTest {
         @Test
         void canNotAttack() {
             //given
-            Square blackSource = Square.from("d7");
-            Square blackTarget = Square.from("c6");
+            Square blackSource = Square.of(File.D, Rank.SEVEN);
+            Square blackTarget = Square.of(File.C, Rank.SIX);
             Movement blackMovement = new Movement(blackSource, blackTarget);
 
             //when
@@ -116,15 +128,17 @@ class BlackPawnTest {
         @Test
         void canNotAttackOneStep() {
             //given
-            Square blackSource = Square.from("d7");
-            Square blackTarget = Square.from("d6");
+            Square blackSource = Square.of(File.D, Rank.SEVEN);
+            Square blackTarget = Square.of(File.D, Rank.SIX);
             Movement blackMovement = new Movement(blackSource, blackTarget);
 
             //when
-            boolean blackCanMove = blackPawn.canMove(blackMovement, Pawn.of(Color.WHITE));
+            boolean blackCanMoveToWhite = blackPawn.canMove(blackMovement, Pawn.of(Color.WHITE));
+            boolean blackCanMoveToBlack = blackPawn.canMove(blackMovement, Pawn.of(Color.BLACK));
 
             //then
-            assertThat(blackCanMove).isFalse();
+            assertThat(blackCanMoveToWhite).isFalse();
+            assertThat(blackCanMoveToBlack).isFalse();
         }
     }
 }

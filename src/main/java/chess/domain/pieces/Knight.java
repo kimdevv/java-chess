@@ -2,13 +2,12 @@ package chess.domain.pieces;
 
 import chess.domain.pieces.piece.Color;
 import chess.domain.pieces.piece.Piece;
-import chess.domain.pieces.piece.Type;
 import chess.domain.square.Movement;
 
 public class Knight extends Piece {
 
     public Knight(final Color color) {
-        super(color, Type.KNIGHT);
+        super(color);
     }
 
     @Override

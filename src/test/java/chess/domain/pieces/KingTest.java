@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import chess.domain.pieces.piece.Color;
 import chess.domain.pieces.piece.Piece;
+import chess.domain.square.File;
 import chess.domain.square.Movement;
+import chess.domain.square.Rank;
 import chess.domain.square.Square;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,16 @@ import org.junit.jupiter.api.Test;
 
 @DisplayName("킹")
 class KingTest {
+
+    @DisplayName("킹이 맞는지 검증한다")
+    @Test
+    void isKing() {
+        //given
+        Piece king = new King(Color.WHITE);
+
+        //when & then
+        assertThat(king.isKing()).isTrue();
+    }
 
     @Nested
     @DisplayName("킹이 움직일 수 있는 경우")
@@ -29,8 +41,8 @@ class KingTest {
         @Test
         void canMoveOneSquareUp() {
             //given
-            Square source = Square.from("e1");
-            Square target = Square.from("e2");
+            Square source = Square.of(File.E, Rank.ONE);
+            Square target = Square.of(File.E, Rank.TWO);
 
             //when
             Movement movement = new Movement(source, target);
@@ -43,8 +55,8 @@ class KingTest {
         @Test
         void canMoveOneSquareDown() {
             //given
-            Square source = Square.from("e2");
-            Square target = Square.from("e1");
+            Square source = Square.of(File.E, Rank.TWO);
+            Square target = Square.of(File.E, Rank.ONE);
 
             //when
             Movement movement = new Movement(source, target);
@@ -57,8 +69,8 @@ class KingTest {
         @Test
         void canMoveOneSquareRight() {
             //given
-            Square source = Square.from("e1");
-            Square target = Square.from("f1");
+            Square source = Square.of(File.E, Rank.ONE);
+            Square target = Square.of(File.F, Rank.ONE);
 
             //when
             Movement movement = new Movement(source, target);
@@ -71,8 +83,8 @@ class KingTest {
         @Test
         void canMoveOneSquareLeft() {
             //given
-            Square source = Square.from("f1");
-            Square target = Square.from("e1");
+            Square source = Square.of(File.F, Rank.ONE);
+            Square target = Square.of(File.E, Rank.ONE);
 
             //when
             Movement movement = new Movement(source, target);
@@ -85,8 +97,8 @@ class KingTest {
         @Test
         void canMoveDiagonallyUpLeft() {
             //given
-            Square source = Square.from("e1");
-            Square target = Square.from("d2");
+            Square source = Square.of(File.E, Rank.ONE);
+            Square target = Square.of(File.D, Rank.TWO);
 
             //when
             Movement movement = new Movement(source, target);
@@ -99,8 +111,8 @@ class KingTest {
         @Test
         void canMoveDiagonallyUpRight() {
             //given
-            Square source = Square.from("e1");
-            Square target = Square.from("f2");
+            Square source = Square.of(File.E, Rank.ONE);
+            Square target = Square.of(File.F, Rank.TWO);
 
             //when
             Movement movement = new Movement(source, target);
@@ -113,8 +125,8 @@ class KingTest {
         @Test
         void canMoveDiagonallyDownLeft() {
             //given
-            Square source = Square.from("e2");
-            Square target = Square.from("d1");
+            Square source = Square.of(File.E, Rank.TWO);
+            Square target = Square.of(File.D, Rank.ONE);
 
             //when
             Movement movement = new Movement(source, target);
@@ -127,8 +139,8 @@ class KingTest {
         @Test
         void canMoveDiagonallyDownRight() {
             //given
-            Square source = Square.from("e1");
-            Square target = Square.from("f2");
+            Square source = Square.of(File.E, Rank.ONE);
+            Square target = Square.of(File.F, Rank.TWO);
 
             //when
             Movement movement = new Movement(source, target);
@@ -153,8 +165,8 @@ class KingTest {
         @Test
         void canNotMoveDiagonally() {
             //given
-            Square source = Square.from("e1");
-            Square target = Square.from("c3");
+            Square source = Square.of(File.E, Rank.ONE);
+            Square target = Square.of(File.C, Rank.THREE);
 
             //when
             Movement movement = new Movement(source, target);
@@ -167,8 +179,8 @@ class KingTest {
         @Test
         void canNotMoveTwoSquaresUp() {
             //given
-            Square source = Square.from("e1");
-            Square target = Square.from("e3");
+            Square source = Square.of(File.E, Rank.ONE);
+            Square target = Square.of(File.E, Rank.THREE);
 
             //when
             Movement movement = new Movement(source, target);

@@ -15,7 +15,7 @@ public class Board {
     private static final String ERROR_SAME_SQUARE = "기물의 출발지와 목적지는 달라야 합니다.";
     private static final String ERROR_NOT_EXIST_PIECE = "해당 위치에 기물이 존재하지 않습니다.";
     private static final String ERROR_MOVE_NOT_AVAILABLE = "해당 위치로 기물을 이동할 수 없습니다.";
-    private static final String ERROR_IS_NOT_TURN = "본인 팀의 기물만 이동할 수 있습니다.";
+    private static final String ERROR_IS_NOT_TURN = "본인 진영의 기물만 이동할 수 있습니다.";
 
     private final Map<Square, Piece> pieces;
 
@@ -45,10 +45,6 @@ public class Board {
         }
     }
 
-    private Piece findPieceBySquare(final Square square) {
-        return pieces.get(square);
-    }
-
     private void validateIsNotTurn(final Square source, final PieceColor turn) {
         final Piece sourcePiece = findPieceBySquare(source);
         if (!sourcePiece.isSameColor(turn)) {
@@ -58,22 +54,9 @@ public class Board {
 
     private void validateCannotMove(final Square source, final Square target) {
         final Piece sourcePiece = findPieceBySquare(source);
-        if (findPieceBySquare(source).isPawn()) {
-            if (!canPawnAttack(source, target)) {
-                throw new IllegalArgumentException(ERROR_MOVE_NOT_AVAILABLE);
-            }
-        }
-
-        if (!sourcePiece.canMove(source, target)) {
+        if (!sourcePiece.canMove(this, source, target)) {
             throw new IllegalArgumentException(ERROR_MOVE_NOT_AVAILABLE);
         }
-    }
-
-    private boolean canPawnAttack(final Square source, final Square target) {
-        if (source.isDiagonal(target) && findPieceBySquare(target).isEmpty()) {
-            return false;
-        }
-        return true;
     }
 
     private void validateNotExistObstacleOnPath(final Square source, final Square target) {
@@ -84,7 +67,7 @@ public class Board {
     }
 
     private void checkIsNotEmpty(final Square square) {
-        if (!findPieceBySquare(square).isEmpty()) {
+        if (findPieceBySquare(square).isNotEmpty()) {
             throw new IllegalArgumentException(ERROR_MOVE_NOT_AVAILABLE);
         }
     }
@@ -94,6 +77,11 @@ public class Board {
         pieces.replace(source, new Piece(PieceType.EMPTY, PieceColor.NONE));
         pieces.replace(target, sourcePiece);
     }
+
+    public Piece findPieceBySquare(final Square square) {
+        return pieces.getOrDefault(square, new Piece(PieceType.EMPTY, PieceColor.NONE));
+    }
+
 
     public Map<Square, Piece> getPieces() {
         return Collections.unmodifiableMap(pieces);

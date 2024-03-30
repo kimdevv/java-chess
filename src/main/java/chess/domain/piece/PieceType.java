@@ -1,39 +1,40 @@
 package chess.domain.piece;
 
-import chess.domain.piece.strategy.DiagonalStrategy;
+import chess.domain.board.Board;
+import chess.domain.piece.strategy.BishopMoveStrategy;
 import chess.domain.piece.strategy.EmptyStrategy;
-import chess.domain.piece.strategy.IntersectionStrategy;
+import chess.domain.piece.strategy.KingMoveStrategy;
 import chess.domain.piece.strategy.KnightStrategy;
 import chess.domain.piece.strategy.MoveStrategy;
-import chess.domain.piece.strategy.OnlyForwardStrategy;
-import chess.domain.piece.strategy.PawnAttackStrategy;
-import chess.domain.piece.strategy.StraightStrategy;
-import chess.domain.piece.strategy.UnionStrategy;
-import chess.domain.piece.strategy.WithinOneStepStrategy;
+import chess.domain.piece.strategy.PawnMoveStrategy;
+import chess.domain.piece.strategy.QueenMoveStrategy;
+import chess.domain.piece.strategy.RookMoveStrategy;
 import chess.domain.square.Square;
-
-import java.util.List;
 
 public enum PieceType {
 
-    KING(new IntersectionStrategy(List.of(
-            new UnionStrategy(List.of(new StraightStrategy(), new DiagonalStrategy())),
-            new WithinOneStepStrategy()))),
-    QUEEN(new UnionStrategy(List.of(new StraightStrategy(), new DiagonalStrategy()))),
-    ROOK(new StraightStrategy()),
-    BISHOP(new DiagonalStrategy()),
-    KNIGHT(new KnightStrategy()),
-    PAWN(new UnionStrategy(List.of(new OnlyForwardStrategy(), new PawnAttackStrategy()))),
-    EMPTY(new EmptyStrategy()),
+    KING(new KingMoveStrategy(), 0),
+    QUEEN(new QueenMoveStrategy(), 9),
+    ROOK(new RookMoveStrategy(), 5),
+    BISHOP(new BishopMoveStrategy(), 3),
+    KNIGHT(new KnightStrategy(), 2.5),
+    PAWN(new PawnMoveStrategy(), 1),
+    EMPTY(new EmptyStrategy(), 0),
     ;
 
     private final MoveStrategy moveStrategy;
+    private final double score;
 
-    PieceType(MoveStrategy moveStrategy) {
+    PieceType(MoveStrategy moveStrategy, double score) {
         this.moveStrategy = moveStrategy;
+        this.score = score;
     }
 
-    public boolean canMove(final Square source, final Square target) {
-        return moveStrategy.canMove(source, target);
+    public boolean canMove(final Board board, final Square source, final Square target) {
+        return moveStrategy.canMove(board, source, target);
+    }
+
+    public double getScore() {
+        return score;
     }
 }

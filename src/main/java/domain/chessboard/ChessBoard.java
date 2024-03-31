@@ -1,5 +1,7 @@
-package domain;
+package domain.chessboard;
 
+import domain.ChessVector;
+import domain.Team;
 import domain.piece.*;
 import domain.square.File;
 import domain.square.Rank;
@@ -26,13 +28,12 @@ public class ChessBoard {
     );
     private static final Piece BLACK_PAWN = new Pawn(Team.BLACK);
     private static final Piece WHITE_PAWN = new Pawn(Team.WHITE);
+    private static final int KING_COUNT = 2;
 
     private final Map<Square, Piece> pieceSquares;
-    private Team currentTeam;
 
-    private ChessBoard(final Map<Square, Piece> pieceSquares) {
+    public ChessBoard(final Map<Square, Piece> pieceSquares) {
         this.pieceSquares = pieceSquares;
-        this.currentTeam = Team.WHITE;
     }
 
     public static ChessBoard create() {
@@ -54,14 +55,10 @@ public class ChessBoard {
         final Piece sourcePiece = pieceSquares.get(source);
         pieceSquares.put(target, sourcePiece);
         pieceSquares.remove(source);
-
-        currentTeam = currentTeam.turn();
     }
 
     private void validateMove(final Square source, final Square target) {
-        validateEmptySource(source);
         validateSameSquare(source, target);
-        validateTeam(source);
 
         if (pieceSquares.containsKey(target)) {
             validateAttack(source, target);
@@ -72,22 +69,9 @@ public class ChessBoard {
         validateBlocking(source, target);
     }
 
-    private void validateEmptySource(final Square source) {
-        if (!pieceSquares.containsKey(source)) {
-            throw new IllegalArgumentException("해당 위치에 기물이 없습니다.");
-        }
-    }
-
     private void validateSameSquare(final Square source, final Square target) {
         if (source.equals(target)) {
             throw new IllegalArgumentException("제자리 이동은 불가합니다.");
-        }
-    }
-
-    private void validateTeam(final Square source) {
-        final Piece sourcePiece = pieceSquares.get(source);
-        if (sourcePiece.isOppositeTeam(currentTeam)) {
-            throw new IllegalArgumentException("상대방의 말을 움직일 수 없습니다.");
         }
     }
 
@@ -126,6 +110,19 @@ public class ChessBoard {
                 .limit(pathCount)
                 .filter(square -> !square.equals(target))
                 .anyMatch(pieceSquares::containsKey);
+    }
+
+    public boolean isKingDead() {
+        return pieceSquares.values().stream()
+                .filter(piece -> piece.pieceType() == PieceType.KING)
+                .count() < KING_COUNT;
+    }
+
+    public Piece findPiece(final Square source) {
+        if (!pieceSquares.containsKey(source)) {
+            throw new IllegalArgumentException("해당 위치에 기물이 없습니다.");
+        }
+        return pieceSquares.get(source);
     }
 
     public Map<Square, Piece> getPieceSquares() {

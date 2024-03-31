@@ -1,4 +1,4 @@
-package domain;
+package domain.chessboard;
 
 import domain.piece.Piece;
 import domain.square.File;
@@ -20,16 +20,15 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class ChessBoardTest {
 
-    @DisplayName("Source에 기물이 없으면 움직일 수 없다.")
+    @DisplayName("Source에 기물이 없으면 예외를 발생한다.")
     @Test
     void validateEmptySource() {
         // given
         final ChessBoard chessBoard = ChessBoard.create();
         final Square source = new Square(File.A, Rank.THREE);
-        final Square target = new Square(File.A, Rank.FOUR);
 
         // when & then
-        assertThatThrownBy(() -> chessBoard.move(source, target))
+        assertThatThrownBy(() -> chessBoard.findPiece(source))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 위치에 기물이 없습니다.");
     }
@@ -45,20 +44,6 @@ class ChessBoardTest {
         assertThatThrownBy(() -> chessBoard.move(source, source))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("제자리 이동은 불가합니다.");
-    }
-
-    @DisplayName("White팀이 처음 시작하고 현재 턴인 팀의 기물만 움직일 수 있다.")
-    @Test
-    void validateTeam() {
-        // given
-        final ChessBoard chessBoard = ChessBoard.create();
-        final Square blackPawnSource = new Square(File.A, Rank.SEVEN);
-        final Square target = new Square(File.A, Rank.SIX);
-
-        // when & then
-        assertThatThrownBy(() -> chessBoard.move(blackPawnSource, target))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("상대방의 말을 움직일 수 없습니다.");
     }
 
     @DisplayName("기물에 맞지 않는 움직임으로 이동할 수 없다. 폰은 공격이 아닌경우 대각선으로 이동할 수 없다.")
@@ -122,10 +107,6 @@ class ChessBoardTest {
 
                     assertThat(movedPiece).isEqualTo(whitePawn);
                 }),
-                dynamicTest("이동 후 턴이 변경된다.", () ->
-                        assertThat(chessBoard).extracting("currentTeam")
-                                .isEqualTo(Team.BLACK)
-                ),
                 /*
                 R.BQKBNR  8 (rank 8)
                 PPPPPPPP  7

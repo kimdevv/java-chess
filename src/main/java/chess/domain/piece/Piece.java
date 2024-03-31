@@ -1,6 +1,7 @@
 package chess.domain.piece;
 
 import chess.domain.board.Coordinate;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,8 @@ public interface Piece {
     boolean canMove(Coordinate now, Coordinate destination, Map<Coordinate, Piece> boardInformation);
 
     Piece updateAfterMove();
+
+    BigDecimal score(List<Piece> sameFileAlly);
 
     PieceType getType();
 
@@ -23,4 +26,11 @@ public interface Piece {
     boolean isSameTeam(Piece piece);
 
     boolean isNotSameTeam(Piece piece);
+
+    boolean isSameTeam(Team team);
+
+    boolean isNotSameTeam(Team team);
+
+    boolean isSameType(PieceType type);
+
 }

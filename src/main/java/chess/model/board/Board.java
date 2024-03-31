@@ -2,6 +2,8 @@ package chess.model.board;
 
 import chess.model.piece.Color;
 import chess.model.piece.Empty;
+import chess.model.piece.King;
+import chess.model.piece.Pawn;
 import chess.model.piece.Piece;
 import chess.model.position.Movement;
 import chess.model.position.Position;
@@ -12,9 +14,9 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 public class Board {
-    private static final Color START_COLOR = Color.WHITE;
     public static final int MAX_LENGTH = 8;
     public static final int MIN_LENGTH = 1;
+    private static final Color START_COLOR = Color.WHITE;
     private static final List<Position> ALL_POSITIONS = Position.values();
 
     private final Map<Position, Piece> squares;
@@ -67,17 +69,74 @@ public class Board {
         squares.put(source, Empty.getInstance());
     }
 
+    public Color determineWinner() {
+        if (isKingCaptured()) {
+            return currnetColor.getOpposite();
+        }
+        return Color.NONE;
+    }
+
+    private boolean isKingCaptured() {
+        Piece king = King.from(currnetColor);
+        return squares.values().stream()
+                .noneMatch(piece -> piece.equals(king));
+    }
+
+    public Map<Color, Double> calculateScore() {
+        Map<Color, Double> answer = new HashMap<>();
+        answer.put(Color.WHITE, calculateScore(Color.WHITE));
+        answer.put(Color.BLACK, calculateScore(Color.BLACK));
+        return answer;
+    }
+
+    private double calculateScore(Color color) {
+        Double pieceScore = calculatePieceScore(color);
+        Double reducedPawnScore = calculateReducedPawnScore(color);
+        return pieceScore - reducedPawnScore;
+    }
+
+    private double calculatePieceScore(Color color) {
+        return squares.values().stream()
+                .filter(piece -> piece.hasSameColorAs(color))
+                .mapToDouble(Piece::getScore)
+                .sum();
+    }
+
+    public double calculateReducedPawnScore(Color color) {
+        return IntStream.rangeClosed(MIN_LENGTH, MAX_LENGTH)
+                .mapToDouble(file -> calculateReducedPawnScoreByFile(file, color))
+                .sum();
+    }
+
+    private double calculateReducedPawnScoreByFile(int file, Color color) {
+        long pawnCount = calculatePawnCountInSameFile(file, color);
+        return Pawn.calculateReducedScoreByCount(pawnCount);
+    }
+
+    private long calculatePawnCountInSameFile(int file, Color color) {
+        Piece pawn = Pawn.from(color);
+        return getLineByFile(file).stream()
+                .filter(piece -> piece.equals(pawn))
+                .count();
+    }
+
+    private List<Piece> getLineByFile(int file) {
+        return IntStream.rangeClosed(MIN_LENGTH, MAX_LENGTH)
+                .mapToObj(rank -> squares.get(Position.of(file, rank)))
+                .toList();
+    }
+
     public List<List<Piece>> getLines() {
         List<List<Piece>> lines = new ArrayList<>();
         for (int rank = MAX_LENGTH; rank >= MIN_LENGTH; rank--) {
-            lines.add(getLine(rank));
+            lines.add(getLineByRank(rank));
         }
         return lines;
     }
 
-    private List<Piece> getLine(int lineIndex) {
+    private List<Piece> getLineByRank(int rank) {
         return IntStream.rangeClosed(MIN_LENGTH, MAX_LENGTH)
-                .mapToObj(file -> squares.get(Position.of(file, lineIndex)))
+                .mapToObj(file -> squares.get(Position.of(file, rank)))
                 .toList();
     }
 

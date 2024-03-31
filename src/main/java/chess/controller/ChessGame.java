@@ -4,10 +4,12 @@ import chess.dto.BoardDTO;
 import chess.dto.PositionDTO;
 import chess.model.board.Board;
 import chess.model.board.InitialBoardGenerator;
+import chess.model.piece.Color;
 import chess.model.position.Movement;
 import chess.view.Command;
 import chess.view.InputView;
 import chess.view.OutputView;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class ChessGame {
@@ -40,13 +42,26 @@ public class ChessGame {
     }
 
     private void playTurn(GameStatus gameStatus, Board board) {
-        Command command = inputView.askMoveOrEndCommand();
+        Command command = inputView.askMoveOrStatusOrEndCommand();
         if (command == Command.END) {
             gameStatus.stop();
             return;
         }
+        if (command == Command.STATUS) {
+            showBoardStatus(board);
+            return;
+        }
+        if (command == Command.MOVE) {
+            moveAndShowResult(board, gameStatus);
+            return;
+        }
+        throw new IllegalArgumentException("아직 제공하지 않는 기능입니다.");
+    }
+
+    private void moveAndShowResult(Board board, GameStatus gameStatus) {
         move(board);
         showBoard(board);
+        determineWinner(gameStatus, board);
     }
 
     private void move(Board board) {
@@ -54,6 +69,19 @@ public class ChessGame {
         PositionDTO targetPositionDTO = inputView.askPosition();
         Movement movement = new Movement(sourcePositionDTO.toEntity(), targetPositionDTO.toEntity());
         board.move(movement);
+    }
+
+    private void determineWinner(GameStatus gameStatus, Board board) {
+        Color winner = board.determineWinner();
+        if (winner != Color.NONE) {
+            gameStatus.stop();
+            outputView.printWinner(winner);
+        }
+    }
+
+    private void showBoardStatus(Board board) {
+        Map<Color, Double> boardStatus = board.calculateScore();
+        outputView.printBoardStatus(boardStatus);
     }
 
     private void retryOnException(Runnable action) {

@@ -1,13 +1,14 @@
 package chess.domain.piece.pawn;
 
+import chess.domain.board.Board;
 import chess.domain.color.Color;
 import chess.domain.piece.Direction;
 import chess.domain.piece.Piece;
 import chess.domain.position.Position;
 import chess.domain.position.Positions;
-import chess.domain.strategy.MoveStrategy;
-import chess.domain.strategy.PawnMoveStrategy;
-import java.util.Map;
+import chess.domain.score.Score;
+import chess.domain.state.ChessState;
+import chess.domain.state.PawnChessState;
 import java.util.Set;
 
 public abstract class Pawn extends Piece {
@@ -18,12 +19,19 @@ public abstract class Pawn extends Piece {
         this.directions = directions;
     }
 
-    public abstract boolean isCaptureMove(Positions positions);
+    public final boolean isCaptureMove(Positions positions) {
+        Position from = positions.from();
+        Position to = positions.to();
+        Direction direction = from.findDirectionTo(to);
+        return sameWithCaptureMove(direction);
+    }
+
+    protected abstract boolean sameWithCaptureMove(Direction direction);
 
     public abstract Piece update();
 
     @Override
-    public Set<Position> findPath(Positions positions) {
+    public final Set<Position> findPath(Positions positions) {
         Position from = positions.from();
         Position to = positions.to();
         Set<Position> movable = from.findMovablePositions(directions);
@@ -35,12 +43,17 @@ public abstract class Pawn extends Piece {
     }
 
     @Override
-    public boolean isBlank() {
+    public final boolean isBlank() {
         return false;
     }
 
     @Override
-    public MoveStrategy strategy(Map<Position, Piece> board) {
-        return new PawnMoveStrategy(board);
+    public final ChessState state(Board board) {
+        return new PawnChessState(board);
+    }
+
+    @Override
+    public Score score() {
+        return new Score(1);
     }
 }

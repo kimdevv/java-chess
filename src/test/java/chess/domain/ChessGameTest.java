@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
+import chess.domain.board.BlankBoard;
+import chess.domain.board.Board;
 import chess.domain.color.Color;
-import chess.domain.position.Position;
 import chess.domain.piece.sliding.Rook;
+import chess.domain.position.Position;
 import chess.domain.position.Positions;
 import java.util.Collection;
 import java.util.List;
@@ -20,10 +22,11 @@ class ChessGameTest {
     @TestFactory
     @DisplayName("턴은 번갈아 가며 진행된다.")
     Collection<DynamicTest> changeTurnColor() {
-        ChessGame chessGame = new ChessGame(new BlankBoard().fillWith(Map.of(
+        Board board = new Board(new BlankBoard().fillWith(Map.of(
                 new Position(1, 1), new Rook(Color.WHITE),
                 new Position(8, 8), new Rook(Color.BLACK)
         )));
+        ChessGame chessGame = new ChessGame(board);
 
         return List.of(
                 dynamicTest("첫 턴에 블랙 말을 움직이면 예외가 발생한다.", () -> {

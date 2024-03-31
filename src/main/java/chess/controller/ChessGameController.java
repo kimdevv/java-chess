@@ -1,8 +1,15 @@
 package chess.controller;
 
-import chess.domain.BoardFactory;
+import chess.db.ChessGameDBConnector;
+import chess.domain.board.Board;
+import chess.service.ChessGameService;
+import chess.db.PiecesDaoForMysql;
+import chess.db.TurnsDaoForMysql;
+import chess.domain.board.BoardFactory;
 import chess.domain.ChessGame;
 import chess.domain.position.Positions;
+import chess.domain.score.Scores;
+import chess.dto.Status;
 import chess.view.InputView;
 import chess.view.OutputView;
 import java.util.List;
@@ -10,17 +17,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ChessGameController {
-    private static final String START_COMMAND = "start";
-    private static final String MOVE_COMMAND = "move";
-    private static final String END_COMMAND = "end";
-    private static final Pattern MOVE_COMMAND_PATTERN = Pattern.compile("^" + MOVE_COMMAND + "\\s+(\\w\\d\\s+\\w\\d)$");
+    private static final Pattern MOVE_COMMAND_PATTERN = Pattern.compile(
+            "^" + Command.MOVE.command() + "\\s+(\\w\\d\\s+\\w\\d)$");
 
+    private final ChessGameService chessGameService;
     private final InputView inputView;
     private final OutputView outputView;
 
     public ChessGameController(InputView inputView, OutputView outputView) {
         this.inputView = inputView;
         this.outputView = outputView;
+        ChessGameDBConnector connector = new ChessGameDBConnector();
+        this.chessGameService = new ChessGameService(new PiecesDaoForMysql(connector),
+                new TurnsDaoForMysql(connector));
     }
 
     public void run() {
@@ -32,24 +41,32 @@ public class ChessGameController {
     }
 
     private boolean isNotStartCommand() {
-        String command = inputView.readCommand().trim();
-        return !command.equals(START_COMMAND);
+        String command = inputView.readCommand();
+        return !Command.START.sameWith(command);
     }
 
     private void startChessGame() {
-        ChessGame chessGame = new ChessGame(new BoardFactory().getInitialBoard());
+        ChessGame chessGame = registerChessGame();
         outputView.printBoard(chessGame.collectBoard());
 
         boolean canContinue = true;
         while (canContinue) {
             String command = readGameCommand();
-            tryOneRound(chessGame, command);
-            canContinue = canContinue(command);
+            play(chessGame, command);
+            canContinue = canContinue(chessGame, command);
         }
     }
 
+    private ChessGame registerChessGame() {
+        if (chessGameService.hasPreviousData()) {
+            return chessGameService.getCurrentChessGame();
+        }
+        Board board = new Board(new BoardFactory().getInitialBoard());
+        return new ChessGame(board);
+    }
+
     private String readGameCommand() {
-        String command = inputView.readCommand().trim();
+        String command = inputView.readCommand();
         try {
             validateIllegalGameCommand(command);
         } catch (IllegalArgumentException e) {
@@ -59,15 +76,24 @@ public class ChessGameController {
     }
 
     private void validateIllegalGameCommand(String command) {
-        if (!command.startsWith(MOVE_COMMAND) && !command.equals(END_COMMAND)) {
+        if (!Command.hasCommand(command) && !Command.MOVE.startsWith(command)) {
             throw new IllegalArgumentException("올바른 명령어를 입력해 주세요.");
         }
     }
 
-    private void tryOneRound(ChessGame chessGame, String command) {
-        if (command.startsWith(MOVE_COMMAND)) {
+    private void play(ChessGame chessGame, String command) {
+        if (Command.MOVE.startsWith(command)) {
             movePiece(chessGame, command);
         }
+        if (Command.STATUS.sameWith(command)) {
+            showStatus(chessGame);
+        }
+    }
+
+    private void showStatus(ChessGame chessGame) {
+        Scores scores = chessGame.calculateScores();
+        Status status = Status.of(scores);
+        outputView.printStatus(status);
     }
 
     private void movePiece(ChessGame chessGame, String command) {
@@ -94,7 +120,20 @@ public class ChessGameController {
         throw new IllegalArgumentException("올바른 명령어를 입력해 주세요.");
     }
 
-    private boolean canContinue(String command) {
-        return !command.equals(END_COMMAND);
+    private boolean canContinue(ChessGame chessGame, String command) {
+        if (chessGame.isKingCaptured()) {
+            outputView.printResult(chessGame.findLoser(), chessGame.findWinner());
+            chessGameService.deleteAll();
+            return false;
+        }
+        return isNotEnd(chessGame, command);
+    }
+
+    private boolean isNotEnd(ChessGame chessGame, String command) {
+        if (Command.END.sameWith(command)) {
+            chessGameService.saveGame(chessGame);
+            return false;
+        }
+        return true;
     }
 }

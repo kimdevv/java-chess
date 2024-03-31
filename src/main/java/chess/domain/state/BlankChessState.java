@@ -1,14 +1,12 @@
-package chess.domain.strategy;
+package chess.domain.state;
 
+import chess.domain.board.Board;
 import chess.domain.color.Color;
-import chess.domain.piece.Piece;
-import chess.domain.position.Position;
 import chess.domain.position.Positions;
-import java.util.Map;
 
-public class BlankMoveStrategy extends MoveStrategy {
+public final class BlankChessState extends ChessState {
 
-    public BlankMoveStrategy(Map<Position, Piece> board) {
+    public BlankChessState(Board board) {
         super(board);
     }
 

@@ -1,28 +1,27 @@
-package chess.domain.strategy;
+package chess.domain.state;
 
+import chess.domain.board.Board;
 import chess.domain.color.Color;
 import chess.domain.piece.Piece;
-import chess.domain.position.Position;
-import chess.domain.piece.blank.Blank;
 import chess.domain.piece.pawn.Pawn;
+import chess.domain.position.Position;
 import chess.domain.position.Positions;
-import java.util.Map;
 import java.util.Set;
 
-public class PawnMoveStrategy extends MoveStrategy {
+public final class PawnChessState extends ChessState {
 
-    public PawnMoveStrategy(Map<Position, Piece> board) {
+    public PawnChessState(Board board) {
         super(board);
     }
 
     @Override
     public void move(Color turnColor, Positions positions) {
-        Pawn currentPiece = (Pawn) board.get(positions.from());
+        Pawn currentPiece = (Pawn) board.getPiece(positions.from());
         checkTurnOf(currentPiece, turnColor);
-        Piece destinationPiece = board.get(positions.to());
+        Piece destinationPiece = board.getPiece(positions.to());
         validateMovable(positions, currentPiece);
         validateWithCapture(positions, currentPiece, destinationPiece);
-        updateBoard(positions, currentPiece);
+        board.update(positions, currentPiece.update());
     }
 
     private void validateWithCapture(Positions positions, Pawn currentPiece, Piece destinationPiece) {
@@ -39,10 +38,5 @@ public class PawnMoveStrategy extends MoveStrategy {
         if (isNotAllBlankPath(pathToDestination)) {
             throw new IllegalArgumentException("이동 할 수 없는 위치입니다.");
         }
-    }
-
-    public void updateBoard(Positions positions, Pawn currentPiece) {
-        board.replace(positions.to(), currentPiece.update());
-        board.replace(positions.from(), new Blank());
     }
 }

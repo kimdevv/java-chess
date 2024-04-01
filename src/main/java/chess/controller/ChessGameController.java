@@ -1,38 +1,98 @@
 package chess.controller;
 
+import static chess.utils.Constant.MOVE_COMMAND;
+import static chess.utils.Constant.STATUS_COMMAND;
+
 import chess.domain.board.ChessBoard;
+import chess.domain.board.GameInformation;
+import chess.domain.piece.Color;
+import chess.domain.position.Position;
+import chess.domain.state.End;
 import chess.domain.state.GameState;
 import chess.domain.state.Ready;
+import chess.domain.vo.Score;
 import chess.dto.ChessBoardDto;
+import chess.dto.CurrentResultDto;
+import chess.service.ChessService;
 import chess.view.InputView;
 import chess.view.OutputView;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class ChessGameController {
-    private final InputView inputView = new InputView();
-    private final OutputView outputView = new OutputView();
+    private static final int COMMAND_TYPE_INDEX = 0;
 
-    public void run() {
-        ChessBoard chessBoard = new ChessBoard();
-        GameState gameState = new Ready(chessBoard);
-        outputView.printStartMessage();
+    private final InputView inputView;
+    private final OutputView outputView;
+    private final ChessService chessService;
 
-        playGame(gameState, chessBoard);
+    public ChessGameController(InputView inputView, OutputView outputView, ChessService chessService) {
+        this.inputView = inputView;
+        this.outputView = outputView;
+        this.chessService = chessService;
     }
 
-    private void playGame(GameState gameState, ChessBoard chessBoard) {
+    public void run() {
+        ChessBoard chessBoard = prepareChessBoard();
+        outputView.printStartMessage(chessBoard.getGameName());
+
+        playGame(chessBoard);
+    }
+
+    private void playGame(ChessBoard chessBoard) {
+        GameState gameState = new Ready(chessBoard);
+        GameInformation gameInformation = chessBoard.getGameInformation();
+
         while (!gameState.isEnd()) {
             GameState currentGameState = gameState;
-            gameState = repeatUntilSuccess(() -> playEachTurn(currentGameState));
+            gameState = repeatUntilSuccess(() -> playEachTurn(currentGameState, gameInformation));
 
             printChessBoardInProgress(gameState, chessBoard);
         }
+        handleKingCapture((End) gameState, chessBoard);
     }
 
-    private GameState playEachTurn(GameState gameState) {
+    private ChessBoard prepareChessBoard() {
+        List<GameInformation> gameInfos = chessService.getAllGameInformation();
+        outputView.printGameInformation(gameInfos);
+
+        String gameName = repeatUntilSuccess(inputView::readGameName);
+        return chessService.loadChessBoard(gameInfos, gameName);
+    }
+
+    private void handleKingCapture(End gameState, ChessBoard chessBoard) {
+        if (gameState.isEndByKingCaptured()) {
+            printResultByKingCaptured(chessBoard);
+            chessService.removeFinishedGame(chessBoard);
+        }
+    }
+
+    private void printResultByKingCaptured(ChessBoard chessBoard) {
+        outputView.printChessBoard(new ChessBoardDto(chessBoard));
+        outputView.printResultWithKingCaptured(chessBoard.findWinnerColorByKing());
+    }
+
+    private GameState playEachTurn(GameState gameState, GameInformation gameInformation) {
         List<String> command = inputView.readCommand();
+        if (command.get(COMMAND_TYPE_INDEX).equals(STATUS_COMMAND)) {
+            printCurrentScore(gameState);
+            return gameState;
+        }
+        if (command.get(COMMAND_TYPE_INDEX).equals(MOVE_COMMAND)) {
+            List<Position> sourceAndTarget = gameState.convertToSourceAndTarget(command);
+            GameState updatedGameState = gameState.play(command);
+            chessService.updateChessBoard(sourceAndTarget, gameInformation);
+            return updatedGameState;
+        }
         return gameState.play(command);
+    }
+
+    private void printCurrentScore(GameState gameState) {
+        Score blackScore = gameState.calculateScore(Color.BLACK);
+        Score whiteScore = gameState.calculateScore(Color.WHITE);
+        Color winnerColor = gameState.getWinnerColor();
+        CurrentResultDto currentResultDto = new CurrentResultDto(blackScore, whiteScore, winnerColor);
+        outputView.printEachTeamScore(currentResultDto);
     }
 
     private void printChessBoardInProgress(GameState gameState, ChessBoard chessBoard) {

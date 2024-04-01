@@ -1,0 +1,105 @@
+package chess.dao;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import chess.domain.board.ChessBoard;
+import chess.domain.board.GameInformation;
+import chess.domain.piece.Color;
+import chess.domain.piece.Piece;
+import chess.domain.piece.Rook;
+import chess.domain.position.File;
+import chess.domain.position.Position;
+import chess.domain.position.Rank;
+import chess.dto.ChessGameComponentDto;
+import chess.service.ConnectionGenerator;
+import java.sql.Connection;
+import java.util.List;
+import java.util.NoSuchElementException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+class ChessBoardDaoTest implements DaoTest {
+    private ChessBoardDao chessBoardDao;
+    private Connection connection;
+
+    @BeforeEach
+    void initializeChessGameDao() {
+        chessBoardDao = new ChessBoardDao();
+        ConnectionGenerator testConnectionGenerator = ConnectionGenerator.from(TEST_CONFIGURATION_FILE_NAME);
+        connection = testConnectionGenerator.getConnection();
+    }
+
+    @DisplayName("데이터베이스에서 전체 데이터를 조회한다.")
+    @Test
+    void findAll() {
+        // when
+        List<ChessGameComponentDto> dtos = chessBoardDao.findAll(connection);
+
+        // then
+        assertThat(dtos).hasSize(32);
+    }
+
+    @DisplayName("데이터베이스에서 게임 이름에 해당하는 데이터를 조회한다.")
+    @Test
+    void findByGameName() {
+        // when
+        String gameName = "ella";
+        List<ChessGameComponentDto> dtos = chessBoardDao.findByGameName(gameName, connection);
+
+        // then
+        assertThat(dtos).hasSize(32);
+    }
+
+    @DisplayName("데이터베이스에서 position에 해당되는 piece를 찾아온다.")
+    @Test
+    void findPieceByPosition() {
+        // given
+        String gameName = "ella";
+        Position position = Position.of(File.A, Rank.ONE);
+
+        // when
+        Piece piece = chessBoardDao.findPieceByPosition(position, gameName, connection);
+
+        // then
+        assertAll(
+                () -> assertThat(piece).isInstanceOf(Rook.class),
+                () -> assertThat(piece.getColor()).isEqualTo(Color.WHITE)
+        );
+    }
+
+    @DisplayName("ChessBoard를 데이터베이스에 저장한다.")
+    @Test
+    void saveChessBoard() {
+        // given
+        GameInformation gameInformation = new GameInformation("ash");
+        ChessBoard chessBoard = new ChessBoard(gameInformation);
+
+        // when
+        chessBoardDao.create(chessBoard, connection);
+
+        // then
+        assertThat(chessBoardDao.findAll(connection)).hasSize(64);
+    }
+
+    @DisplayName("piece가 이동하면 데이터베이스에서 해당 정보를 수정한다.")
+    @Test
+    void update() {
+        // given
+        String gameName = "ella";
+        Position source = Position.of(File.A, Rank.ONE);
+        Position target = Position.of(File.B, Rank.FIVE);
+
+        // when
+        chessBoardDao.update(source, target, gameName, connection);
+        Piece targetPiece = chessBoardDao.findPieceByPosition(target, gameName, connection);
+
+        // then
+        assertAll(
+                () -> assertThat(targetPiece).isInstanceOf(Rook.class),
+                () -> assertThatThrownBy(() -> chessBoardDao.findPieceByPosition(source, gameName, connection))
+                        .isInstanceOf(NoSuchElementException.class));
+    }
+}

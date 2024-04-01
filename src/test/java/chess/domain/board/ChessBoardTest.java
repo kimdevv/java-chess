@@ -4,34 +4,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import chess.domain.piece.Color;
 import chess.domain.piece.Knight;
+import chess.domain.piece.Pawn;
 import chess.domain.piece.Piece;
 import chess.domain.position.File;
 import chess.domain.position.Position;
 import chess.domain.position.Rank;
-import java.lang.reflect.Field;
+import chess.domain.vo.Score;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ChessBoardTest {
-    @DisplayName("체스보드가 생성되면 32개의 말이 셋팅된다")
-    @Test
-    void initialBoard() {
-        // when
-        ChessBoard chessBoard = new ChessBoard();
+class ChessBoardTest {
+    private ChessBoard chessBoard;
 
-        // then
-        assertThat(chessBoard).extracting("chessBoard")
-                .satisfies(map -> assertThat((Map<?, ?>) map).hasSize(32));
+    @BeforeEach
+    void setUpChessBoard() {
+        GameInformation gameInformation = new GameInformation("ella", Color.WHITE);
+        chessBoard = new ChessBoard(gameInformation);
     }
 
     @DisplayName("source에 위치한 piece가 움직일 수 있는지 판단한다")
     @Test
-    public void move() throws NoSuchFieldException, IllegalAccessException {
+    void move() {
         // given
-        ChessBoard chessBoard = new ChessBoard();
-
         Position source = Position.of(File.B, Rank.ONE);
         Position target = Position.of(File.C, Rank.THREE);
 
@@ -39,14 +37,11 @@ public class ChessBoardTest {
         chessBoard.move(source, target);
 
         // then
-        Field field = ChessBoard.class.getDeclaredField("chessBoard");
-        field.setAccessible(true);
-        Map<Position, Piece> chessBoardMap = (Map<Position, Piece>) field.get(chessBoard);
-
-        Piece piece = chessBoardMap.get(target);
+        Map<Position, Piece> board = chessBoard.getChessBoard();
+        Piece piece = board.get(target);
 
         assertAll(
-                () -> assertThat(chessBoardMap).containsKey(target),
+                () -> assertThat(board).containsKey(target),
                 () -> assertThat(piece).isInstanceOf(Knight.class)
         );
     }
@@ -55,8 +50,6 @@ public class ChessBoardTest {
     @Test
     void moveInvalidTarget() {
         // given
-        ChessBoard chessBoard = new ChessBoard();
-
         Position source = Position.of(File.B, Rank.ONE);
         Position target = Position.of(File.C, Rank.EIGHT);
 
@@ -69,13 +62,73 @@ public class ChessBoardTest {
     @Test
     void moveInvalidSource() {
         // given
-        ChessBoard chessBoard = new ChessBoard();
-
         Position source = Position.of(File.B, Rank.THREE);
         Position target = Position.of(File.B, Rank.FOUR);
 
         // when, then
         assertThatThrownBy(() -> chessBoard.move(source, target))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("둘 중 왕이 잡힌 팀이 있는지 확인한다")
+    @Test
+    void isKingCaptured() {
+        // given
+        Position blackKingPosition = Position.of(File.E, Rank.EIGHT);
+        chessBoard.getChessBoard().remove(blackKingPosition);
+
+        // when
+        boolean result = chessBoard.isKingCaptured();
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("승리한 팀을 판별한다")
+    @Test
+    void findWinnerByKing() {
+        // given
+        Position blackKingPosition = Position.of(File.E, Rank.EIGHT);
+        chessBoard.getChessBoard().remove(blackKingPosition);
+
+        // when
+        Color result = chessBoard.findWinnerColorByKing();
+
+        // then
+        assertThat(result).isEqualTo(Color.WHITE);
+    }
+
+    @DisplayName("점수를 계산한다")
+    @Test
+    void calculateScore() {
+        // when
+        Score score = chessBoard.calculateScore(Color.BLACK);
+
+        // then
+        assertThat(score).isEqualTo(new Score(38));
+    }
+
+    /*
+     * 체스판 상태
+     * RNBQKBNR  8 (rank 8)
+     * P..PPPPP  7
+     * P.......  6
+     * P.......  5
+     * abcdefgh
+     */
+    @DisplayName("같은 file에 2개 이상의 pawn이 있으면 0.5점으로 계산한다.")
+    @Test
+    void calculatePawnScore() {
+        // given
+        chessBoard.getChessBoard().remove(Position.of(File.B, Rank.SEVEN));
+        chessBoard.getChessBoard().remove(Position.of(File.C, Rank.SEVEN));
+        chessBoard.getChessBoard().put(Position.of(File.A, Rank.SIX), new Pawn(Color.BLACK));
+        chessBoard.getChessBoard().put(Position.of(File.A, Rank.FIVE), new Pawn(Color.BLACK));
+
+        // when
+        Score score = chessBoard.calculateScore(Color.BLACK);
+
+        // then
+        assertThat(score).isEqualTo(new Score(36.5));
     }
 }

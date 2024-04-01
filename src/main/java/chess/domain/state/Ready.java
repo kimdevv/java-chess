@@ -3,6 +3,9 @@ package chess.domain.state;
 import static chess.utils.Constant.START_COMMAND;
 
 import chess.domain.board.ChessBoard;
+import chess.domain.piece.Color;
+import chess.domain.position.Position;
+import chess.domain.vo.Score;
 import java.util.List;
 
 public class Ready implements GameState {
@@ -24,5 +27,20 @@ public class Ready implements GameState {
     @Override
     public boolean isEnd() {
         return false;
+    }
+
+    @Override
+    public Score calculateScore(Color color) {
+        throw new UnsupportedOperationException("시작되지 않은 게임은 점수를 계산할 수 없습니다.");
+    }
+
+    @Override
+    public Color getWinnerColor() {
+        throw new UnsupportedOperationException("시작되지 않은 게임은 승패를 판단할 수 없습니다.");
+    }
+
+    @Override
+    public List<Position> convertToSourceAndTarget(List<String> command) {
+        throw new UnsupportedOperationException("종료된 게임은 이동할 수 없습니다.");
     }
 }

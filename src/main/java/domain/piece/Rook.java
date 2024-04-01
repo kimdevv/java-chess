@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import static domain.piece.CommonMovementDirection.calculateDirection;
 import static domain.piece.PieceType.ROOK;
 
-
 public class Rook extends Piece {
     private static final PieceType PIECE_TYPE = ROOK;
 
@@ -51,5 +50,15 @@ public class Rook extends Piece {
     @Override
     public PieceType pieceType() {
         return PIECE_TYPE;
+    }
+
+    @Override
+    public double score() {
+        return pieceType().score();
+    }
+
+    @Override
+    public boolean matchPieceType(final PieceType target) {
+        return PIECE_TYPE == target;
     }
 }

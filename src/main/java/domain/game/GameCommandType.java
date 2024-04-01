@@ -7,7 +7,10 @@ import java.util.function.Function;
 
 public enum GameCommandType {
     START("start", command -> new Start()),
+    CONTINUE("continue", command -> new Continue()),
+    NEW("new", command -> new New()),
     MOVE("move", GameCommandType::toMove),
+    STATUS("status", command -> new Status()),
     END("end", command -> new End());
 
     private static final int COMMAND_INDEX = 0;

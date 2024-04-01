@@ -4,6 +4,7 @@ import domain.board.Board;
 import domain.board.File;
 import domain.board.Position;
 import domain.board.Rank;
+import domain.board.TestPieceDao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,11 +14,27 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static domain.board.File.C;
+import static domain.board.File.D;
+import static domain.board.File.E;
+import static domain.board.File.F;
+import static domain.board.File.G;
+import static domain.board.Rank.FIVE;
+import static domain.board.Rank.FOUR;
+import static domain.board.Rank.SEVEN;
+import static domain.board.Rank.SIX;
+import static domain.board.Rank.THREE;
+import static domain.board.Rank.TWO;
+import static domain.piece.PawnMovementDirection.DOWN_LEFT;
+import static domain.piece.PawnMovementDirection.DOWN_ONE_STEP;
+import static domain.piece.PawnMovementDirection.DOWN_RIGHT;
+import static domain.piece.PawnMovementDirection.DOWN_TWO_STEP;
+import static domain.piece.PawnMovementDirection.UP_LEFT;
+import static domain.piece.PawnMovementDirection.UP_ONE_STEP;
+import static domain.piece.PawnMovementDirection.UP_RIGHT;
+import static domain.piece.PawnMovementDirection.UP_TWO_STEP;
 import static domain.piece.PieceColor.BLACK;
 import static domain.piece.PieceColor.WHITE;
-import static domain.board.File.*;
-import static domain.piece.PawnMovementDirection.*;
-import static domain.board.Rank.*;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -35,7 +52,7 @@ class PawnTest {
                 position(E, FOUR), new Rook(enemyColor),
                 position(C, FOUR), new Rook(enemyColor)
         );
-        Board board = new Board(piecePositions);
+        Board board = board(piecePositions);
 
         // When & Then
         assertThatCode(() -> pawn.move(source, destination, board))
@@ -62,7 +79,7 @@ class PawnTest {
         // Given
         Pawn pawn = new Pawn(pieceColor);
         Map<Position, Piece> piecePositions = Collections.emptyMap();
-        Board board = new Board(piecePositions);
+        Board board = board(piecePositions);
 
         // When & Then
         assertThatThrownBy(() -> pawn.move(source, destination, board))
@@ -86,7 +103,7 @@ class PawnTest {
         // Given
         Pawn pawn = new Pawn(pieceColor);
         Map<Position, Piece> piecePositions = Collections.emptyMap();
-        Board board = new Board(piecePositions);
+        Board board = board(piecePositions);
 
         // When & Then
         assertThatThrownBy(() -> pawn.move(source, destination, board))
@@ -111,7 +128,7 @@ class PawnTest {
                 position(D, THREE), new Rook(WHITE),
                 position(C, THREE), new Rook(BLACK)
         );
-        Board board = new Board(piecePositions);
+        Board board = board(piecePositions);
 
         // When & Then
         assertThatThrownBy(() -> pawn.move(source, destination, board))
@@ -128,5 +145,9 @@ class PawnTest {
 
     private static Position position(final File file, final Rank rank) {
         return new Position(file, rank);
+    }
+
+    private static Board board(final Map<Position, Piece> piecePositions) {
+        return new Board(new TestPieceDao(), piecePositions);
     }
 }

@@ -2,14 +2,14 @@ package chess.game.state;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import chess.board.Board;
-import chess.board.BoardInitializer;
-import chess.piece.Color;
-import chess.piece.King;
-import chess.piece.Piece;
-import chess.position.File;
-import chess.position.Position;
-import chess.position.Rank;
+import chess.domain.board.Board;
+import chess.domain.board.BoardInitializer;
+import chess.domain.piece.Color;
+import chess.domain.piece.King;
+import chess.domain.piece.Piece;
+import chess.domain.position.File;
+import chess.domain.position.Position;
+import chess.domain.position.Rank;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,7 @@ class WhiteTurnTest {
         Board board = BoardInitializer.createBoard();
         Position source = Position.of(File.A, Rank.TWO);
         Position destination = Position.of(File.A, Rank.FOUR);
-        WhiteTurn whiteTurn = new WhiteTurn();
+        WhiteTurn whiteTurn = WhiteTurn.getInstance();
         // when
         GameState actual = whiteTurn.proceedTurn(board, source, destination);
         // then
@@ -38,14 +38,25 @@ class WhiteTurnTest {
         Map<Position, Piece> pieces = new HashMap<>();
         Position source = Position.of(File.A, Rank.ONE);
         Position destination = Position.of(File.B, Rank.TWO);
-        pieces.put(source, new King(Color.WHITE));
-        pieces.put(destination, new King(Color.BLACK));
+        pieces.put(source, King.getInstance(Color.WHITE));
+        pieces.put(destination, King.getInstance(Color.BLACK));
         Board board = new Board(pieces);
 
-        WhiteTurn whiteTurn = new WhiteTurn();
+        WhiteTurn whiteTurn = WhiteTurn.getInstance();
         // when
         GameState actual = whiteTurn.proceedTurn(board, source, destination);
         // then
         assertThat(actual).isInstanceOf(TerminatedState.class);
+    }
+
+    @Test
+    @DisplayName("일시정지하면 백 일시정지 상태로 전이된다.")
+    void pauseTest() {
+        // given
+        WhiteTurn state = WhiteTurn.getInstance();
+        // when
+        GameState actual = state.pause();
+        // then
+        assertThat(actual).isInstanceOf(WhitePausedState.class);
     }
 }

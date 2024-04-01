@@ -1,13 +1,18 @@
 package chess.game.state;
 
-import chess.board.Board;
-import chess.position.Position;
+import chess.domain.board.Board;
+import chess.domain.position.Position;
 
 public class InitState implements GameState {
 
+    private static final InitState INSTANCE = new InitState();
+
+    private InitState() {
+    }
+
     @Override
     public GameState start() {
-        return new WhiteTurn();
+        return WhiteTurn.getInstance();
     }
 
     @Override
@@ -16,12 +21,21 @@ public class InitState implements GameState {
     }
 
     @Override
+    public GameState pause() {
+        throw new UnsupportedOperationException("게임이 시작되지 않았습니다.");
+    }
+
+    @Override
     public GameState terminate() {
-        return new TerminatedState();
+        return TerminatedState.getInstance();
     }
 
     @Override
     public boolean isPlaying() {
         return false;
+    }
+
+    public static InitState getInstance() {
+        return INSTANCE;
     }
 }

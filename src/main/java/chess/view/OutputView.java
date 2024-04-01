@@ -7,12 +7,20 @@ import java.util.List;
 public class OutputView {
 
     public void printInitMessage() {
-        System.out.println("> 체스 게임을 시작합니다.");
-        System.out.println("> 게임 시작: " + Command.START.getText());
-        System.out.println("> 게임 종료: " + Command.END.getText());
-        System.out.print("> 게임 이동 : " + Command.MOVE.getText() + " source위치 target위치, ");
-        System.out.println("예. " + Command.MOVE.getText() + " b2 b3");
-        System.out.println("> 점수 확인 : " + Command.STATUS.getText());
+        System.out.printf("""
+                        > 체스 게임을 시작합니다.
+                        > 게임 시작을 위해 방 이름을 입력하세요, 방 이름은 알파벳 소문자 10글자까지 가능합니다.
+                        (추가 커맨드)
+                        > 게임 이동 : %s (source) (target), 예: %s b2 b3
+                        > 점수 확인 : %s
+                        > 게임 종료 : %s (진행 상태가 저장됩니다.)
+                        > 방 삭제 : %s (방이 삭제되고 종료됩니다.)
+                        > 방 이름 :\s""",
+                Command.MOVE.getText(),
+                Command.MOVE.getText(),
+                Command.STATUS.getText(),
+                Command.END.getText(),
+                Command.RESET.getText());
     }
 
     public void printBoard(List<RankDisplay> rankDisplays) {

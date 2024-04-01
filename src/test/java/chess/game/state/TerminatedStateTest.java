@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import chess.board.Board;
-import chess.board.BoardInitializer;
-import chess.position.File;
-import chess.position.Position;
-import chess.position.Rank;
+import chess.domain.board.Board;
+import chess.domain.board.BoardInitializer;
+import chess.domain.position.File;
+import chess.domain.position.Position;
+import chess.domain.position.Rank;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class TerminatedStateTest {
         @DisplayName("진행 현황을 올바르게 반환한다.")
         void isPlayingTest() {
             // given
-            TerminatedState terminatedState = new TerminatedState();
+            TerminatedState terminatedState = TerminatedState.getInstance();
             // when
             boolean actual = terminatedState.isPlaying();
             // then
@@ -37,7 +37,7 @@ class TerminatedStateTest {
             Board board = BoardInitializer.createBoard();
             Position source = Position.of(File.A, Rank.TWO);
             Position destination = Position.of(File.A, Rank.FOUR);
-            TerminatedState terminatedState = new TerminatedState();
+            TerminatedState terminatedState = TerminatedState.getInstance();
             // when, then
             assertAll(
                     () -> assertThatThrownBy(terminatedState::start)
@@ -48,6 +48,9 @@ class TerminatedStateTest {
                             .hasMessage("게임이 이미 종료되었습니다."),
                     () -> assertThatThrownBy(terminatedState::terminate)
                             .isInstanceOf(UnsupportedOperationException.class)
+                            .hasMessage("게임이 이미 종료되었습니다."),
+                    () -> assertThatThrownBy(terminatedState::pause)
+                            .isInstanceOf(UnsupportedOperationException.class)
                             .hasMessage("게임이 이미 종료되었습니다.")
             );
         }
@@ -55,9 +58,9 @@ class TerminatedStateTest {
         @Test
         @DisplayName("플레이 중을 검증한다.")
         void validatePlaying() {
-            TerminatedState state = new TerminatedState();
+            TerminatedState state = TerminatedState.getInstance();
             assertThatThrownBy(state::validatePlaying)
-                    .isInstanceOf(UnsupportedOperationException.class)
+                    .isInstanceOf(IllegalStateException.class)
                     .hasMessage("게임이 진행되고 있지 않습니다.");
         }
     }

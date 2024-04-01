@@ -1,100 +1,76 @@
 package chess.game;
 
-import chess.board.Board;
-import chess.board.BoardInitializer;
+import chess.domain.board.Board;
+import chess.domain.board.Square;
+import chess.domain.piece.Color;
+import chess.domain.piece.Piece;
+import chess.domain.position.Position;
+import chess.domain.score.Score;
 import chess.game.state.GameState;
 import chess.game.state.InitState;
-import chess.piece.Color;
-import chess.position.File;
-import chess.position.Position;
-import chess.position.Rank;
-import chess.score.Score;
-import chess.view.Command;
-import chess.view.InputView;
-import chess.view.OutputView;
-import chess.view.PathDto;
-import chess.view.display.BoardDisplayConverter;
-import chess.view.display.RankDisplay;
-import java.util.EnumMap;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ChessGame {
 
-    private final InputView inputView;
-    private final OutputView outputView;
-    private final Map<Command, CommandExecutor> executors;
+    private final Board board;
     private GameState gameState;
 
-    public ChessGame(InputView inputView, OutputView outputView) {
-        this.inputView = inputView;
-        this.outputView = outputView;
-        this.executors = new EnumMap<>(Command.class);
-        this.gameState = new InitState();
+    public ChessGame(Board board) {
+        this(board, InitState.getInstance());
     }
 
-    public void run() {
-        Board board = BoardInitializer.createBoard();
-        BoardDisplayConverter converter = new BoardDisplayConverter();
-        prepareCommandExecutors(board, converter);
-
-        outputView.printInitMessage();
-        executeCommandFromInput();
+    public ChessGame(Board board, GameState gameState) {
+        this.board = board;
+        this.gameState = gameState;
     }
 
-    private void prepareCommandExecutors(Board board, BoardDisplayConverter converter) {
-        executors.put(Command.START, () -> startGame(board, converter));
-        executors.put(Command.MOVE, () -> proceedTurn(board, converter));
-        executors.put(Command.STATUS, () -> showStatus(board));
-        executors.put(Command.END, () -> gameState = gameState.terminate());
-    }
-
-    private void executeCommandFromInput() {
-        Command command = inputView.readCommand();
-        CommandExecutor commandExecutor = executors.get(command);
-        commandExecutor.execute();
-    }
-
-    private void startGame(Board board, BoardDisplayConverter converter) {
-        gameState = gameState.start();
-        printBoard(board, converter);
-        while (gameState.isPlaying()) {
-            executeCommandFromInput();
+    public boolean start() {
+        if (gameState.isPlaying()) {
+            return false;
         }
-        outputView.printEndMessage();
+        gameState = gameState.start();
+        return true;
     }
 
-    private void proceedTurn(Board board, BoardDisplayConverter converter) {
-        PathDto pathDto = inputView.readPosition();
-        Position source = getSourceFrom(pathDto);
-        Position destination = getDestinationFrom(pathDto);
+    public void proceedTurn(Position source, Position destination) {
         gameState = gameState.proceedTurn(board, source, destination);
-        printBoard(board, converter);
     }
 
-    private void showStatus(Board board) {
-        gameState.validatePlaying();
+    public void pause() {
+        gameState = gameState.pause();
+    }
+
+    public void terminate() {
+        gameState = gameState.terminate();
+    }
+
+    public GameScore calculateScore() {
         Score whiteScore = board.calculateScore(Color.WHITE);
         Score blackScore = board.calculateScore(Color.BLACK);
-        outputView.printScore(whiteScore.getScore(), blackScore.getScore());
+        return new GameScore(whiteScore.getScore(), blackScore.getScore());
     }
 
-    private void printBoard(Board board, BoardDisplayConverter converter) {
-        List<RankDisplay> rankDisplays = converter.convert(board.pieces());
-        outputView.printBoard(rankDisplays);
+    public void validatePlaying() {
+        gameState.validatePlaying();
     }
 
-    private Position getSourceFrom(PathDto pathDto) {
-        return Position.of(
-                File.from(pathDto.sourceFileName()),
-                Rank.from(pathDto.sourceRankNumber())
-        );
+    public boolean isPlaying() {
+        return gameState.isPlaying();
     }
 
-    private Position getDestinationFrom(PathDto pathDto) {
-        return Position.of(
-                File.from(pathDto.destinationFileName()),
-                Rank.from(pathDto.destinationRankNumber())
-        );
+    public Map<Position, Piece> getPieces() {
+        Map<Position, Square> pieces = board.pieces();
+        return pieces.keySet()
+                .stream()
+                .collect(
+                        HashMap::new,
+                        (map, position) -> map.put(position, pieces.get(position).getPiece()),
+                        HashMap::putAll
+                );
+    }
+
+    public GameState getGameState() {
+        return gameState;
     }
 }

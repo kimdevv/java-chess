@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 public enum Command {
 
-    START("start"),
     END("end"),
     MOVE("move"),
     STATUS("status"),
+    RESET("reset"),
     ;
 
     private final String text;

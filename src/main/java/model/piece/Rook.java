@@ -1,16 +1,14 @@
 package model.piece;
 
 import java.util.Set;
-import model.Camp;
+import model.game.Camp;
 import model.position.Moving;
 import model.position.Position;
 
 public final class Rook extends Piece {
 
-    private static final String ROOK_NAME = "r";
-
     public Rook(final Camp camp) {
-        super(camp, ROOK_NAME);
+        super(camp, PieceType.ROOK);
     }
 
     @Override

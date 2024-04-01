@@ -1,5 +1,6 @@
-package model;
+package model.game;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,9 +19,10 @@ import model.position.Moving;
 import model.position.Position;
 import model.position.Row;
 
-public class ChessGame {
+public class ChessBoard {
 
     private static final Map<Column, Function<Camp, Piece>> initPosition = new EnumMap<>(Column.class);
+    private static final int ALL_KING_COUNT = 2;
 
     static {
         initPosition.put(Column.A, Rook::new);
@@ -34,29 +36,21 @@ public class ChessGame {
     }
 
     private final Map<Position, Piece> board;
-    private ChessStatus chessStatus;
-    private Camp camp;
 
-    public ChessGame() {
+    public ChessBoard() {
         this.board = new HashMap<>();
-        this.chessStatus = ChessStatus.INIT;
+        setting();
     }
 
-    public void start() {
-        if (chessStatus == ChessStatus.INIT) {
-            chessStatus = ChessStatus.RUNNING;
-            this.camp = Camp.WHITE;
-            setting();
-            return;
-        }
-        throw new IllegalArgumentException("이미 게임이 진행중입니다.");
+    public ChessBoard(Map<Position, Piece> board) {
+        this.board = board;
     }
 
     private void setting() {
-        settingExceptPawn(Camp.BLACK, Row.EIGHTH);
+        settingExceptPawn(Camp.BLACK, Row.EIGHT);
         settingBlackPawn();
         settingWhitePawn();
-        settingExceptPawn(Camp.WHITE, Row.FIRST);
+        settingExceptPawn(Camp.WHITE, Row.ONE);
     }
 
     private void settingExceptPawn(final Camp camp, Row row) {
@@ -67,35 +61,29 @@ public class ChessGame {
 
     private void settingBlackPawn() {
         for (Column column : Column.values()) {
-            board.put(new Position(column, Row.SEVENTH), new BlackPawn());
+            board.put(new Position(column, Row.SEVEN), new BlackPawn());
         }
     }
 
     private void settingWhitePawn() {
         for (Column column : Column.values()) {
-            board.put(new Position(column, Row.SECOND), new WhitePawn());
+            board.put(new Position(column, Row.TWO), new WhitePawn());
         }
     }
 
-    public void move(Moving moving) {
-        if (chessStatus == ChessStatus.RUNNING) {
-            validate(moving);
-
-            Piece piece = board.get(moving.getCurrentPosition());
-            board.put(moving.getNextPosition(), piece);
-            board.remove(moving.getCurrentPosition());
-            camp = camp.toggle();
-            return;
-        }
-        throw new IllegalArgumentException("start를 입력해야 게임이 시작됩니다.");
+    public void move(Moving moving, Camp camp) {
+        validate(moving, camp);
+        Piece source = board.get(moving.getCurrentPosition());
+        board.put(moving.getNextPosition(), source);
+        board.remove(moving.getCurrentPosition());
     }
 
-    private void validate(Moving moving) {
+    private void validate(Moving moving, Camp camp) {
         Position currentPosition = moving.getCurrentPosition();
         validateCurrentPositionIsEmpty(currentPosition);
 
         Piece piece = board.get(currentPosition);
-        validateOtherCamp(piece);
+        validateOtherCamp(piece, camp);
 
         Set<Position> positions = getRoute(moving, piece);
         validateRouteIsContainPiece(positions);
@@ -110,7 +98,7 @@ public class ChessGame {
         }
     }
 
-    private void validateOtherCamp(Piece piece) {
+    private void validateOtherCamp(Piece piece, Camp camp) {
         if (!piece.isSameCamp(camp)) {
             throw new IllegalArgumentException("자신의 기물만 이동 가능합니다.");
         }
@@ -141,19 +129,21 @@ public class ChessGame {
         }
     }
 
-    public void end() {
-        chessStatus = ChessStatus.END;
+    public boolean isKingDie() {
+        return ALL_KING_COUNT > board.values().stream()
+                .filter(Piece::isKing)
+                .count();
     }
 
-    public boolean isNotEnd() {
-        return chessStatus.isNotEnd();
+    public Piece findPiece(Position currentPosition) {
+        return board.get(currentPosition);
+    }
+
+    public boolean isExistPosition(Position nextPosition) {
+        return board.containsKey(nextPosition);
     }
 
     public Map<Position, Piece> getBoard() {
-        return board;
-    }
-
-    public Camp getCamp() {
-        return camp;
+        return Collections.unmodifiableMap(board);
     }
 }

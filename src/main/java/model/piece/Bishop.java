@@ -1,16 +1,14 @@
 package model.piece;
 
 import java.util.Set;
-import model.Camp;
+import model.game.Camp;
 import model.position.Moving;
 import model.position.Position;
 
 public final class Bishop extends Piece {
 
-    private static final String BISHOP_NAME = "b";
-
     public Bishop(final Camp camp) {
-        super(camp, BISHOP_NAME);
+        super(camp, PieceType.BISHOP);
     }
 
     @Override

@@ -1,6 +1,6 @@
-package model.menu;
+package controller.menu;
 
-import model.ChessGame;
+import model.game.ChessGame;
 
 public interface Menu {
 

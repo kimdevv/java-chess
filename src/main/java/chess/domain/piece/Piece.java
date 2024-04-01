@@ -34,4 +34,20 @@ public abstract class Piece {
     public PieceType getPieceType() {
         return pieceType;
     }
+
+    public PieceScore getScore() {
+        return PieceScore.of(pieceType);
+    }
+
+    public boolean isPawn() {
+        return pieceType == PieceType.PAWN;
+    }
+
+    public boolean isKing() {
+        return pieceType == PieceType.KING;
+    }
+
+    public Color getColor() {
+        return color;
+    }
 }

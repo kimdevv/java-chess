@@ -38,9 +38,7 @@ public class Position {
             throw new IllegalArgumentException("이동할 수 없는 경로가 입력되었습니다.");
         }
         for (int i = 0; i < files.size(); i++) {
-            positions.add(new Position(
-                    files.get(i), ranks.get(i)
-            ));
+            positions.add(new Position(files.get(i), ranks.get(i)));
         }
 
         return positions;
@@ -55,6 +53,10 @@ public class Position {
             files.forEach((routeFile) -> positions.add(new Position(routeFile, rank)));
         }
         return positions;
+    }
+
+    public boolean isSameFile(File file) {
+        return this.file == file;
     }
 
     @Override
@@ -73,5 +75,13 @@ public class Position {
     @Override
     public int hashCode() {
         return Objects.hash(file, rank);
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public Rank getRank() {
+        return rank;
     }
 }

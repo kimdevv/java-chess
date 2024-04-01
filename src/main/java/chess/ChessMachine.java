@@ -1,8 +1,11 @@
 package chess;
 
+import chess.dao.SpacesService;
 import chess.domain.chessBoard.ChessBoard;
+import chess.domain.chessBoard.InitialPieceGenerator;
 import chess.domain.chessBoard.OriginalChessSpaceGenerator;
-import chess.domain.chessBoard.PieceGenerator;
+import chess.domain.chessBoard.Score;
+import chess.domain.chessBoard.fixedChessBoardReader;
 import chess.domain.piece.Color;
 import chess.domain.position.Position;
 import chess.view.InputView;
@@ -12,73 +15,86 @@ public class ChessMachine {
 
     private final OutputView outputView;
     private final InputView inputView;
+    private final SpacesService spacesService;
 
-    public ChessMachine(OutputView outputView, InputView inputView) {
+    public ChessMachine(OutputView outputView, InputView inputView, SpacesService spacesService) {
         this.outputView = outputView;
         this.inputView = inputView;
+        this.spacesService = spacesService;
     }
 
     public void run() {
         outputView.printStartGameMessage();
         outputView.printCommandGuideMessage();
 
-        validateFirstCommand();
+        validateFirstCommand(inputView.getCommand());
 
-        ChessBoard chessBoard = new ChessBoard(new OriginalChessSpaceGenerator(new PieceGenerator()));
+        ChessBoard chessBoard = createChessBoard();
         outputView.printChessBoard(chessBoard.getSpaces());
 
-        Color initialTurnColor = Color.WHITE;
-        playChess(chessBoard, initialTurnColor);
+        playChess(chessBoard);
+
+        outputView.printGameEndMessage();
+        validateCommandIsStatus(inputView.getCommand());
+        printGameResult(chessBoard);
     }
 
-    private void validateFirstCommand() {
-        if (inputView.getCommand() != Command.START) {
+    private ChessBoard createChessBoard() {
+        if (spacesService.isExistGame()) {
+            return new ChessBoard(new fixedChessBoardReader(spacesService.loadSpaces()));
+        }
+        return new ChessBoard(new OriginalChessSpaceGenerator(new InitialPieceGenerator()));
+    }
+
+    private void printGameResult(ChessBoard chessBoard) {
+        Score whiteScore = chessBoard.calculateScore(Color.WHITE);
+        Score blackScore = chessBoard.calculateScore(Color.BLACK);
+        outputView.printGameResultScore(whiteScore, blackScore);
+        outputView.printWinner(chessBoard.getWinner());
+    }
+
+    private void validateFirstCommand(Command command) {
+        if (command != Command.START) {
             throw new IllegalArgumentException("게임을 먼저 시작해야합니다.");
         }
     }
 
-    private void playChess(ChessBoard chessBoard, Color turnColor) {
-        Command command = inputView.getCommand();
-        while (command != Command.END) {
-            validateCommandIsMove(command);
-            turnColor = consumeTurn(chessBoard, turnColor);
-
-            outputView.printChessBoard(chessBoard.getSpaces());
-
-            command = inputView.getCommand();
+    private void validateCommandIsStatus(Command command) {
+        if (command != Command.STATUS) {
+            throw new IllegalArgumentException("올바르지 않은 명령어입니다.");
         }
     }
 
-    private Color consumeTurn(ChessBoard chessBoard, Color turnColor) {
+    private void playChess(ChessBoard chessBoard) {
+        Command command;
+        while (chessBoard.isAllKingAlive() && (command = inputView.getCommand()) != Command.END) {
+            validateCommandIsMoveOrStatus(command);
+            proceedCommand(command, chessBoard);
+        }
+        spacesService.deleteAll();
+    }
+
+    private void validateCommandIsMoveOrStatus(Command command) {
+        if (command != Command.MOVE && command != Command.STATUS) {
+            throw new IllegalArgumentException("게임 진행중일 때, 사용가능한 명령어가 아닙니다.");
+        }
+    }
+
+    private void proceedCommand(Command command, ChessBoard chessBoard) {
+        if (command == Command.MOVE) {
+            tryMove(chessBoard);
+            outputView.printChessBoard(chessBoard.getSpaces());
+        }
+        if (command == Command.STATUS) {
+            printGameResult(chessBoard);
+        }
+    }
+
+    private void tryMove(ChessBoard chessBoard) {
         Position from = inputView.getMovePosition();
         Position to = inputView.getMovePosition();
-
-        if(isRightTurn(chessBoard, turnColor, from)){
-            chessBoard.move(from, to);
-            return nextTurnColor(turnColor);
-        }
-        return turnColor;
-    }
-
-    private boolean isRightTurn(ChessBoard chessBoard, Color turnColor, Position from) {
-        if(chessBoard.isSameColor(from, turnColor)){
-            return true;
-        }
-        outputView.printWrongTurn();
-        return false;
-    }
-
-    private Color nextTurnColor(Color turnColor) {
-        if(turnColor==Color.WHITE){
-            return Color.BLACK;
-        }
-        return Color.WHITE;
-    }
-
-    private void validateCommandIsMove(Command command) {
-        if (command != Command.MOVE) {
-            throw new IllegalArgumentException("잘못된 명령어 입니다.");
-        }
+        chessBoard.move(from, to);
+        spacesService.saveChessBoard(chessBoard.getSpaces());
     }
 }
 

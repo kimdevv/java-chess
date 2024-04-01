@@ -1,5 +1,6 @@
 package chess.view;
 
+import chess.domain.chessBoard.Score;
 import chess.domain.chessBoard.Space;
 import chess.domain.piece.Color;
 import chess.domain.piece.Piece;
@@ -66,7 +67,24 @@ public class OutputView {
         return sign;
     }
 
-    public void printWrongTurn() {
-        System.out.println("상대방의 말은 움직일 수 없습니다.");
+    public void printGameEndMessage() {
+        System.out.println("> 게임이 종료되었습니다\n"
+                + "> 게임 결과 : status");
+    }
+
+    public void printGameResultScore(Score whiteScore, Score blackScore) {
+        System.out.println("> 흰색 점수 : " + whiteScore.getScore());
+        System.out.println("> 검은색 점수 : " + blackScore.getScore());
+    }
+
+    public void printWinner(Color color) {
+        String winner = "무승부";
+        if (color == Color.BLACK) {
+            winner = "흰색승리";
+        }
+        if (color == Color.WHITE) {
+            winner = "검은색승리";
+        }
+        System.out.println(winner);
     }
 }

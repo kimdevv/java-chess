@@ -52,7 +52,7 @@ public enum File {
         try {
             return files[leftOrdinal];
         } catch (ArrayIndexOutOfBoundsException exception) {
-            throw new IllegalStateException("해당 칸의 왼쪽 칸이 존재하지 않습니다.");
+            throw new IllegalStateException("현재(%s) 칸에서 왼쪽으로 %s만큼 가면 칸이 존재하지 않습니다.".formatted(this.name(), step));
         }
     }
 
@@ -66,7 +66,7 @@ public enum File {
         try {
             return files[rightOrdinal];
         } catch (ArrayIndexOutOfBoundsException exception) {
-            throw new IllegalStateException("해당 칸의 오른쪽 칸이 존재하지 않습니다.");
+            throw new IllegalStateException("현재(%s) 칸에서 오른쪽으로 %s만큼 가면 칸이 존재하지 않습니다.".formatted(this.name(), step));
         }
     }
 

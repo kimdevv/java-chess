@@ -15,34 +15,43 @@ import static chess.domain.attribute.Rank.ONE;
 import static chess.domain.attribute.Rank.SEVEN;
 import static chess.domain.attribute.Rank.TWO;
 
+import chess.domain.attribute.Color;
 import chess.domain.attribute.File;
+import chess.domain.attribute.Score;
 import chess.domain.attribute.Square;
 import chess.domain.piece.Bishop;
 import chess.domain.piece.BlackPawn;
 import chess.domain.piece.King;
 import chess.domain.piece.Knight;
 import chess.domain.piece.Piece;
+import chess.domain.piece.PieceType;
 import chess.domain.piece.Queen;
 import chess.domain.piece.Rook;
 import chess.domain.piece.WhitePawn;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Chessboard {
 
+    private static final int INITIAL_KING_COUNT = 2;
     private final Map<Square, Piece> chessboard;
 
     private Chessboard(final Map<Square, Piece> chessboard) {
         this.chessboard = chessboard;
     }
 
+    protected static Chessboard createChessBoard(Map<Square, Piece> map) {
+        return new Chessboard(new HashMap<>(map));
+    }
 
     public static Chessboard createChessBoard() {
         Map<Square, Piece> chessboard = new HashMap<>();
         Set<Piece> pieces = new HashSet<>();
-        pieces.addAll(creatWhitePieces());
+        pieces.addAll(createWhitePieces());
         pieces.addAll(createBlackPieces());
         for (Piece piece : pieces) {
             chessboard.put(piece.currentSquare(), piece);
@@ -50,7 +59,15 @@ public class Chessboard {
         return new Chessboard(chessboard);
     }
 
-    private static Set<Piece> creatWhitePieces() {
+    public static Chessboard of(List<Piece> pieces) {
+        Map<Square, Piece> chessboard = new HashMap<>();
+        for (Piece piece : pieces) {
+            chessboard.put(piece.currentSquare(), piece);
+        }
+        return new Chessboard(chessboard);
+    }
+
+    private static Set<Piece> createWhitePieces() {
         Set<Piece> pieces = new HashSet<>();
         pieces.add(new King(WHITE, Square.of(E, ONE)));
         pieces.add(new Queen(WHITE, Square.of(D, ONE)));
@@ -99,7 +116,7 @@ public class Chessboard {
 
     private void validateSourceSquareOccupied(final Square square) {
         if (isBlank(square)) {
-            throw new IllegalArgumentException("기물이 존재하지 않습니다.");
+            throw new IllegalArgumentException("%s칸에 기물이 존재하지 않습니다.".formatted(square));
         }
     }
 
@@ -108,11 +125,94 @@ public class Chessboard {
         chessboard.remove(source);
     }
 
+    public boolean catchKing() {
+        long count = chessboard.values().stream()
+                .filter(piece -> piece.isTypeOf(PieceType.KING))
+                .count();
+        return count != INITIAL_KING_COUNT;
+    }
+
+    public Score totalScoreOf(Color color) {
+        Set<Piece> sameColorPieces = findSameAllyPieces(color);
+        Score exceptPawnScore = calculateTotalScoreExceptPawn(sameColorPieces);
+        Set<Piece> pawns = filterNotPawns(sameColorPieces);
+        return exceptPawnScore.add(pawns.stream()
+                .mapToDouble(pawn -> calculatePawnScore(pawn, pawns).getValue())
+                .sum());
+    }
+
+    private Score calculatePawnScore(Piece pawn, Set<Piece> pawns) {
+        if (hasSameFileIn(pawns, pawn.getLocatedFile())) {
+            return new Score(0.5);
+        }
+        return new Score(1.0);
+    }
+
+    private Set<Piece> filterNotPawns(Set<Piece> sameColorPieces) {
+        return sameColorPieces.stream()
+                .filter(piece -> piece.isTypeOf(PieceType.PAWN))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Piece> findSameAllyPieces(Color color) {
+        return chessboard.values().stream()
+                .filter(piece -> piece.isAllyOf(color))
+                .collect(Collectors.toSet());
+    }
+
+    private Score calculateTotalScoreExceptPawn(Set<Piece> sameColorPieces) {
+        return new Score(sameColorPieces.stream()
+                .filter(piece -> piece.isNotTypeOf(PieceType.PAWN))
+                .mapToDouble(piece -> piece.getScore().getValue())
+                .sum());
+    }
+
+    private boolean hasSameFileIn(Set<Piece> pawns, File file) {
+        long count = pawns.stream()
+                .filter(pawn -> pawn.locateSameFile(file))
+                .count();
+        return count > 1;
+    }
+
+
     private boolean isBlank(final Square square) {
         return !chessboard.containsKey(square);
     }
 
     public Map<Square, Piece> getChessboard() {
         return Map.copyOf(chessboard);
+    }
+
+    public GameResult findWinner() {
+        if (notExistKingOf(WHITE)) {
+            return GameResult.BLACK_WIN;
+        }
+
+        if (notExistKingOf(BLACK)) {
+            return GameResult.WHITE_WIN;
+        }
+        return findResultByScore();
+    }
+
+    private boolean notExistKingOf(Color color) {
+        Set<Piece> pieces = findSameAllyPieces(color);
+        return pieces.stream()
+                .noneMatch(piece -> piece.isTypeOf(PieceType.KING));
+    }
+
+    private GameResult findResultByScore() {
+        Score whiteScore = totalScoreOf(WHITE);
+        Score blackScore = totalScoreOf(BLACK);
+        if (whiteScore.isHigherThan(blackScore)) {
+            return GameResult.WHITE_WIN;
+        }
+        if (whiteScore.isLowerThan(blackScore)) {
+            return GameResult.BLACK_WIN;
+        }
+        return GameResult.DRAW;
+    }
+
+    public void deleteAllPieces() {
+        chessboard.clear();
     }
 }

@@ -2,7 +2,10 @@ package chess.view;
 
 import static chess.view.command.Command.END;
 
+import chess.domain.attribute.Color;
+import chess.domain.attribute.Score;
 import chess.view.dto.ChessboardDto;
+import chess.view.dto.GameResultDto;
 import java.util.List;
 
 public class ResultView {
@@ -21,6 +24,15 @@ public class ResultView {
     public void printBoard(final ChessboardDto chessboardDto) {
         List<List<String>> chessboard = chessboardDto.getChessboard();
         chessboard.forEach(squares -> System.out.println(String.join("", squares)));
+        System.out.println();
+    }
+
+    public void printStatus(Color color, Score score) {
+        System.out.println("%s 점수 : %s".formatted(color, score.getValue()));
+    }
+
+    public void printWinner(GameResultDto gameResultDto) {
+        System.out.println(gameResultDto.output());
         System.out.println();
     }
 }

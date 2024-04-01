@@ -48,7 +48,7 @@ public enum Rank {
         try {
             return files[upOrdinal];
         } catch (ArrayIndexOutOfBoundsException exception) {
-            throw new IllegalStateException("해당 칸의 위칸이 존재하지 않습니다.");
+            throw new IllegalStateException("현재 칸(%s)에서 %s만큼 올라가면 칸이 존재하지 않습니다.".formatted(this.name(), step));
         }
     }
 
@@ -63,7 +63,7 @@ public enum Rank {
         try {
             return files[downOrdinal];
         } catch (ArrayIndexOutOfBoundsException exception) {
-            throw new IllegalStateException("해당 칸의 아래칸이 존재하지 않습니다.");
+            throw new IllegalStateException("현재 칸(%s)에서 %s만큼 내려가면 칸이 존재하지 않습니다.".formatted(this.name(), step));
         }
     }
 
@@ -91,6 +91,10 @@ public enum Rank {
             return false;
         }
         return true;
+    }
+
+    public String getValue() {
+        return String.valueOf(value);
     }
 
     public boolean isRankSeven() {

@@ -28,7 +28,8 @@ public abstract class Pawn extends Piece {
         }
     }
 
-    private Square addToMovableSquares(Set<Piece> existPieces, Square currentSquare, Set<Square> squares, Movement movement) {
+    private Square addToMovableSquares(Set<Piece> existPieces, Square currentSquare, Set<Square> squares,
+                                       Movement movement) {
         for (int i = 0; i < 2 && currentSquare.canMove(movement); i++) {
             currentSquare = currentSquare.move(movement);
             if (isOccupied(existPieces, currentSquare)) {
@@ -62,7 +63,7 @@ public abstract class Pawn extends Piece {
         return entirePieces.stream()
                 .filter(piece -> piece.currentSquare() == currentSquare)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 위치에 기물이 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("%s칸에 기물이 없습니다.".formatted(currentSquare)));
     }
 
     protected boolean isOccupied(Set<Piece> entirePieces, Square currentSquare) {

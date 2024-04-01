@@ -11,14 +11,14 @@ public enum Movement {
     RIGHT_DOWN(1, -1),
     UP_UP(0, 2),
     DOWN_DOWN(0, -2),
-    UP_UP_LEFT(LEFT_DOWN.x, UP_UP.y),
-    UP_UP_RIGHT(RIGHT_DOWN.x, UP_UP.y),
-    LEFT_LEFT_UP(LEFT.x * 2, UP.y),
-    LEFT_LEFT_DOWN(LEFT.x * 2, DOWN.y),
-    RIGHT_RIGHT_UP(RIGHT.x * 2, UP.y),
-    RIGHT_RIGHT_DOWN(RIGHT.x * 2, DOWN.y),
-    DOWN_DOWN_LEFT(LEFT_DOWN.x, DOWN_DOWN.y),
-    DOWN_DOWN_RIGHT(RIGHT_DOWN.x, DOWN_DOWN.y),
+    UP_UP_LEFT(-1, 2),
+    UP_UP_RIGHT(1, 2),
+    LEFT_LEFT_UP(-2, 1),
+    LEFT_LEFT_DOWN(-2, -1),
+    RIGHT_RIGHT_UP(2, 1),
+    RIGHT_RIGHT_DOWN(2, -1),
+    DOWN_DOWN_LEFT(-1, -2),
+    DOWN_DOWN_RIGHT(1, -2),
     ;
 
     private final int x;

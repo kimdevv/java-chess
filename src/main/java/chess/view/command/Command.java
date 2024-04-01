@@ -7,7 +7,8 @@ public enum Command {
 
     START("start", Pattern.compile("start")),
     MOVE("move", Pattern.compile("^move [a-h][1-8] [a-h][1-8]$")),
-    END("end", Pattern.compile("end"));
+    END("end", Pattern.compile("end")),
+    STATUS("status", Pattern.compile("status"));
 
     private final String message;
     private final Pattern pattern;
@@ -35,6 +36,10 @@ public enum Command {
 
     public static boolean isMove(final String input) {
         return MOVE.pattern.matcher(input).matches();
+    }
+
+    public static boolean isStatus(final String input) {
+        return STATUS.pattern.matcher(input).matches();
     }
 
     public String getMessage() {

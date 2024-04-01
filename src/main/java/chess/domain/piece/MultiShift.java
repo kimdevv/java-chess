@@ -33,11 +33,11 @@ public abstract class MultiShift extends Piece {
         }
     }
 
-    private Piece getPiece(Set<Piece> entirePieces, Square existPieces) {
+    private Piece getPiece(Set<Piece> entirePieces, Square existPieceSquare) {
         return entirePieces.stream()
-                .filter(piece -> piece.currentSquare() == existPieces)
+                .filter(piece -> piece.currentSquare() == existPieceSquare)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 위치에 기물이 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("%s 칸에 기물이 없습니다.".formatted(existPieceSquare)));
     }
 
     private boolean isOccupied(Set<Piece> entirePieces, Square currentSquare) {

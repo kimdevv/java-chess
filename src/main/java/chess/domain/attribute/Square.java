@@ -64,6 +64,14 @@ public class Square {
         return true;
     }
 
+    public boolean isSameFile(File file) {
+        return this.file == file;
+    }
+
+    public boolean isSameRank(Rank rank) {
+        return this.rank == rank;
+    }
+
     public Square move(Movement movement) {
         return moveHorizontal(movement.getX()).moveVertical(movement.getY());
     }
@@ -88,100 +96,100 @@ public class Square {
         return this;
     }
 
+    public Square moveUp() {
+        return moveUp(1);
+    }
+
     public Square moveUp(int step) {
         return Square.of(file, rank.up(Math.abs(step)));
     }
 
-    public Square moveUp() {
-        return Square.of(file, rank.up());
+    public Square moveDown() {
+        return moveDown(1);
     }
 
     public Square moveDown(int step) {
         return Square.of(file, rank.down(Math.abs(step)));
     }
 
-    public Square moveDown() {
-        return Square.of(file, rank.down());
+    public Square moveLeft() {
+        return moveLeft(1);
     }
 
     public Square moveLeft(int step) {
         return Square.of(file.left(Math.abs(step)), rank);
     }
 
-    public Square moveLeft() {
-        return Square.of(file.left(), rank);
+    public Square moveRight() {
+        return moveRight(1);
     }
 
     public Square moveRight(int step) {
         return Square.of(file.right(Math.abs(step)), rank);
     }
 
-    public Square moveRight() {
-        return Square.of(file.right(), rank);
+    public Square moveLeftUp() {
+        return moveLeftUp(1);
     }
 
     public Square moveLeftUp(int step) {
         return Square.of(file.left(Math.abs(step)), rank.up());
     }
 
-    public Square moveLeftUp() {
-        return Square.of(file.left(), rank.up());
+    public Square moveLeftDown() {
+        return moveLeftDown(1);
     }
 
     public Square moveLeftDown(int step) {
         return Square.of(file.left(Math.abs(step)), rank.down());
     }
 
-    public Square moveLeftDown() {
-        return Square.of(file.left(), rank.down());
+    public Square moveRightUp() {
+        return moveRightUp(1);
     }
 
     public Square moveRightUp(int step) {
         return Square.of(file.right(Math.abs(step)), rank.up());
     }
 
-    public Square moveRightUp() {
-        return Square.of(file.right(), rank.up());
+    public Square moveRightDown() {
+        return moveRightDown(1);
     }
 
     public Square moveRightDown(int step) {
         return Square.of(file.right(Math.abs(step)), rank.down());
     }
 
-    public Square moveRightDown() {
-        return Square.of(file.right(), rank.down());
+    public boolean canMoveUp() {
+        return canMoveUp(1);
     }
 
     public boolean canMoveUp(int step) {
         return rank.canMoveUp(Math.abs(step));
     }
 
-    public boolean canMoveUp() {
-        return rank.canMoveUp();
+    public boolean canMoveDown() {
+        return canMoveDown(1);
     }
 
     public boolean canMoveDown(int step) {
         return rank.canMoveDown(Math.abs(step));
     }
 
-    public boolean canMoveDown() {
-        return rank.canMoveDown();
+    public boolean canMoveLeft() {
+        return canMoveLeft(1);
     }
 
     public boolean canMoveLeft(int step) {
         return file.canMoveLeft(Math.abs(step));
     }
 
-    public boolean canMoveLeft() {
-        return file.canMoveLeft();
+    public boolean canMoveRight() {
+        return canMoveRight(1);
     }
 
     public boolean canMoveRight(int step) {
         return file.canMoveRight(Math.abs(step));
-    }
-
-    public boolean canMoveRight() {
-        return file.canMoveRight();
     }
 
     public boolean canMoveLeftUp() {
@@ -205,6 +213,14 @@ public class Square {
             return rank.isRankTwo();
         }
         return rank.isRankSeven();
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public Rank getRank() {
+        return rank;
     }
 
     @Override

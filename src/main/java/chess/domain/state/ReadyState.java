@@ -4,10 +4,14 @@ import chess.domain.Board;
 import chess.domain.position.Position;
 
 public class ReadyState implements GameState {
+    private static final ReadyState INSTANCE = new ReadyState();
+
+    private ReadyState() {
+    }
 
     @Override
     public GameState start() {
-        return new WhiteState();
+        return WhiteState.getInstance();
     }
 
     @Override
@@ -17,11 +21,20 @@ public class ReadyState implements GameState {
 
     @Override
     public GameState end() {
-        return new EndState();
+        return EndState.getInstance();
+    }
+
+    @Override
+    public GameState status() {
+        throw new UnsupportedOperationException("준비 상태에서는 점수를 계산할 수 없습니다.");
     }
 
     @Override
     public boolean isPlaying() {
         return true;
+    }
+
+    public static ReadyState getInstance() {
+        return ReadyState.INSTANCE;
     }
 }

@@ -9,14 +9,14 @@ import java.util.Set;
 
 public abstract class MultiStepPiece extends Piece {
 
-    protected MultiStepPiece(Color color, PieceType pieceType, Set<Direction> directions) {
-        super(color, pieceType, directions);
+    protected MultiStepPiece(Color color) {
+        super(color);
     }
 
     @Override
     public Set<Position> calculateMovablePositions(Position currentPosition, Board board) {
         Set<Position> movablePositions = new HashSet<>();
-        directions.forEach(direction -> addMoves(board, direction, currentPosition, movablePositions));
+        getDirections().forEach(direction -> addMoves(board, direction, currentPosition, movablePositions));
 
         return movablePositions;
     }

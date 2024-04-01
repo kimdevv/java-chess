@@ -4,6 +4,10 @@ import chess.domain.Board;
 import chess.domain.position.Position;
 
 public class EndState implements GameState {
+    private static final EndState INSTANCE = new EndState();
+
+    private EndState() {
+    }
 
     @Override
     public GameState start() {
@@ -21,7 +25,16 @@ public class EndState implements GameState {
     }
 
     @Override
+    public GameState status() {
+        throw new UnsupportedOperationException("종료 상태에서는 점수를 계산할 수 없습니다.");
+    }
+
+    @Override
     public boolean isPlaying() {
         return false;
+    }
+
+    public static EndState getInstance() {
+        return EndState.INSTANCE;
     }
 }

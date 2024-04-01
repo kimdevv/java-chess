@@ -1,9 +1,12 @@
 package chess.view;
 
 import chess.domain.Board;
+import chess.domain.ChessGameResult;
+import chess.domain.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class OutputView {
     private static final String NEW_LINE = System.lineSeparator();
@@ -52,5 +55,17 @@ public class OutputView {
             String pieceDisplay = PieceConverter.convert(piece);
             boardDisplays.get(MAX_ROW - rank - 1).set(file, pieceDisplay);
         });
+    }
+
+    public static void printChessGameScore(ChessGameResult chessGameResult) {
+        Map<Color, Double> result = chessGameResult.getResult();
+
+        result.forEach((key, value) -> System.out.printf("%s : %.1f점%s", key.name(), value, NEW_LINE));
+
+        Color winnerColor = chessGameResult.getWinner();
+        if (winnerColor.isSame(Color.NONE)) {
+            return;
+        }
+        System.out.printf("%s 승리%s", winnerColor.name(), NEW_LINE);
     }
 }

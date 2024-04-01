@@ -5,8 +5,9 @@ import java.util.List;
 
 public enum GameCommand {
     START("start", 1),
+    MOVE("move", 3),
     END("end", 1),
-    MOVE("move", 3);
+    STATUS("status", 1);
 
     private static final int COMMAND_INDEX = 0;
 
@@ -20,7 +21,8 @@ public enum GameCommand {
 
     public static GameCommand from(List<String> inputCommand) {
         return Arrays.stream(values())
-                .filter(gameCommand -> isSameCommand(inputCommand, gameCommand) && isSameArgsCount(inputCommand, gameCommand))
+                .filter(gameCommand -> isSameCommand(inputCommand, gameCommand) && isSameArgsCount(inputCommand,
+                        gameCommand))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게임 명령어입니다."));
     }

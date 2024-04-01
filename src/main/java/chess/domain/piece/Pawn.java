@@ -8,27 +8,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Pawn extends Piece {
+    public static final Pawn WHITE_PAWN = new Pawn(Color.WHITE);
+    public static final Pawn BLACK_PAWN = new Pawn(Color.BLACK);
     private static final int DEFAULT_WHITE_RANK = 2;
     private static final int DEFAULT_BLACK_RANK = 7;
 
-    private Pawn(Color color, Set<Direction> directions) {
-        super(color, PieceType.PAWN, directions);
-    }
-
-    public static Pawn ofBlack() {
-        Set<Direction> directions = Direction.BLACK_PAWN;
-        return new Pawn(Color.BLACK, directions);
-    }
-
-    public static Pawn ofWhite() {
-        Set<Direction> directions = Direction.WHITE_PAWN;
-        return new Pawn(Color.WHITE, directions);
+    private Pawn(Color color) {
+        super(color);
     }
 
     @Override
     public Set<Position> calculateMovablePositions(Position currentPosition, Board board) {
         Set<Position> movablePositions = new HashSet<>();
-        directions.forEach(direction -> {
+        getDirections().forEach(direction -> {
             if (!currentPosition.canMoveNext(direction)) {
                 return;
             }
@@ -81,5 +73,33 @@ public class Pawn extends Piece {
     private boolean isStartingPosition(Direction direction, int currentRank) {
         return (DEFAULT_WHITE_RANK == currentRank && direction == Direction.NORTH) ||
                 (DEFAULT_BLACK_RANK == currentRank && direction == Direction.SOUTH);
+    }
+
+    @Override
+    public boolean isKing() {
+        return false;
+    }
+
+    @Override
+    public boolean isPawn() {
+        return true;
+    }
+
+    @Override
+    public PieceType getPieceType() {
+        return PieceType.PAWN;
+    }
+
+    @Override
+    public Set<Direction> getDirections() {
+        if (isWhite()) {
+            return Direction.WHITE_PAWN;
+        }
+        return Direction.BLACK_PAWN;
+    }
+
+    @Override
+    public double getScore() {
+        return 1.0;
     }
 }

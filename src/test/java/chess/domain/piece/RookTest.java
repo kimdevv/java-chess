@@ -3,6 +3,7 @@ package chess.domain.piece;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import chess.domain.Board;
+import chess.domain.ScoreCalculator;
 import chess.domain.position.File;
 import chess.domain.position.Position;
 import chess.domain.position.Rank;
@@ -17,37 +18,63 @@ class RookTest {
     @Test
     void givenRookMoveWhenMeetTeamMThenStop() {
         Rook rook = Rook.WHITE;
-        Position currentRookPosition = Position.from(File.A, Rank.ONE);
+        Position currentRookPosition = Position.of(File.A, Rank.ONE);
         Map<Position, Piece> board = Map.of(
                 currentRookPosition, rook,
-                Position.from(File.A, Rank.FOUR), Bishop.WHITE,
-                Position.from(File.E, Rank.ONE), Knight.WHITE
+                Position.of(File.A, Rank.FOUR), Bishop.WHITE,
+                Position.of(File.E, Rank.ONE), Knight.WHITE
         );
 
-        Set<Position> movablePositions = rook.calculateMovablePositions(currentRookPosition, new Board(board));
+        Set<Position> movablePositions = rook.calculateMovablePositions(currentRookPosition,
+                new Board(board, new ScoreCalculator()));
 
         assertThat(movablePositions).isEqualTo(
-                Set.of(Position.from(File.A, Rank.TWO), Position.from(File.A, Rank.THREE),
-                        Position.from(File.B, Rank.ONE),
-                        Position.from(File.C, Rank.ONE), Position.from(File.D, Rank.ONE)));
+                Set.of(Position.of(File.A, Rank.TWO), Position.of(File.A, Rank.THREE),
+                        Position.of(File.B, Rank.ONE),
+                        Position.of(File.C, Rank.ONE), Position.of(File.D, Rank.ONE)));
     }
 
     @DisplayName("적군을 만난 위치까지 이동 가능하다.")
     @Test
     void givenRookMoveWhenMeetEnemyThenStopAtEnemyPosition() {
         Rook rook = Rook.WHITE;
-        Position currentRookPosition = Position.from(File.H, Rank.EIGHT);
+        Position currentRookPosition = Position.of(File.H, Rank.EIGHT);
         Map<Position, Piece> board = Map.of(
                 currentRookPosition, rook,
-                Position.from(File.G, Rank.EIGHT), Bishop.BLACK,
-                Position.from(File.H, Rank.FIVE), Knight.BLACK
+                Position.of(File.G, Rank.EIGHT), Bishop.BLACK,
+                Position.of(File.H, Rank.FIVE), Knight.BLACK
         );
 
-        Set<Position> movablePositions = rook.calculateMovablePositions(currentRookPosition, new Board(board));
+        Set<Position> movablePositions = rook.calculateMovablePositions(currentRookPosition,
+                new Board(board, new ScoreCalculator()));
 
         assertThat(movablePositions).isEqualTo(
-                Set.of(Position.from(File.G, Rank.EIGHT), Position.from(File.H, Rank.FIVE),
-                        Position.from(File.H, Rank.SIX), Position.from(File.H, Rank.SEVEN))
+                Set.of(Position.of(File.G, Rank.EIGHT), Position.of(File.H, Rank.FIVE),
+                        Position.of(File.H, Rank.SIX), Position.of(File.H, Rank.SEVEN))
         );
+    }
+
+    @DisplayName("킹인지 물어보면 false를 반환한다")
+    @Test
+    void givenRookWhenIsKingThenReturnFalse() {
+        Rook rook = Rook.WHITE;
+
+        assertThat(rook.isKing()).isFalse();
+    }
+
+    @DisplayName("룩의 점수를 가져오면 5.0점을 반환한다")
+    @Test
+    void givenQueenWhenGetScoreThenReturn5() {
+        Rook rook = Rook.WHITE;
+
+        assertThat(rook.getScore()).isEqualTo(5.0);
+    }
+
+    @DisplayName("룩에게 폰인지 물어보면 false를 반환한다")
+    @Test
+    void givenRookWhenIsPawnThenReturnFalse() {
+        Rook rook = Rook.WHITE;
+
+        assertThat(rook.isPawn()).isFalse();
     }
 }

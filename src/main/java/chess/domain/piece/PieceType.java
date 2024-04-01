@@ -1,11 +1,15 @@
 package chess.domain.piece;
 
 public enum PieceType {
+    KING,
     PAWN,
-    ROOK,
     KNIGHT,
     BISHOP,
-    KING,
+    ROOK,
     QUEEN,
     NONE;
+
+    public boolean isPawn() {
+        return this == PAWN;
+    }
 }

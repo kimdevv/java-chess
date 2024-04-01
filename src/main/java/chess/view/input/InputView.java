@@ -20,13 +20,17 @@ public class InputView {
         return parse(scanner.nextLine());
     }
 
-    private ClientCommand parse(String input) {
+    private ClientCommand parse(final String input) {
         validateCommand(input);
-        List<String> parts = List.of(input.trim().split(" "));
+        List<String> parts = List.of(parseAdditionalArguments(input));
         return new ClientCommand(GameCommand.getGameCommand(parts.get(0)), parseArguments(parts));
     }
 
-    private void validateCommand(String input) {
+    private String[] parseAdditionalArguments(final String input) {
+        return input.trim().split(" ");
+    }
+
+    private void validateCommand(final String input) {
         Matcher matcher = COMMAND_PATTERN.matcher(input);
         if (!matcher.find()) {
             throw new IllegalArgumentException("올바르지 않는 명령어 입력입니다.");

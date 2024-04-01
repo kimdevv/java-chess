@@ -1,23 +1,24 @@
 package chess.view.input.command;
 
+import chess.domain.position.File;
 import java.util.Arrays;
 
 public enum FileSymbol {
-    A("a", 1),
-    B("b", 2),
-    C("c", 3),
-    D("d", 4),
-    E("e", 5),
-    F("f", 6),
-    G("g", 7),
-    H("h", 8);
+    A(File.A, "a"),
+    B(File.B, "b"),
+    C(File.C, "c"),
+    D(File.D, "d"),
+    E(File.E, "e"),
+    F(File.F, "f"),
+    G(File.G, "g"),
+    H(File.H, "h");
 
+    private final File file;
     private final String symbol;
-    private final int file;
 
-    FileSymbol(final String symbol, final int file) {
-        this.symbol = symbol;
+    FileSymbol(final File file, final String symbol) {
         this.file = file;
+        this.symbol = symbol;
     }
 
     public static FileSymbol getFileSymbol(final String symbol) {
@@ -26,7 +27,7 @@ public enum FileSymbol {
                 .orElseThrow(() -> new IllegalArgumentException("파일은 알파벳 소문자 a ~ h 까지 변환 가능합니다."));
     }
 
-    public int getFile() {
+    public File getFile() {
         return file;
     }
 }

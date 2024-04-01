@@ -1,6 +1,7 @@
 package chess.domain.position;
 
 public enum Vector {
+    
     UP_UP_RIGHT(1, 2),
     UP_UP_LEFT(-1, 2),
     DOWN_DOWN_RIGHT(1, -2),
@@ -12,7 +13,7 @@ public enum Vector {
     private final int fileVector;
     private final int rankVector;
 
-    Vector(int fileVector, int rankVector) {
+    Vector(final int fileVector, final int rankVector) {
         this.fileVector = fileVector;
         this.rankVector = rankVector;
     }

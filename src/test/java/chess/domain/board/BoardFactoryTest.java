@@ -1,20 +1,50 @@
 package chess.domain.board;
 
+import static chess.domain.Fixtures.A1;
+import static chess.domain.Fixtures.A2;
+import static chess.domain.Fixtures.A7;
+import static chess.domain.Fixtures.A8;
+import static chess.domain.Fixtures.B1;
+import static chess.domain.Fixtures.B2;
+import static chess.domain.Fixtures.B7;
+import static chess.domain.Fixtures.B8;
+import static chess.domain.Fixtures.C1;
+import static chess.domain.Fixtures.C2;
+import static chess.domain.Fixtures.C7;
+import static chess.domain.Fixtures.C8;
+import static chess.domain.Fixtures.D1;
+import static chess.domain.Fixtures.D2;
+import static chess.domain.Fixtures.D7;
+import static chess.domain.Fixtures.D8;
+import static chess.domain.Fixtures.E1;
+import static chess.domain.Fixtures.E2;
+import static chess.domain.Fixtures.E7;
+import static chess.domain.Fixtures.E8;
+import static chess.domain.Fixtures.F1;
+import static chess.domain.Fixtures.F2;
+import static chess.domain.Fixtures.F7;
+import static chess.domain.Fixtures.F8;
+import static chess.domain.Fixtures.G1;
+import static chess.domain.Fixtures.G2;
+import static chess.domain.Fixtures.G7;
+import static chess.domain.Fixtures.G8;
+import static chess.domain.Fixtures.H1;
+import static chess.domain.Fixtures.H2;
+import static chess.domain.Fixtures.H7;
+import static chess.domain.Fixtures.H8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import chess.domain.piece.Bishop;
 import chess.domain.piece.Color;
-import chess.domain.piece.Empty;
-import chess.domain.piece.King;
-import chess.domain.piece.Knight;
 import chess.domain.piece.Pawn;
 import chess.domain.piece.Piece;
-import chess.domain.piece.Queen;
-import chess.domain.piece.Rook;
+import chess.domain.piece.PieceType;
+import chess.domain.position.File;
 import chess.domain.position.Position;
+import chess.domain.position.Rank;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -30,47 +60,47 @@ class BoardFactoryTest {
         assertAll(
                 () -> assertThat(initialPiecePositions)
                         .containsAllEntriesOf(Map.of(
-                                new Position(1, 1), new Rook(Color.WHITE),
-                                new Position(2, 1), new Knight(Color.WHITE),
-                                new Position(3, 1), new Bishop(Color.WHITE),
-                                new Position(4, 1), new Queen(Color.WHITE),
-                                new Position(5, 1), new King(Color.WHITE),
-                                new Position(6, 1), new Bishop(Color.WHITE),
-                                new Position(7, 1), new Knight(Color.WHITE),
-                                new Position(8, 1), new Rook(Color.WHITE)
+                                A1, Piece.of(PieceType.ROOK, Color.WHITE),
+                                B1, Piece.of(PieceType.KNIGHT, Color.WHITE),
+                                C1, Piece.of(PieceType.BISHOP, Color.WHITE),
+                                D1, Piece.of(PieceType.QUEEN, Color.WHITE),
+                                E1, Piece.of(PieceType.KING, Color.WHITE),
+                                F1, Piece.of(PieceType.BISHOP, Color.WHITE),
+                                G1, Piece.of(PieceType.KNIGHT, Color.WHITE),
+                                H1, Piece.of(PieceType.ROOK, Color.WHITE)
                         )),
                 () -> assertThat(initialPiecePositions)
                         .containsAllEntriesOf(Map.of(
-                                new Position(1, 2), new Pawn(Color.WHITE),
-                                new Position(2, 2), new Pawn(Color.WHITE),
-                                new Position(3, 2), new Pawn(Color.WHITE),
-                                new Position(4, 2), new Pawn(Color.WHITE),
-                                new Position(5, 2), new Pawn(Color.WHITE),
-                                new Position(6, 2), new Pawn(Color.WHITE),
-                                new Position(7, 2), new Pawn(Color.WHITE),
-                                new Position(8, 2), new Pawn(Color.WHITE)
+                                A2, Pawn.of(Color.WHITE),
+                                B2, Pawn.of(Color.WHITE),
+                                C2, Pawn.of(Color.WHITE),
+                                D2, Pawn.of(Color.WHITE),
+                                E2, Pawn.of(Color.WHITE),
+                                F2, Pawn.of(Color.WHITE),
+                                G2, Pawn.of(Color.WHITE),
+                                H2, Pawn.of(Color.WHITE)
                         )),
                 () -> assertThat(initialPiecePositions)
                         .containsAllEntriesOf(Map.of(
-                                new Position(1, 7), new Pawn(Color.BLACK),
-                                new Position(2, 7), new Pawn(Color.BLACK),
-                                new Position(3, 7), new Pawn(Color.BLACK),
-                                new Position(4, 7), new Pawn(Color.BLACK),
-                                new Position(5, 7), new Pawn(Color.BLACK),
-                                new Position(6, 7), new Pawn(Color.BLACK),
-                                new Position(7, 7), new Pawn(Color.BLACK),
-                                new Position(8, 7), new Pawn(Color.BLACK)
+                                A7, Pawn.of(Color.BLACK),
+                                B7, Pawn.of(Color.BLACK),
+                                C7, Pawn.of(Color.BLACK),
+                                D7, Pawn.of(Color.BLACK),
+                                E7, Pawn.of(Color.BLACK),
+                                F7, Pawn.of(Color.BLACK),
+                                G7, Pawn.of(Color.BLACK),
+                                H7, Pawn.of(Color.BLACK)
                         )),
                 () -> assertThat(initialPiecePositions)
                         .containsAllEntriesOf(Map.of(
-                                new Position(1, 8), new Rook(Color.BLACK),
-                                new Position(2, 8), new Knight(Color.BLACK),
-                                new Position(3, 8), new Bishop(Color.BLACK),
-                                new Position(4, 8), new Queen(Color.BLACK),
-                                new Position(5, 8), new King(Color.BLACK),
-                                new Position(6, 8), new Bishop(Color.BLACK),
-                                new Position(7, 8), new Knight(Color.BLACK),
-                                new Position(8, 8), new Rook(Color.BLACK)
+                                A8, Piece.of(PieceType.ROOK, Color.BLACK),
+                                B8, Piece.of(PieceType.KNIGHT, Color.BLACK),
+                                C8, Piece.of(PieceType.BISHOP, Color.BLACK),
+                                D8, Piece.of(PieceType.QUEEN, Color.BLACK),
+                                E8, Piece.of(PieceType.KING, Color.BLACK),
+                                F8, Piece.of(PieceType.BISHOP, Color.BLACK),
+                                G8, Piece.of(PieceType.KNIGHT, Color.BLACK),
+                                H8, Piece.of(PieceType.ROOK, Color.BLACK)
                         ))
         );
     }
@@ -82,8 +112,9 @@ class BoardFactoryTest {
         Board board = BoardFactory.create();
         // when, then
         Map<Position, Piece> initialPiecePositions = board.getBoard();
-        IntStream.rangeClosed(3, 6).boxed()
-                .flatMap(rank -> IntStream.rangeClosed(1, 8).boxed().map(file -> new Position(file, rank)))
-                .forEach(position -> assertThat(initialPiecePositions.get(position)).isEqualTo(new Empty()));
+        Arrays.stream(Rank.values())
+                .filter(rank -> !List.of(Rank.ONE, Rank.TWO, Rank.SEVEN, Rank.EIGHT).contains(rank))
+                .flatMap(rank -> Arrays.stream(File.values()).map(file -> Position.of(file, rank)))
+                .forEach(position -> assertThat(initialPiecePositions.get(position)).isEqualTo(Piece.EMPTY_PIECE));
     }
 }

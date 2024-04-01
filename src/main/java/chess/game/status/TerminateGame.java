@@ -1,5 +1,6 @@
 package chess.game.status;
 
+import chess.service.ChessService;
 import chess.view.input.InputView;
 import chess.view.output.OutputView;
 
@@ -11,7 +12,7 @@ public class TerminateGame implements GameStatus {
     }
 
     @Override
-    public GameStatus play(final InputView inputView, final OutputView outputView) {
+    public GameStatus play(final InputView inputView, final OutputView outputView, final ChessService chessService) {
         return this;
     }
 }

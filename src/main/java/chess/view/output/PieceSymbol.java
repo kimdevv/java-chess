@@ -11,7 +11,8 @@ public enum PieceSymbol {
     KNIGHT(PieceType.KNIGHT, "n"),
     BISHOP(PieceType.BISHOP, "b"),
     ROOK(PieceType.ROOK, "r"),
-    PAWN(PieceType.PAWN, "p"),
+    WHITE_PAWN(PieceType.WHITE_PAWN, "p"),
+    BLACK_PAWN(PieceType.BLACK_PAWN, "P"),
     EMPTY(PieceType.EMPTY, "."),
     ;
 

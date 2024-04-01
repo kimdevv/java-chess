@@ -1,44 +1,97 @@
 package chess.domain.position;
 
-public record Position(int file, int rank) {
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
-    private static final int MIN_POSITION_RANGE = 1;
-    private static final int MAX_POSITION_RANGE = 8;
+public class Position {
 
-    public Position {
-        validateRange(file);
-        validateRange(rank);
+    private static final List<Position> CACHED_POSITIONS;
+    static {
+        CACHED_POSITIONS = Arrays.stream(File.values())
+                .flatMap(file -> makePosition(file)).toList();
+    }
+    
+    File file;
+    Rank rank;
+
+    private Position(final File file, final Rank rank) {
+        this.file = file;
+        this.rank = rank;
     }
 
-    private void validateRange(final int position) {
-        if (position < MIN_POSITION_RANGE || position > MAX_POSITION_RANGE) {
-            throw new IllegalArgumentException("위치의 가로, 세로 범위는 각각 1 ~ 8이여야 합니다.");
-        }
+    private static Stream<Position> makePosition(final File file) {
+        return Arrays.stream(Rank.values()).map(rank -> new Position(file, rank));
+    }
+
+    public static Position of(final File file, final Rank rank) {
+        return CACHED_POSITIONS.stream()
+                .filter(position -> isSameFile(position, file) && isSameRank(position, rank))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 파일과 랭크로 위치를 생성할 수 없습니다."));
+    }
+
+    private static boolean isSameFile(final Position position, final File file) {
+        return position.file == file;
+    }
+
+    private static boolean isSameRank(final Position position, final Rank rank) {
+        return position.rank == rank;
     }
 
     public boolean isMinimumFile() {
-        return file == MIN_POSITION_RANGE;
+        return file.isMinimum();
     }
 
     public boolean isMaximumFile() {
-        return file == MAX_POSITION_RANGE;
+        return file.isMaximum();
     }
 
     public boolean isMinimumRank() {
-        return rank == MIN_POSITION_RANGE;
+        return rank.isMinimum();
     }
 
     public boolean isMaximumRank() {
-        return rank == MAX_POSITION_RANGE;
+        return rank.isMaximum();
     }
 
     public boolean isNextPositionInRange(final Vector vector) {
-        int nextFile = vector.getFileVector() + file;
-        int nextRank = vector.getRankVector() + rank;
-        return isNextMoveInRange(nextFile) && isNextMoveInRange(nextRank);
+        var fileVector = vector.getFileVector();
+        var rankVector = vector.getRankVector();
+        return isFileMoveNext(fileVector) && isRankMoveNext(rankVector);
     }
 
-    private boolean isNextMoveInRange(int nextPosition) {
-        return nextPosition > 0 && nextPosition < 9;
+    private boolean isFileMoveNext(final int rankVector) {
+        return file.canMoveNext(rankVector);
+    }
+
+    private boolean isRankMoveNext(final int fileVector) {
+        return rank.canMoveNext(fileVector);
+    }
+
+    public File file() {
+        return file;
+    }
+
+    public Rank rank() {
+        return rank;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Position position = (Position) o;
+        return file == position.file && rank == position.rank;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(file, rank);
     }
 }

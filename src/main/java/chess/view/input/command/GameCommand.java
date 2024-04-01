@@ -6,7 +6,7 @@ public enum GameCommand {
     START("start", "게임 시작 : start"),
     END("end", "게임 종료 : end"),
     MOVE("move", "게임 이동 : move source위치 target위치 - 예. move b2 b3"),
-    ;
+    STATUS("status", "게임 상태 : status");
 
     private final String consoleCommand;
     private final String helperMassage;

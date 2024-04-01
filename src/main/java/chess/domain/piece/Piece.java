@@ -1,14 +1,23 @@
 package chess.domain.piece;
 
-import chess.domain.movement.Movement;
+import chess.domain.position.Obstacle;
 import chess.domain.position.Position;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-public abstract class Piece {
+public class Piece {
+
+    public static final Piece EMPTY_PIECE = new Piece(PieceType.EMPTY, Color.NONE);
+    private static final List<Piece> CACHED_PIECES;
+    static {
+        List<Piece> pieces = new ArrayList<>(generateNormalPiece());
+        pieces.add(new Piece(PieceType.WHITE_PAWN, Color.WHITE));
+        pieces.add(new Piece(PieceType.BLACK_PAWN, Color.BLACK));
+        CACHED_PIECES = Collections.unmodifiableList(pieces);
+    }
 
     private final PieceType pieceType;
     private final Color color;
@@ -18,37 +27,36 @@ public abstract class Piece {
         this.color = color;
     }
 
-    public boolean canMove(final Position source, final Position target, final Map<Position, Piece> pieces) {
-        return getPieceType().getMovements()
-                .stream()
-                .filter(movement -> filterMovement(movement, source, target, pieces))
-                .map(Movement::getDirection)
-                .anyMatch(direction -> direction.canReach(source, target, findObstacle(source, target, pieces)));
+    private static List<Piece> generateNormalPiece() {
+        return Arrays.stream(PieceType.values())
+                .filter(pieceType -> pieceType != PieceType.EMPTY)
+                .filter(pieceType -> pieceType != PieceType.WHITE_PAWN)
+                .filter(pieceType -> pieceType != PieceType.BLACK_PAWN)
+                .flatMap(pieceType -> Arrays.stream(Color.values()).map(color -> new Piece(pieceType, color)))
+                .toList();
     }
 
-    abstract protected boolean filterMovement(Movement movement, Position source, Position target,
-                                              Map<Position, Piece> pieces);
-
-    private List<Position> findObstacle(final Position source, final Position target,
-                                        final Map<Position, Piece> pieces) {
-        return pieces.entrySet().stream()
-                .filter(entry -> filterObstacles(source, target, entry))
-                .map(Entry::getKey)
-                .collect(Collectors.toList());
+    public static Piece of(final PieceType pieceType, final Color color) {
+        return CACHED_PIECES.stream()
+                .filter(piece -> piece.getPieceType() == pieceType && piece.getColor() == color)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 타입과 색상으로 체스말을 생성할 수 없습니다."));
     }
 
-    abstract protected boolean filterObstacles(Position source, Position target, Entry<Position, Piece> entry);
-
-    public boolean isSameColor(final Color color) {
-        return this.color == color;
+    public boolean canMove(final Position source, final Position target, final Obstacle obstacle) {
+        return pieceType.canMove(source, target, obstacle);
     }
 
-    public boolean isNotEmpty() {
-        return pieceType != PieceType.EMPTY;
+    public boolean canAttack(final Position source, final Position target, final Obstacle obstacle) {
+        return pieceType.canAttack(source, target, obstacle);
     }
 
     public boolean isEmpty() {
         return pieceType == PieceType.EMPTY;
+    }
+
+    public boolean isSameColor(final Color color) {
+        return this.color == color;
     }
 
     public PieceType getPieceType() {
@@ -60,7 +68,7 @@ public abstract class Piece {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

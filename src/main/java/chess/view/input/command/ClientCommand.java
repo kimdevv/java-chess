@@ -6,7 +6,7 @@ public class ClientCommand {
     GameCommand command;
     List<String> arguments;
 
-    public ClientCommand(GameCommand command, List<String> arguments) {
+    public ClientCommand(final GameCommand command, final List<String> arguments) {
         this.command = command;
         this.arguments = arguments;
     }

@@ -90,6 +90,18 @@ public class Position {
         return positions;
     }
 
+    public Column findColumn() {
+        return Column.findColumn(x);
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

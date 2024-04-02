@@ -28,7 +28,13 @@ public abstract class Piece {
         return false;
     }
 
+    public Column findColumn() {
+        return position.findColumn();
+    }
+
     public abstract Piece update(final Position destination);
 
     public abstract PieceType pieceType();
+
+    public abstract double score();
 }

@@ -12,7 +12,7 @@ public enum File {
     g(7),
     h(8);
 
-    private int index;
+    private final int index;
 
     File(int index) {
         this.index = index;

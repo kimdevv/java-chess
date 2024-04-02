@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OutputView {
+    private OutputView() {
+    }
+
     private static final Map<Piece, String> pieceBoard = initializePiece();
     private static final Map<Team, String> teamBoard = initializeTeam();
 
@@ -58,19 +61,21 @@ public class OutputView {
     }
 
     public static void printScore(Map<Team, Score> calculateTotalScore) {
-        double whiteScore = calculateTotalScore.get(WHITE).getScore();
-        double blackScore = calculateTotalScore.get(BLACK).getScore();
+        double whiteScore = calculateTotalScore.get(WHITE)
+                .getScore();
+        double blackScore = calculateTotalScore.get(BLACK)
+                .getScore();
 
         System.out.println(String.format("%s팀 점수 : %.1f", WHITE, whiteScore));
         System.out.println(String.format("%s팀 점수 : %.1f", BLACK, blackScore));
 
-        if(whiteScore > blackScore) {
+        if (whiteScore > blackScore) {
             System.out.println("백팀 승");
         }
-        if(whiteScore == blackScore) {
+        if (whiteScore == blackScore) {
             System.out.println("무승부");
         }
-        if(whiteScore < blackScore) {
+        if (whiteScore < blackScore) {
             System.out.println("흑팀 승");
         }
     }

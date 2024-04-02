@@ -12,7 +12,7 @@ public enum Rank {
     SEVEN(7),
     EIGHT(8);
 
-    private int index;
+    private final int index;
 
     Rank(int index) {
         this.index = index;
@@ -63,5 +63,9 @@ public enum Rank {
 
     public int findDirection(Rank rank) {
         return Integer.compare(rank.index, index);
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

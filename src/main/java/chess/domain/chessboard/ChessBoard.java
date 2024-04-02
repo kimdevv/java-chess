@@ -11,7 +11,6 @@ import chess.domain.chesspiece.Team;
 import chess.domain.position.File;
 import chess.domain.position.Position;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,32 +29,32 @@ public class ChessBoard {
         piece.checkValidMove(gameStatus);
 
         checkTargetIsTeam(piece, target);
-        piece.findRoute(source, target, isEmpty(target))
+        piece.findRoute(source, target, isPositionEmpty(target))
                 .forEach(this::checkObstacle);
 
         return replacePieceToTarget(source, target, gameStatus);
     }
 
     private void checkEmpty(Position position) {
-        if (isEmpty(position)) {
+        if (isPositionEmpty(position)) {
             throw new IllegalArgumentException("해당 공간에는 기물이 존재하지 않습니다.");
         }
     }
 
     private void checkObstacle(Position position) {
-        if (!isEmpty(position)) {
+        if (!isPositionEmpty(position)) {
             throw new IllegalArgumentException("방해물이 있어 이동할 수 없습니다.");
         }
     }
 
     private void checkTargetIsTeam(Piece source, Position targetPosition) {
-        if (!isEmpty(targetPosition) && source.isTeam(getPiece(targetPosition))) {
+        if (!isPositionEmpty(targetPosition) && source.isTeam(getPiece(targetPosition))) {
             throw new IllegalArgumentException("같은 팀이 있는 곳으로는 이동할 수 없습니다.");
         }
     }
 
     private GameStatus replacePieceToTarget(Position source, Position target, GameStatus turn) {
-        if (!isEmpty(target) && getPiece(target).isKing()) {
+        if (!isPositionEmpty(target) && getPiece(target).isKing()) {
             return GAME_OVER;
         }
         Piece piece = getPiece(source);
@@ -100,8 +99,12 @@ public class ChessBoard {
         return score;
     }
 
-    private boolean isEmpty(Position target) {
+    private boolean isPositionEmpty(Position target) {
         return !chessBoard.containsKey(target);
+    }
+
+    public boolean isEmpty() {
+        return chessBoard.isEmpty();
     }
 
     private Piece getPiece(Position position) {

@@ -1,7 +1,14 @@
 package domain.board;
 
 import domain.game.Turn;
-import domain.piece.*;
+import domain.piece.Bishop;
+import domain.piece.Color;
+import domain.piece.Empty;
+import domain.piece.King;
+import domain.piece.Knight;
+import domain.piece.Pawn;
+import domain.piece.Queen;
+import domain.piece.Rook;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +63,7 @@ class BoardTest {
         Position source = Position.of(2, 1);
         Position target = Position.of(3, 3);
         Knight knight = new Knight(Color.WHITE);
-        Empty empty = new Empty(Color.EMPTY);
+        Empty empty = new Empty();
         Board board = Board.generatedBy(() -> new HashMap<>(
                 Map.of(
                         source, knight,
@@ -77,7 +84,7 @@ class BoardTest {
         Position source = Position.of(2, 2);
         Position target = Position.of(1, 3);
         King king = new King(Color.WHITE);
-        Empty empty = new Empty(Color.EMPTY);
+        Empty empty = new Empty();
         Board board = Board.generatedBy(() -> new HashMap<>(
                 Map.of(
                         source, king,
@@ -98,7 +105,7 @@ class BoardTest {
         Position source = Position.of(2, 1);
         Position target = Position.of(3, 4);
         Knight knight = new Knight(Color.WHITE);
-        Empty empty = new Empty(Color.EMPTY);
+        Empty empty = new Empty();
         Board board = Board.generatedBy(() -> new HashMap<>(
                 Map.of(
                         source, knight,
@@ -120,7 +127,7 @@ class BoardTest {
 
         Rook rook = new Rook(Color.WHITE);
         Pawn pawn = new Pawn(Color.WHITE);
-        Empty empty = new Empty(Color.EMPTY);
+        Empty empty = new Empty();
 
         Board board = Board.generatedBy(() -> new HashMap<>(
                 Map.of(
@@ -144,7 +151,7 @@ class BoardTest {
 
         Bishop bishop = new Bishop(Color.WHITE);
         Pawn pawn = new Pawn(Color.WHITE);
-        Empty empty = new Empty(Color.EMPTY);
+        Empty empty = new Empty();
 
         Board board = Board.generatedBy(() -> new HashMap<>(
                 Map.of(
@@ -168,7 +175,7 @@ class BoardTest {
 
         Queen queen = new Queen(Color.WHITE);
         Pawn pawn = new Pawn(Color.WHITE);
-        Empty empty = new Empty(Color.EMPTY);
+        Empty empty = new Empty();
 
         Board board = Board.generatedBy(() -> new HashMap<>(
                 Map.of(
@@ -192,7 +199,7 @@ class BoardTest {
 
         Pawn pawn = new Pawn(Color.WHITE);
         Queen queen = new Queen(Color.WHITE);
-        Empty empty = new Empty(Color.EMPTY);
+        Empty empty = new Empty();
 
         Board board = Board.generatedBy(() -> new HashMap<>(
                 Map.of(
@@ -259,7 +266,7 @@ class BoardTest {
         Position target = Position.of(3, 3);
 
         Pawn pawn = new Pawn(Color.WHITE);
-        Empty empty = new Empty(Color.EMPTY);
+        Empty empty = new Empty();
 
         Board board = Board.generatedBy(() -> new HashMap<>(
                 Map.of(
@@ -271,5 +278,21 @@ class BoardTest {
         assertThatThrownBy(() -> board.move(source, target, Turn.makeInitialTurn()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("대각선 방향에 상대방 말이 없으면 움직일 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("모든 흰색 말의 점수를 계산")
+    void calculateWhiteScore() {
+        Board board = Board.generatedBy(new InitialBoardGenerator());
+
+        assertThat(board.calculateWhiteScore()).isEqualTo(38);
+    }
+
+    @Test
+    @DisplayName("모든 검정 말의 점수를 계산")
+    void calculateBlackScore() {
+        Board board = Board.generatedBy(new InitialBoardGenerator());
+
+        assertThat(board.calculateBlackScore()).isEqualTo(38);
     }
 }

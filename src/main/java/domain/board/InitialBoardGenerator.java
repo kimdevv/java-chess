@@ -1,11 +1,22 @@
 package domain.board;
 
-import domain.piece.*;
+import domain.piece.Bishop;
+import domain.piece.Color;
+import domain.piece.Empty;
+import domain.piece.King;
+import domain.piece.Knight;
+import domain.piece.Pawn;
+import domain.piece.Piece;
+import domain.piece.Queen;
+import domain.piece.Rook;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class InitialBoardGenerator implements BoardGenerator {
+
+    private static final int MIN_FILE = 1;
+    private static final int MAX_FILE = 8;
 
     @Override
     public Map<Position, Piece> generate() {
@@ -21,7 +32,7 @@ public class InitialBoardGenerator implements BoardGenerator {
     }
 
     private void placePawns(Map<Position, Piece> board) {
-        for (int i = 1; i <= 8; i++) {
+        for (int i = MIN_FILE; i <= MAX_FILE; i++) {
             board.put(Position.of(i, 2), new Pawn(Color.WHITE));
             board.put(Position.of(i, 7), new Pawn(Color.BLACK));
         }
@@ -65,8 +76,8 @@ public class InitialBoardGenerator implements BoardGenerator {
     }
 
     private void placeEmptyToOneRank(Map<Position, Piece> board, int rank) {
-        for (int file = 1; file <= 8; file++) {
-            board.put(Position.of(file, rank), new Empty(Color.EMPTY));
+        for (int file = MIN_FILE; file <= MAX_FILE; file++) {
+            board.put(Position.of(file, rank), new Empty());
         }
     }
 }

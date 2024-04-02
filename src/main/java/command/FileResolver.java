@@ -1,4 +1,4 @@
-package view.dto;
+package command;
 
 import java.util.Arrays;
 

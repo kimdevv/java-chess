@@ -10,6 +10,12 @@ import java.util.Map;
 
 public class Board {
 
+    private static final double PAWN_PENALTY = 0.5;
+    private static final int MIN_RANK = 1;
+    private static final int MAX_RANK = 8;
+    private static final int MIN_FILE = 1;
+    private static final int MAX_FILE = 8;
+
     private final Map<Position, Piece> board;
 
     private Board(Map<Position, Piece> board) {
@@ -20,11 +26,15 @@ public class Board {
         return new Board(boardGenerator.generate());
     }
 
+    public static Board replaceBoardWith(Map<Position, Piece> board) {
+        return new Board(board);
+    }
+
     public Board move(Position source, Position target, Turn turn) {
         Piece piece = board.get(source);
         validate(source, target, turn);
         board.remove(source);
-        board.put(source, new Empty(Color.EMPTY));
+        board.put(source, new Empty());
         board.put(target, piece);
         return new Board(board);
     }
@@ -145,5 +155,83 @@ public class Board {
 
     public Piece findPieceAt(Position position) {
         return board.get(position);
+    }
+
+    public double calculateWhiteScore() {
+        return calculateTotalWhiteScore() - calculateWhitePawnPenaltyScore();
+    }
+
+    private double calculateTotalWhiteScore() {
+        return board.values()
+                .stream()
+                .filter(Piece::isWhite)
+                .mapToDouble(Score::valueByPiece)
+                .sum();
+    }
+
+    private double calculateWhitePawnPenaltyScore() {
+        double penalty = 0;
+        for (int file = MIN_FILE; file <= MAX_FILE; file++) {
+            penalty += calculateWhitePawnPenaltyScoreByFile(file);
+        }
+        return penalty;
+    }
+
+    private double calculateWhitePawnPenaltyScoreByFile(int file) {
+        int pawnCount = 0;
+        for (int rank = MIN_RANK; rank <= MAX_RANK; rank++) {
+            Piece piece = board.get(Position.of(file, rank));
+            pawnCount = increasePawnCountIfIsWhitePawn(piece, pawnCount);
+        }
+        if (pawnCount == 0) {
+            return 0;
+        }
+        return (pawnCount - 1) * PAWN_PENALTY;
+    }
+
+    private int increasePawnCountIfIsWhitePawn(Piece piece, int pawnCount) {
+        if (piece.isPawn() && piece.isWhite()) {
+            pawnCount++;
+        }
+        return pawnCount;
+    }
+
+    public double calculateBlackScore() {
+        return calculateTotalBlackScore() - calculateBlackPawnPenaltyScore();
+    }
+
+    private double calculateTotalBlackScore() {
+        return board.values()
+                .stream()
+                .filter(Piece::isBlack)
+                .mapToDouble(Score::valueByPiece)
+                .sum();
+    }
+
+    private double calculateBlackPawnPenaltyScore() {
+        double penalty = 0;
+        for (int file = MIN_FILE; file <= MAX_FILE; file++) {
+            penalty += calculateBlackPawnPenaltyScoreByFile(file);
+        }
+        return penalty;
+    }
+
+    private double calculateBlackPawnPenaltyScoreByFile(int file) {
+        int pawnCount = 0;
+        for (int rank = MIN_RANK; rank <= MAX_RANK; rank++) {
+            Piece piece = board.get(Position.of(file, rank));
+            pawnCount = increasePawnCountIfIsBlackPawn(piece, pawnCount);
+        }
+        if (pawnCount == 0) {
+            return 0;
+        }
+        return (pawnCount - 1) * PAWN_PENALTY;
+    }
+
+    private int increasePawnCountIfIsBlackPawn(Piece piece, int pawnCount) {
+        if (piece.isPawn() && piece.isBlack()) {
+            pawnCount++;
+        }
+        return pawnCount;
     }
 }

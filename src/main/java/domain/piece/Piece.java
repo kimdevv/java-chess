@@ -10,6 +10,13 @@ public abstract class Piece {
         this.color = color;
     }
 
+    protected String pieceToString(String piece) {
+        if (isWhite()) {
+            return piece.toLowerCase();
+        }
+        return piece;
+    }
+
     public abstract boolean canMove(Position source, Position target);
 
     public abstract String asString();
@@ -18,8 +25,20 @@ public abstract class Piece {
         return color == Color.WHITE;
     }
 
+    public boolean isBlack() {
+        return color == Color.BLACK;
+    }
+
     public boolean isEmpty() {
         return this instanceof Empty;
+    }
+
+    public boolean isKing() {
+        return this instanceof King;
+    }
+
+    public boolean isPawn() {
+        return this instanceof Pawn;
     }
 
     public boolean hasNotColorOf(Color color) {

@@ -3,6 +3,8 @@ package chess.domain.piece;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -16,17 +18,22 @@ public class PieceTest {
         assertThatCode(() -> new Piece(PieceType.KING, CampType.WHITE)).doesNotThrowAnyException();
     }
 
-    @DisplayName("체스말은 같은 색인지 여부를 반환한다.")
+    @DisplayName("체스말은 타입에 따른 점수를 반환한다.")
     @Test
-    void checkSameColor() {
+    void calculateScore() {
         // given
-        Piece blackPiece = new Piece(PieceType.PAWN, CampType.BLACK);
-        Piece whitePiece = new Piece(PieceType.ROOK, CampType.WHITE);
+        Piece queen = new Piece(PieceType.QUEEN, CampType.WHITE);
+        List<Piece> piecesByFile = List.of(
+                new Piece(PieceType.QUEEN, CampType.WHITE),
+                new Piece(PieceType.PAWN, CampType.WHITE),
+                new Piece(PieceType.PAWN, CampType.BLACK),
+                new Piece(PieceType.QUEEN, CampType.BLACK)
+        );
 
         // when
-        boolean actual = blackPiece.isSameColor(whitePiece);
+        double actual = queen.calculateScore(piecesByFile);
 
         // then
-        assertThat(actual).isFalse();
+        assertThat(actual).isEqualTo(9);
     }
 }

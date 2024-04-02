@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public class Square {
 
     private static final Pattern INTEGER_FORMAT_REGEX = Pattern.compile("^[1-9][0-9]*$");
-    private static final String INVALID_RANK_ERROR = "랭크는 자연수로 입력해야 합니다.";
+    private static final String INVALID_RANK_EXCEPTION = "랭크는 자연수로 입력해야 합니다.";
     private static final Map<String, Square> POOL = createSquarePool();
 
     private final File file;
@@ -29,8 +29,8 @@ public class Square {
     }
 
     public static Square from(SquareCreateCommand command) {
-        String fileCommand = String.valueOf(command.getFileCommand());
-        String rankValue = String.valueOf(command.getRankValue());
+        String fileCommand = command.fileCommand();
+        String rankValue = command.rankValue();
         validateRank(rankValue);
 
         File file = File.findFileByCommand(fileCommand);
@@ -41,8 +41,16 @@ public class Square {
 
     private static void validateRank(String rankValue) {
         if (!INTEGER_FORMAT_REGEX.matcher(rankValue).matches()) {
-            throw new IllegalArgumentException(INVALID_RANK_ERROR);
+            throw new IllegalArgumentException(INVALID_RANK_EXCEPTION);
         }
+    }
+
+    public static Square from(String key) {
+        if (!POOL.containsKey(key)) {
+            throw new IllegalArgumentException("존재하지 않는 키입니다.");
+        }
+
+        return POOL.get(key);
     }
 
     private static Map<String, Square> createSquarePool() {
@@ -78,5 +86,9 @@ public class Square {
 
     public boolean isSameRank(Rank rank) {
         return this.rank.equals(rank);
+    }
+
+    public String getKey() {
+        return file.name() + rank.name();
     }
 }

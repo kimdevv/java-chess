@@ -1,9 +1,11 @@
 package chess.view;
 
+import chess.domain.CurrentTurn;
 import chess.domain.position.File;
 import chess.domain.position.Position;
 import chess.domain.position.Rank;
 import chess.domain.square.Empty;
+import chess.domain.square.Score;
 import chess.domain.square.Square;
 import chess.domain.square.piece.unified.Bishop;
 import chess.domain.square.piece.Color;
@@ -58,6 +60,7 @@ public class OutputView {
         System.out.println("> 게임 시작 : start");
         System.out.println("> 게임 종료 : end");
         System.out.println("> 게임 이동 : move source위치 target위치 - 예. move b2 b3");
+        System.out.println("> 현재 점수 및 승패 : status");
     }
 
     public void printChessBoard(Map<Position, Square> squares) {
@@ -75,5 +78,34 @@ public class OutputView {
             Square square = squares.get(new Position(rank, file));
             System.out.print(squareViews.get(square));
         }
+    }
+
+    public void printTurnMessage(CurrentTurn currentTurn) {
+        if (currentTurn.value() == Color.WHITE) {
+            System.out.println("흰팀의 턴입니다.");
+            return;
+        }
+        System.out.println("검정팀의 턴입니다.");
+    }
+
+    public void printStatus(Score whiteScore, Score blackScore, Color leadingSide) {
+        System.out.println("흰팀 점수 : " + whiteScore.getValue());
+        System.out.println("검정팀 점수 : " + blackScore.getValue());
+        String leadingSideMessage = "동점입니다.";
+        if (leadingSide == Color.WHITE) {
+            leadingSideMessage = "흰팀이 우세합니다.";
+        }
+        if (leadingSide == Color.BLACK) {
+            leadingSideMessage = "검정팀이 우세합니다.";
+        }
+        System.out.println(leadingSideMessage);
+    }
+
+    public void printEndMessage(Color winner) {
+        String winnerView = "흰팀";
+        if (winner == Color.BLACK) {
+            winnerView = "검정팀";
+        }
+        System.out.println("축하합니다! " + winnerView + "이 승리했습니다.");
     }
 }

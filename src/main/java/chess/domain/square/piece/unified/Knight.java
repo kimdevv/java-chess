@@ -1,12 +1,17 @@
 package chess.domain.square.piece.unified;
 
-import chess.domain.position.PathFinder;
+import chess.domain.position.Path;
+import chess.domain.square.Score;
+import chess.domain.square.Square;
 import chess.domain.square.piece.Color;
+
 import java.util.Map;
+import java.util.Set;
 
 public class Knight extends MoveAttackUnified {
     private static final int MIN_MOVABLE_DISTANCE = 1;
     private static final int MAX_MOVABLE_DISTANCE = 2;
+    private static final double SCORE = 2.5;
     private static final Map<Color, Knight> KNIGHT_POOL = Map.of(
             Color.WHITE, new Knight(Color.WHITE),
             Color.BLACK, new Knight(Color.BLACK));
@@ -20,8 +25,13 @@ public class Knight extends MoveAttackUnified {
     }
 
     @Override
-    protected boolean canMove(PathFinder pathFinder) {
-        return (pathFinder.rankDistance() == MIN_MOVABLE_DISTANCE && pathFinder.fileDistance() == MAX_MOVABLE_DISTANCE) ||
-                (pathFinder.rankDistance() == MAX_MOVABLE_DISTANCE && pathFinder.fileDistance() == MIN_MOVABLE_DISTANCE);
+    protected boolean canMove(Path path) {
+        return (path.rankDistance() == MIN_MOVABLE_DISTANCE && path.fileDistance() == MAX_MOVABLE_DISTANCE) ||
+                (path.rankDistance() == MAX_MOVABLE_DISTANCE && path.fileDistance() == MIN_MOVABLE_DISTANCE);
+    }
+
+    @Override
+    public Score score(Set<Square> sameFileSquares) {
+        return Score.of(SCORE, getColor());
     }
 }

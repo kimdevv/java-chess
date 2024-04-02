@@ -1,10 +1,15 @@
 package chess.domain.square.piece.unified;
 
-import chess.domain.position.PathFinder;
+import chess.domain.position.Path;
+import chess.domain.square.Score;
+import chess.domain.square.Square;
 import chess.domain.square.piece.Color;
+
 import java.util.Map;
+import java.util.Set;
 
 public class Bishop extends MoveAttackUnified {
+    private static final double SCORE = 3.0;
     private static final Map<Color, Bishop> BISHOP_POOL = Map.of(
             Color.WHITE, new Bishop(Color.WHITE),
             Color.BLACK, new Bishop(Color.BLACK));
@@ -18,7 +23,12 @@ public class Bishop extends MoveAttackUnified {
     }
 
     @Override
-    protected boolean canMove(PathFinder pathFinder) {
-        return pathFinder.isDiagonal();
+    protected boolean canMove(Path path) {
+        return path.isDiagonal();
+    }
+
+    @Override
+    public Score score(Set<Square> sameFileSquares) {
+        return Score.of(SCORE, getColor());
     }
 }

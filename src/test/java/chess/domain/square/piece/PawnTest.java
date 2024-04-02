@@ -4,12 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import chess.domain.EmptySquaresMaker;
 import chess.domain.position.File;
-import chess.domain.position.PathFinder;
+import chess.domain.position.Path;
 import chess.domain.position.Position;
 import chess.domain.position.Rank;
+import chess.domain.square.Score;
 import chess.domain.square.Square;
+
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
+
+import chess.domain.square.piece.unified.Bishop;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,10 +32,10 @@ class PawnTest {
             final Map<Position, Square> board = EmptySquaresMaker.make();
             Piece piece = Pawn.from(Color.BLACK);
             board.put(new Position(Rank.SEVENTH, File.A), piece);
-            PathFinder pathFinder = new PathFinder(
+            Path path = new Path(
                     new Position(Rank.SEVENTH, File.A), new Position(Rank.FIFTH, File.A));
 
-            final boolean canMove = piece.canArrive(pathFinder, board);
+            final boolean canMove = piece.canArrive(path, board);
 
             assertThat(canMove).isTrue();
         }
@@ -41,10 +46,10 @@ class PawnTest {
             final Map<Position, Square> board = EmptySquaresMaker.make();
             Piece piece = Pawn.from(Color.BLACK);
             board.put(new Position(Rank.FIFTH, File.A), piece);
-            PathFinder pathFinder = new PathFinder(
+            Path path = new Path(
                     new Position(Rank.FIFTH, File.A), new Position(Rank.THIRD, File.A));
 
-            final boolean canMove = piece.canArrive(pathFinder, board);
+            final boolean canMove = piece.canArrive(path, board);
 
             assertThat(canMove).isFalse();
         }
@@ -55,10 +60,10 @@ class PawnTest {
             final Map<Position, Square> board = EmptySquaresMaker.make();
             Piece piece = Pawn.from(Color.BLACK);
             board.put(new Position(Rank.SEVENTH, File.A), piece);
-            PathFinder pathFinder = new PathFinder(
+            Path path = new Path(
                     new Position(Rank.SEVENTH, File.A), new Position(Rank.SIXTH, File.A));
 
-            final boolean canMove = piece.canArrive(pathFinder, board);
+            final boolean canMove = piece.canArrive(path, board);
 
             assertThat(canMove).isTrue();
         }
@@ -66,23 +71,23 @@ class PawnTest {
         @DisplayName("블랙 폰은 밑으로 한 칸 또는 두 칸을 제외하고 움직일 수 없다.")
         @ParameterizedTest
         @MethodSource("provideUnValidPathForBlack")
-        void CanNotMoveUnlessOneOrTwoStepDown(PathFinder pathFinder) {
+        void CanNotMoveUnlessOneOrTwoStepDown(Path path) {
             final Map<Position, Square> board = EmptySquaresMaker.make();
             Piece piece = Pawn.from(Color.BLACK);
             board.put(new Position(Rank.SEVENTH, File.B), piece);
 
-            final boolean canMove = piece.canArrive(pathFinder, board);
+            final boolean canMove = piece.canArrive(path, board);
 
             assertThat(canMove).isFalse();
         }
 
-        static Stream<PathFinder> provideUnValidPathForBlack() {
+        static Stream<Path> provideUnValidPathForBlack() {
             return Stream.of(
-                    new PathFinder(new Position(Rank.SEVENTH, File.B), new Position(Rank.EIGHTH, File.B)),
-                    new PathFinder(new Position(Rank.SEVENTH, File.B), new Position(Rank.SEVENTH, File.A)),
-                    new PathFinder(new Position(Rank.SEVENTH, File.B), new Position(Rank.SEVENTH, File.C)),
-                    new PathFinder(new Position(Rank.SEVENTH, File.B), new Position(Rank.SIXTH, File.A)),
-                    new PathFinder(new Position(Rank.SEVENTH, File.B), new Position(Rank.SIXTH, File.C))
+                    new Path(new Position(Rank.SEVENTH, File.B), new Position(Rank.EIGHTH, File.B)),
+                    new Path(new Position(Rank.SEVENTH, File.B), new Position(Rank.SEVENTH, File.A)),
+                    new Path(new Position(Rank.SEVENTH, File.B), new Position(Rank.SEVENTH, File.C)),
+                    new Path(new Position(Rank.SEVENTH, File.B), new Position(Rank.SIXTH, File.A)),
+                    new Path(new Position(Rank.SEVENTH, File.B), new Position(Rank.SIXTH, File.C))
             );
         }
 
@@ -98,10 +103,10 @@ class PawnTest {
             Piece attackedPiece = Pawn.from(Color.WHITE);
             board.put(new Position(startRank, startFile), attackerPiece);
             board.put(new Position(targetRank, targetFile), attackedPiece);
-            PathFinder pathFinder = new PathFinder(
+            Path path = new Path(
                     new Position(startRank, startFile), new Position(targetRank, targetFile));
 
-            final boolean canAttack = attackerPiece.canArrive(pathFinder, board);
+            final boolean canAttack = attackerPiece.canArrive(path, board);
 
             assertThat(canAttack).isTrue();
         }
@@ -111,13 +116,13 @@ class PawnTest {
         @MethodSource("provideUnValidAttackedPositionForBlack")
         void CanNotAttackUnlessOneStepDownDiagonal(Position attackedPosition) {
             final Map<Position, Square> board = EmptySquaresMaker.make();
-            PathFinder pathFinder = new PathFinder(new Position(Rank.SEVENTH, File.B), attackedPosition);
+            Path path = new Path(new Position(Rank.SEVENTH, File.B), attackedPosition);
             Piece attackerPiece = Pawn.from(Color.BLACK);
             Piece attackedPiece = Pawn.from(Color.WHITE);
             board.put(new Position(Rank.SEVENTH, File.B), attackerPiece);
             board.put(attackedPosition, attackedPiece);
 
-            final boolean canAttack = attackerPiece.canArrive(pathFinder, board);
+            final boolean canAttack = attackerPiece.canArrive(path, board);
 
             assertThat(canAttack).isFalse();
         }
@@ -143,10 +148,10 @@ class PawnTest {
             final Map<Position, Square> board = EmptySquaresMaker.make();
             Piece piece = Pawn.from(Color.WHITE);
             board.put(new Position(Rank.SECOND, File.A), piece);
-            PathFinder pathFinder = new PathFinder(
+            Path path = new Path(
                     new Position(Rank.SECOND, File.A), new Position(Rank.FOURTH, File.A));
 
-            final boolean canMove = piece.canArrive(pathFinder, board);
+            final boolean canMove = piece.canArrive(path, board);
 
             assertThat(canMove).isTrue();
         }
@@ -157,9 +162,9 @@ class PawnTest {
             final Map<Position, Square> board = EmptySquaresMaker.make();
             Piece piece = Pawn.from(Color.WHITE);
             board.put(new Position(Rank.FOURTH, File.A), piece);
-            PathFinder pathFinder = new PathFinder(new Position(Rank.FOURTH, File.A), new Position(Rank.SIXTH, File.A));
+            Path path = new Path(new Position(Rank.FOURTH, File.A), new Position(Rank.SIXTH, File.A));
 
-            final boolean canMove = piece.canArrive(pathFinder, board);
+            final boolean canMove = piece.canArrive(path, board);
 
             assertThat(canMove).isFalse();
         }
@@ -170,9 +175,9 @@ class PawnTest {
             final Map<Position, Square> board = EmptySquaresMaker.make();
             Piece piece = Pawn.from(Color.WHITE);
             board.put(new Position(Rank.SECOND, File.A), piece);
-            PathFinder pathFinder = new PathFinder(new Position(Rank.SECOND, File.A), new Position(Rank.THIRD, File.A));
+            Path path = new Path(new Position(Rank.SECOND, File.A), new Position(Rank.THIRD, File.A));
 
-            final boolean canMove = piece.canArrive(pathFinder, board);
+            final boolean canMove = piece.canArrive(path, board);
 
             assertThat(canMove).isTrue();
         }
@@ -180,23 +185,23 @@ class PawnTest {
         @DisplayName("화이트 폰은 위로 한 칸 또는 두 칸을 제외하고 움직일 수 없다.")
         @ParameterizedTest
         @MethodSource("provideUnValidPathForWhite")
-        void canNotMoveUnlessOneOrTwoStepUp(PathFinder pathFinder) {
+        void canNotMoveUnlessOneOrTwoStepUp(Path path) {
             final Map<Position, Square> board = EmptySquaresMaker.make();
             Piece piece = Pawn.from(Color.WHITE);
             board.put(new Position(Rank.SECOND, File.B), piece);
 
-            final boolean canMove = piece.canArrive(pathFinder, board);
+            final boolean canMove = piece.canArrive(path, board);
 
             assertThat(canMove).isFalse();
         }
 
-        static Stream<PathFinder> provideUnValidPathForWhite() {
+        static Stream<Path> provideUnValidPathForWhite() {
             return Stream.of(
-                    new PathFinder(new Position(Rank.SECOND, File.B), new Position(Rank.FIRST, File.B)),
-                    new PathFinder(new Position(Rank.SECOND, File.B), new Position(Rank.SECOND, File.A)),
-                    new PathFinder(new Position(Rank.SECOND, File.B), new Position(Rank.SECOND, File.C)),
-                    new PathFinder(new Position(Rank.SECOND, File.B), new Position(Rank.FIRST, File.A)),
-                    new PathFinder(new Position(Rank.SECOND, File.B), new Position(Rank.FIRST, File.C))
+                    new Path(new Position(Rank.SECOND, File.B), new Position(Rank.FIRST, File.B)),
+                    new Path(new Position(Rank.SECOND, File.B), new Position(Rank.SECOND, File.A)),
+                    new Path(new Position(Rank.SECOND, File.B), new Position(Rank.SECOND, File.C)),
+                    new Path(new Position(Rank.SECOND, File.B), new Position(Rank.FIRST, File.A)),
+                    new Path(new Position(Rank.SECOND, File.B), new Position(Rank.FIRST, File.C))
             );
         }
 
@@ -212,10 +217,10 @@ class PawnTest {
             Piece attackedPiece = Pawn.from(Color.BLACK);
             board.put(new Position(startRank, startFile), attackerPiece);
             board.put(new Position(targetRank, targetFile), attackedPiece);
-            PathFinder pathFinder = new PathFinder(
+            Path path = new Path(
                     new Position(startRank, startFile), new Position(targetRank, targetFile));
 
-            final boolean canAttack = attackerPiece.canArrive(pathFinder, board);
+            final boolean canAttack = attackerPiece.canArrive(path, board);
 
             assertThat(canAttack).isTrue();
         }
@@ -225,13 +230,13 @@ class PawnTest {
         @MethodSource("provideUnValidAttackedPositionForWhite")
         void CanNotAttackUnlessOneStepDiagonal(Position attackedPosition) {
             final Map<Position, Square> board = EmptySquaresMaker.make();
-            PathFinder pathFinder = new PathFinder(new Position(Rank.SEVENTH, File.B), attackedPosition);
+            Path path = new Path(new Position(Rank.SEVENTH, File.B), attackedPosition);
             Piece attackerPiece = Pawn.from(Color.WHITE);
             Piece attackedPiece = Pawn.from(Color.BLACK);
             board.put(new Position(Rank.SEVENTH, File.B), attackerPiece);
             board.put(attackedPosition, attackedPiece);
 
-            final boolean canAttack = attackerPiece.canArrive(pathFinder, board);
+            final boolean canAttack = attackerPiece.canArrive(path, board);
 
             assertThat(canAttack).isFalse();
         }
@@ -246,5 +251,25 @@ class PawnTest {
                     new Position(Rank.SEVENTH, File.C)
             );
         }
+    }
+
+    @DisplayName("Pawn과 같은 File에 다른 Pawn이 없으면, 그 Pawn은 1점이다.")
+    @Test
+    void scoreIsOneUnlessSameColorPawnExistInSameFile() {
+        Pawn pawn = Pawn.from(Color.WHITE);
+
+        Score score = pawn.score(Set.of(Pawn.from(Color.BLACK), Bishop.from(Color.WHITE)));
+
+        assertThat(score).isEqualTo(Score.of(1.0, Color.WHITE));
+    }
+
+    @DisplayName("Pawn과 같은 File에 다른 Pawn이 있으면, 그 Pawn은 0.5점이다.")
+    @Test
+    void scoreIsPointFiveIfSameColorPawnExistInSameFile() {
+        Pawn pawn = Pawn.from(Color.WHITE);
+
+        Score score = pawn.score(Set.of(Pawn.from(Color.WHITE), Bishop.from(Color.WHITE)));
+
+        assertThat(score).isEqualTo(Score.of(0.5, Color.WHITE));
     }
 }

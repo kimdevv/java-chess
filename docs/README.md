@@ -1,3 +1,34 @@
+# 4단계 - DB 적용
+
+## 실행 방법
+
+1. `docekr-compose.yml`파일이 있는 `docker` 폴더에서 docker 실행
+```zsh
+docker-compose -p chess up -d
+```
+
+2. `Application` 실행
+
+0. 테이블 스키마
+```mysql
+USE chess;
+
+CREATE TABLE chess_board
+(
+    position    VARCHAR(5) NOT NULL,
+    team        VARCHAR(10) NOT NULL,
+    type        VARCHAR(10) NOT NULL,
+    PRIMARY KEY (position)
+);
+
+CREATE TABLE game_infos
+(
+    game_id INT NOT NULL,
+    turn    VARCHAR(5) NOT NULL,
+    PRIMARY KEY (game_id)
+);
+```
+
 # 3단계 - 승패 및 점수
 
 ## 주요 기능

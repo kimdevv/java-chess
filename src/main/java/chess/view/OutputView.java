@@ -1,7 +1,8 @@
 package chess.view;
 
-import chess.domain.pieceInfo.Team;
 import chess.domain.dto.BoardDto;
+import chess.domain.pieceInfo.Team;
+
 import java.util.List;
 
 public class OutputView {
@@ -31,7 +32,9 @@ public class OutputView {
         System.out.printf("> 게임 시작 : start%n"
                 + "> 게임 종료 : end%n"
                 + "> 게임 이동 : move source위치 target위치 - 예. move b2 b3%n"
-                + "> 게임 점수 : status%n");
+                + "> 게임 점수 : status%n"
+                + "> 게임 저장 : save%n"
+                + "> 게임 로드 : load%n");
     }
 
     public static void printWinner(final Team turn) {
@@ -48,5 +51,15 @@ public class OutputView {
         System.out.printf("> %s 점수 : %f%n", Team.WHITE, whiteScore);
         System.out.printf("> %s 점수 : %f%n", Team.BLACK, blackScore);
         System.out.printf("> 두 진영이 같은 점수입니다.%n");
+    }
+
+    public static void printSaveMessage() {
+        System.out.println("현재 상태가 저장되었습니다.");
+    }
+
+    public static void printLoadMessage(final BoardDto boardDto, final Team turn) {
+        System.out.println("저장된 상태를 불러옵니다.");
+        printBoard(boardDto);
+        System.out.printf("%s의 차례입니다.", turn.name());
     }
 }

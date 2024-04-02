@@ -15,6 +15,11 @@ public class ChessGame {
         this.board = new Board();
     }
 
+    public ChessGame(Board board, Team turn) {
+        this.board = board;
+        this.turn = turn;
+    }
+
     public void start() {
         if (notStarted()) {
             turn = Team.WHITE;
@@ -63,7 +68,7 @@ public class ChessGame {
         }
     }
 
-    private boolean notStarted() {
+    public boolean notStarted() {
         return turn != Team.WHITE && turn != Team.BLACK;
     }
 

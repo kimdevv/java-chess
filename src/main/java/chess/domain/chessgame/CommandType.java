@@ -6,7 +6,10 @@ public enum CommandType {
     START("start"),
     MOVE("move"),
     END("end"),
-    STATUS("status");
+    STATUS("status"),
+    SAVE("save"),
+    LOAD("load"),
+    ;
 
     private final String commandType;
 

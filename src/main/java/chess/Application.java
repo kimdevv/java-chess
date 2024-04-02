@@ -1,19 +1,17 @@
 package chess;
 
-import chess.controller.ChessGame;
-import chess.domain.Board;
+import chess.controller.ChessGameController;
 import chess.view.OutputView;
 
 public class Application {
+    private static final long CHESS_ROOM_ID = 1;
 
     public static void main(String[] args) {
         OutputView.printChessGameStartMessage();
         OutputView.printCommandGuideMessage();
 
-        Board board = new Board();
-        board.placeInitialPieces();
-        ChessGame chessGame = new ChessGame(board);
+        ChessGameController chessGameController = new ChessGameController(CHESS_ROOM_ID);
 
-        chessGame.startGame();
+        chessGameController.startGame();
     }
 }

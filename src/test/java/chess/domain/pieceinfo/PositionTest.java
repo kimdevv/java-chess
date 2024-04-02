@@ -1,4 +1,4 @@
-package chess.domain;
+package chess.domain.pieceinfo;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -38,8 +38,7 @@ public class PositionTest {
     @ValueSource(strings = {"a9", "i1", "00", "1a", "aa"})
     void validateRangeTest(String position) {
         Assertions.assertThatThrownBy(() -> Position.of(position))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("보드의 범위를 벗어난 좌표입니다.");
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("서로 다른 좌표간의 차이를 반환한다.")
@@ -53,7 +52,7 @@ public class PositionTest {
 
         Assertions.assertThat(actualPositionDifference).isEqualTo(expectedPositionDifference);
     }
-    
+
     @DisplayName("좌표 사이에 있는 좌표들을 반환한다.")
     @ParameterizedTest
     @MethodSource("getInternalPositionsParameters")

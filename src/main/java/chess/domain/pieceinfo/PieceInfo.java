@@ -1,4 +1,4 @@
-package chess.domain;
+package chess.domain.pieceinfo;
 
 import java.util.Objects;
 
@@ -21,10 +21,6 @@ public class PieceInfo {
 
     public boolean isSameTeam(Team otherTeam) {
         return team == otherTeam;
-    }
-
-    public boolean isDifferentPosition(Position otherPosition) {
-        return !position.equals(otherPosition);
     }
 
     public PieceInfo renewPosition(Position newPosition) {

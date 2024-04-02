@@ -11,4 +11,10 @@ public class InputView {
     public static List<String> inputCommand() {
         return List.of(scanner.nextLine().split(SEPARATOR));
     }
+
+    public static String inputIfNewGame() {
+        System.out.printf("> 새로운 게임 시작 : 1%n"
+                + "> 원래 게임 시작 : 2%n");
+        return scanner.nextLine();
+    }
 }

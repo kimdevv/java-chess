@@ -1,7 +1,7 @@
 package chess.domain.strategy;
 
-import chess.domain.Position;
-import chess.domain.PositionDifference;
+import chess.domain.pieceinfo.Position;
+import chess.domain.pieceinfo.PositionDifference;
 
 public class RookMoveStrategy implements MoveStrategy {
 

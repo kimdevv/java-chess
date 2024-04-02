@@ -1,7 +1,7 @@
 package chess.domain.piece;
 
-import chess.domain.PieceInfo;
-import chess.domain.Position;
+import chess.domain.pieceinfo.PieceInfo;
+import chess.domain.pieceinfo.Position;
 import chess.domain.strategy.MoveStrategy;
 
 public class EmptyPiece extends ChessPiece {
@@ -11,8 +11,7 @@ public class EmptyPiece extends ChessPiece {
     }
 
     @Override
-    public ChessPiece move(Position newPosition, boolean isObstacleInRange, boolean isOtherPieceExist,
-                           boolean isSameTeamExist) {
+    public ChessPiece createNewPiece(PieceInfo newPieceInfo) {
         return this;
     }
 
@@ -25,5 +24,10 @@ public class EmptyPiece extends ChessPiece {
     @Override
     public PieceType getType() {
         return PieceType.EMPTY;
+    }
+
+    @Override
+    public double getScore() {
+        return 0;
     }
 }

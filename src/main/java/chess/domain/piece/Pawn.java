@@ -1,58 +1,40 @@
 package chess.domain.piece;
 
-import chess.domain.PieceInfo;
-import chess.domain.Position;
-import chess.domain.Team;
-import chess.domain.strategy.BlackPawnNotFirstMoveStrategy;
-import chess.domain.strategy.MoveStrategy;
-import chess.domain.strategy.WhitePawnNotFirstMoveStrategy;
+import static chess.domain.pieceinfo.PieceScore.PAWN_SCORE;
 
-public class Pawn extends ChessPiece {
-    private static final WhitePawnNotFirstMoveStrategy whitePawnNotFirstMoveStrategy = new WhitePawnNotFirstMoveStrategy();
-    private static final BlackPawnNotFirstMoveStrategy blackPawnNotFirstMoveStrategy = new BlackPawnNotFirstMoveStrategy();
+import chess.domain.pieceinfo.PieceInfo;
+import chess.domain.pieceinfo.Position;
+import chess.domain.strategy.MoveStrategy;
+
+public abstract class Pawn extends ChessPiece {
 
     public Pawn(PieceInfo pieceInfo, MoveStrategy moveStrategy) {
         super(pieceInfo, moveStrategy);
     }
 
     @Override
-    public ChessPiece move(Position newPosition, boolean isObstacleInRange, boolean isOtherPieceExist,
-                           boolean isSameTeam) {
-        if (isMoveInvalid(newPosition, isObstacleInRange, isOtherPieceExist, isSameTeam)) {
-            return this;
-        }
-
-        PieceInfo newPieceInfo = pieceInfo.renewPosition(newPosition);
-        return new Pawn(newPieceInfo, changeMovedStrategy());
-    }
+    public abstract ChessPiece createNewPiece(PieceInfo newPieceInfo);
 
     @Override
-    public PieceType getType() {
-        return PieceType.PAWN;
-    }
+    public abstract PieceType getType();
 
     @Override
     public boolean isMoveInvalid(Position newPosition, boolean isDisturbed, boolean isOtherPieceExist,
-                                 boolean isSameTeam) {
+                                 boolean isSameTeamExist) {
         Position currentPosition = pieceInfo.getPosition();
-        int diffX = Math.abs(currentPosition.getX() - newPosition.getX());
+        int diffX = Math.abs(currentPosition.getFileIndex() - newPosition.getFileIndex());
 
         boolean isInvalidVerticalMove = (diffX == 0) && isOtherPieceExist;
-        boolean isInvalidDiagonalMove = (diffX == 1) && (!isOtherPieceExist || isSameTeam);
+        boolean isInvalidDiagonalMove = (diffX == 1) && (!isOtherPieceExist || isSameTeamExist);
 
         if (!moveStrategy.canMove(currentPosition, newPosition)) {
             return true;
         }
-        if (isDisturbed || isInvalidVerticalMove || isInvalidDiagonalMove) {
-            return true;
-        }
-        return false;
+        return isDisturbed || isInvalidVerticalMove || isInvalidDiagonalMove;
     }
 
-    private MoveStrategy changeMovedStrategy() {
-        if (pieceInfo.getTeam() == Team.WHITE) {
-            return whitePawnNotFirstMoveStrategy;
-        }
-        return blackPawnNotFirstMoveStrategy;
+    @Override
+    public double getScore() {
+        return PAWN_SCORE.get();
     }
 }

@@ -1,7 +1,8 @@
-package chess.domain;
+package chess.domain.command;
 
-import static chess.domain.CommandType.MOVE;
+import static chess.domain.command.CommandType.MOVE;
 
+import chess.domain.pieceinfo.Position;
 import java.util.List;
 
 public class Command {
@@ -59,9 +60,13 @@ public class Command {
         return route.getTarget();
     }
 
+    public CommandType getCommandType() {
+        return commandType;
+    }
+
     private void checkCommandTypeMoveWhenGetRoute() {
         if (commandType != MOVE) {
-            throw new IllegalArgumentException("start와 end 커맨드 타입은 경로를 갖지 않습니다.");
+            throw new IllegalArgumentException("move가 아닌 커맨드 타입은 경로를 갖지 않습니다.");
         }
     }
 }

@@ -1,8 +1,8 @@
 package chess.domain.piece;
 
-import chess.domain.PieceInfo;
-import chess.domain.Position;
-import chess.domain.Team;
+import chess.domain.pieceinfo.PieceInfo;
+import chess.domain.pieceinfo.Position;
+import chess.domain.pieceinfo.Team;
 import chess.domain.strategy.MoveStrategy;
 import java.util.Objects;
 
@@ -16,15 +16,34 @@ public abstract class ChessPiece implements Piece {
     }
 
     @Override
-    public abstract ChessPiece move(Position newPosition, boolean isObstacleInRange, boolean isOtherPieceExist,
-                                    boolean isSameTeamExist);
-
-    @Override
-    public abstract boolean isMoveInvalid(Position newPosition, boolean isDisturbed, boolean isOtherPieceExist,
-                                          boolean isSameTeam);
+    public abstract ChessPiece createNewPiece(PieceInfo newPieceInfo);
 
     @Override
     public abstract PieceType getType();
+
+    @Override
+    public abstract double getScore();
+
+    @Override
+    public ChessPiece move(Position newPosition, boolean isObstacleInRange, boolean isOtherPieceExist,
+                           boolean isSameTeamExist) {
+        if (isMoveInvalid(newPosition, isObstacleInRange, isOtherPieceExist, isSameTeamExist)) {
+            return this;
+        }
+
+        PieceInfo newPieceInfo = pieceInfo.renewPosition(newPosition);
+        return createNewPiece(newPieceInfo);
+    }
+
+    @Override
+    public boolean isMoveInvalid(Position newPosition, boolean isDisturbed, boolean isOtherPieceExist,
+                                 boolean isSameTeamExist) {
+        Position currentPosition = pieceInfo.getPosition();
+        if (!moveStrategy.canMove(currentPosition, newPosition)) {
+            return true;
+        }
+        return isDisturbed || isSameTeamExist;
+    }
 
     @Override
     public PieceInfo getPieceInfo() {

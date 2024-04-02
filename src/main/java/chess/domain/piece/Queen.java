@@ -1,7 +1,8 @@
 package chess.domain.piece;
 
-import chess.domain.PieceInfo;
-import chess.domain.Position;
+import static chess.domain.pieceinfo.PieceScore.QUEEN_SCORE;
+
+import chess.domain.pieceinfo.PieceInfo;
 import chess.domain.strategy.MoveStrategy;
 
 public class Queen extends ChessPiece {
@@ -11,13 +12,7 @@ public class Queen extends ChessPiece {
     }
 
     @Override
-    public ChessPiece move(Position newPosition, boolean isObstacleInRange, boolean isOtherPieceExist,
-                           boolean isSameTeamExist) {
-        if (isMoveInvalid(newPosition, isObstacleInRange, isOtherPieceExist, isSameTeamExist)) {
-            return this;
-        }
-
-        PieceInfo newPieceInfo = pieceInfo.renewPosition(newPosition);
+    public ChessPiece createNewPiece(PieceInfo newPieceInfo) {
         return new Queen(newPieceInfo, moveStrategy);
     }
 
@@ -27,15 +22,7 @@ public class Queen extends ChessPiece {
     }
 
     @Override
-    public boolean isMoveInvalid(Position newPosition, boolean isDisturbed, boolean isOtherPieceExist,
-                                 boolean isSameTeamExist) {
-        Position currentPosition = pieceInfo.getPosition();
-        if (!moveStrategy.canMove(currentPosition, newPosition)) {
-            return true;
-        }
-        if (isDisturbed || isSameTeamExist) {
-            return true;
-        }
-        return false;
+    public double getScore() {
+        return QUEEN_SCORE.get();
     }
 }

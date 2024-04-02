@@ -1,26 +1,30 @@
 package chess.model.board;
 
+import chess.model.evaluation.GameResult;
 import chess.model.evaluation.PositionEvaluation;
 import chess.model.piece.Blank;
 import chess.model.piece.King;
 import chess.model.piece.Piece;
 import chess.model.piece.Side;
-import chess.model.position.Position;
 import chess.model.position.Path;
+import chess.model.position.Position;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.unmodifiableMap;
 
 public class ChessBoard {
+    private final long id;
     private final Map<Position, Piece> board;
 
-    public ChessBoard(Map<Position, Piece> board) {
+    public ChessBoard(long id, Map<Position, Piece> board) {
+        this.id = id;
         this.board = new HashMap<>(board);
     }
 
-    public void move(Position sourcePosition, Position targetPosition, Turn turn) {
+    public Piece move(Position sourcePosition, Position targetPosition, Turn turn) {
         Piece sourcePiece = board.get(sourcePosition);
         validateSource(sourcePiece, turn);
         Piece targetPiece = board.get(targetPosition);
@@ -29,6 +33,7 @@ public class ChessBoard {
         validatePathIsEmpty(path);
         validatePathContainsPiece(path);
         replacePiece(sourcePiece, sourcePosition, targetPosition);
+        return sourcePiece;
     }
 
     private void validateSource(Piece sourcePiece, Turn turn) {
@@ -63,8 +68,8 @@ public class ChessBoard {
         board.put(targetPosition, sourcePiece);
     }
 
-    public boolean canContinue() {
-        return Side.colors()
+    public boolean canNotProgress() {
+        return !Side.colors()
                 .stream()
                 .allMatch(side -> board.containsValue(King.from(side)));
     }
@@ -73,7 +78,25 @@ public class ChessBoard {
         return new PositionEvaluation(board);
     }
 
+    public GameResult determineGameResult() {
+        List<GameResult> gameResults = Side.colors()
+                .stream()
+                .filter(side -> board.containsValue(King.from(side)))
+                .map(GameResult::from)
+                .toList();
+        if (gameResults.size() == Side.colorsSize()) {
+            return GameResult.TIE;
+        }
+        return gameResults.stream()
+                .findFirst()
+                .orElseThrow(() -> new UnsupportedOperationException("게임이 이미 종료되어 결과를 판단할 수 없습니다."));
+    }
+
     public Map<Position, Piece> getBoard() {
         return unmodifiableMap(board);
+    }
+
+    public long getId() {
+        return id;
     }
 }

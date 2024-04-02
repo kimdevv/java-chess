@@ -1,5 +1,7 @@
 package chess.controller;
 
+import chess.dao.util.ProductMySqlConnector;
+import chess.service.ChessGameService;
 import chess.view.input.InputView;
 import chess.view.output.OutputView;
 
@@ -7,25 +9,21 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class ChessGame {
-    private final InputView inputView;
-    private final OutputView outputView;
-
-    public ChessGame(InputView inputView, OutputView outputView) {
-        this.inputView = inputView;
-        this.outputView = outputView;
-    }
+    private final InputView inputView = new InputView();
+    private final OutputView outputView = new OutputView();
+    private final ChessGameService chessGameService = new ChessGameService(new ProductMySqlConnector());
 
     public void start() {
         GameState gameState = retryOnException(this::prepare);
         while (gameState.canContinue()) {
             GameState currentGameState = gameState;
-            gameState = retryOnException(() -> currentGameState.run(inputView, outputView));
+            gameState = retryOnException(() -> currentGameState.run(inputView, outputView, chessGameService));
         }
     }
 
     private GameState prepare() {
         GameState prepare = new Prepare();
-        return prepare.run(inputView, outputView);
+        return prepare.run(inputView, outputView, chessGameService);
     }
 
     private <T> T retryOnException(Supplier<T> retryOperation) {

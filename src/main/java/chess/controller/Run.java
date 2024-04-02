@@ -1,14 +1,12 @@
 package chess.controller;
 
 import chess.model.board.ChessBoard;
-import chess.model.evaluation.PositionEvaluation;
 import chess.model.board.Turn;
-import chess.model.piece.Side;
-import chess.model.position.Position;
+import chess.model.evaluation.PositionEvaluation;
+import chess.service.ChessGameService;
 import chess.view.input.GameArguments;
 import chess.view.input.GameCommand;
 import chess.view.input.InputView;
-import chess.view.input.MoveArguments;
 import chess.view.output.OutputView;
 
 public class Run implements GameState {
@@ -20,30 +18,28 @@ public class Run implements GameState {
         this.turn = turn;
     }
 
-    public static Run initializeWithFirstTurn(ChessBoard chessBoard) {
-        return new Run(chessBoard, Turn.from(Side.WHITE));
+    @Override
+    public GameState run(InputView inputView, OutputView outputView, ChessGameService chessGameService) {
+        if (chessBoard.canNotProgress()) {
+            return new Summarize(chessBoard);
+        }
+        GameArguments gameArguments = inputView.readMoveArguments();
+        return playByCommand(gameArguments, outputView);
     }
 
-    @Override
-    public GameState run(InputView inputView, OutputView outputView) {
-        GameArguments gameArguments = inputView.readMoveArguments();
+    private GameState playByCommand(GameArguments gameArguments, OutputView outputView) {
         GameCommand gameCommand = gameArguments.gameCommand();
         if (gameCommand.isEnd()) {
             return new End();
         }
+        if (gameCommand.isTie()) {
+            return new Summarize(chessBoard);
+        }
         if (gameCommand.isMove()) {
-            move(gameArguments.moveArguments(), outputView);
-            return new Run(chessBoard, turn.getNextTurn());
+            return new Move(chessBoard, turn, gameArguments.moveArguments());
         }
         evaluateCurrentBoard(outputView);
         return this;
-    }
-
-    private void move(MoveArguments moveArguments, OutputView outputView) {
-        Position source = moveArguments.createSourcePosition();
-        Position target = moveArguments.createTargetPosition();
-        chessBoard.move(source, target, turn);
-        outputView.printChessBoard(chessBoard);
     }
 
     private void evaluateCurrentBoard(OutputView outputView) {
@@ -53,6 +49,6 @@ public class Run implements GameState {
 
     @Override
     public boolean canContinue() {
-        return chessBoard.canContinue();
+        return true;
     }
 }

@@ -1,18 +1,23 @@
 package chess.domain.piece;
 
-import chess.domain.PieceRelation;
-import chess.domain.position.Movement;
+import chess.domain.position.Position;
 
 public abstract class Piece {
     protected final PieceColor color;
-    protected final PieceType type;
 
-    public Piece(final PieceColor color, final PieceType type) {
+    public Piece(final PieceColor color) {
         this.color = color;
-        this.type = type;
     }
 
-    public abstract boolean isMovable(final Movement movement, final PieceRelation pieceRelation, boolean isOpened);
+    public abstract boolean isMovable(final Position source, final Position target, final PieceRelation pieceRelation);
+
+    public boolean isKing() {
+        return false;
+    }
+
+    public boolean isPawn() {
+        return false;
+    }
 
     public boolean isColor(final PieceColor color) {
         return this.color == color;
@@ -21,6 +26,4 @@ public abstract class Piece {
     public PieceColor color() {
         return color;
     }
-
-    public PieceType type() {return type;}
 }

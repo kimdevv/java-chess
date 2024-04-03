@@ -30,6 +30,10 @@ public class Position {
         return file.value() + rank.value();
     }
 
+    public boolean isFile(final ChessFile file) {
+        return this.file == file;
+    }
+
     public boolean isRank(final ChessRank rank) {
         return this.rank == rank;
     }
@@ -62,6 +66,14 @@ public class Position {
 
     public int indexOfRank() {
         return rank.index();
+    }
+
+    public String valueOfRank() {
+        return rank.value();
+    }
+
+    public String valueOfFile() {
+        return file.value();
     }
 
     @Override

@@ -1,6 +1,6 @@
 package chess.view;
 
-import chess.domain.piece.PieceType;
+import chess.dto.PieceType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
-class PieceTypeViewTest {
+class PieceInfoTypeViewTest {
 
     @DisplayName("모든 PieceType에 대응되는 PieceTypeView를 이름으로 찾을 수 있다.")
     @Test

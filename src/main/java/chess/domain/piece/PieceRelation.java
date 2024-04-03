@@ -1,6 +1,4 @@
-package chess.domain;
-
-import chess.domain.piece.Piece;
+package chess.domain.piece;
 
 public enum PieceRelation {
     NONE,

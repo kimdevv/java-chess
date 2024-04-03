@@ -1,37 +1,42 @@
 package chess.controller;
 
-import chess.domain.Turn;
-import chess.domain.board.ChessBoard;
-import chess.domain.board.ChessBoardGenerator;
-import chess.dto.BoardStatus;
+import chess.controller.command.Command;
+import chess.controller.command.CommandFactory;
+import chess.domain.game.ChessGame;
 import chess.dto.CommandInfo;
+import chess.service.GameService;
+import chess.view.CommandType;
 import chess.view.InputView;
 import chess.view.OutputView;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class ChessGame {
+public class GameController {
     private static final String GAME_NOT_STARTED = "아직 게임이 시작되지 않았습니다.";
-    private static final String GAME_ALREADY_STARTED = "게임 도중 start 명령어를 입력할 수 없습니다.";
-    private static final int SOURCE_INDEX = 0;
-    private static final int TARGET_INDEX = 1;
 
     private final InputView inputView;
     private final OutputView outputView;
+    private final Map<CommandType, Command> commands;
+    private final GameService gameService;
 
-    public ChessGame(final InputView inputView, OutputView outputView) {
+    public GameController(final InputView inputView, final OutputView outputView, final GameService gameService) {
         this.inputView = inputView;
         this.outputView = outputView;
+        this.gameService = gameService;
+        this.commands = CommandFactory.getInstance().create();
     }
 
-    public void run() {
+    public void run(long roomId) {
         outputView.printGameStartMessage();
         start();
-        Turn turn = Turn.first();
-        ChessBoard chessBoard = new ChessBoard(ChessBoardGenerator.getInstance().generate());
-        showBoard(chessBoard);
-        play(turn, chessBoard);
+        ChessGame game = gameService.findGame(roomId);
+        outputView.printChessBoard(game.getBoardStatus());
+
+        play(game);
+
+        terminate(game);
     }
 
     private void start() {
@@ -49,40 +54,33 @@ public class ChessGame {
         return commandInfo;
     }
 
-    private void play(final Turn turn, final ChessBoard chessBoard) {
-        CommandInfo commandInfo = requestUntilValid(this::requestMove);
-        while (commandInfo.type().isMove()) {
-            playTurn(turn, chessBoard, commandInfo);
-            turn.next();
-            commandInfo = requestUntilValid(this::requestMove);
+    private void play(final ChessGame game) {
+        CommandInfo commandInfo = requestUntilValid(this::readCommandInfo);
+        while (!commandInfo.type().isEnd()) {
+            executeCommand(game, commandInfo);
+            if (game.isTerminated()) {
+                break;
+            }
+            commandInfo = requestUntilValid(this::readCommandInfo);
         }
-    }
-
-    private CommandInfo requestMove() {
-        CommandInfo commandInfo = readCommandInfo();
-        if (commandInfo.type().isStart()) {
-            throw new IllegalArgumentException(GAME_ALREADY_STARTED);
-        }
-        return commandInfo;
     }
 
     private CommandInfo readCommandInfo() {
         return CommandInfo.from(requestUntilValid(inputView::readCommand));
     }
 
-    private void playTurn(final Turn turn, final ChessBoard chessBoard, final CommandInfo commandInfo) {
+    private void executeCommand(final ChessGame game, final CommandInfo commandInfo) {
         try {
-            chessBoard.move(commandInfo.arguments().get(SOURCE_INDEX), commandInfo.arguments().get(TARGET_INDEX), turn);
-            showBoard(chessBoard);
+            commands.get(commandInfo.type()).execute(game, commandInfo, outputView, gameService);
         } catch (IllegalArgumentException e) {
             outputView.printGameErrorMessage(e.getMessage());
-            play(turn, chessBoard);
+            play(game);
         }
     }
 
-    private void showBoard(final ChessBoard chessBoard) {
-        BoardStatus boardStatus = chessBoard.status();
-        outputView.printChessBoard(boardStatus);
+    private void terminate(final ChessGame game) {
+        outputView.printEndMessage();
+        outputView.printGameStatus(game.getWinningInfo());
     }
 
     private <T> T requestUntilValid(Supplier<T> supplier) {

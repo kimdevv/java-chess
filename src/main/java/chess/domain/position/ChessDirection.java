@@ -1,7 +1,9 @@
 package chess.domain.position;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public enum ChessDirection {
     UP(0, 1),
@@ -58,35 +60,47 @@ public enum ChessDirection {
         return rankDiff == 0 && fileDiff != 0;
     }
 
-    public boolean isLShaped() {
-        return List.of(UP_UP_LEFT, UP_UP_RIGHT, RIGHT_RIGHT_UP, RIGHT_RIGHT_DOWN, LEFT_LEFT_DOWN, LEFT_LEFT_UP, DOWN_DOWN_LEFT, DOWN_DOWN_RIGHT).contains(this);
+    public static Set<ChessDirection> LShapedDirections() {
+        return Set.of(UP_UP_LEFT, UP_UP_RIGHT, RIGHT_RIGHT_UP, RIGHT_RIGHT_DOWN, LEFT_LEFT_DOWN, LEFT_LEFT_UP, DOWN_DOWN_LEFT, DOWN_DOWN_RIGHT);
+    }
+
+    public static Set<ChessDirection> diagonal() {
+        return Set.of(UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT);
+    }
+
+    public static Set<ChessDirection> cross() {
+        return Set.of(UP, DOWN, RIGHT, LEFT);
+    }
+
+    public static Set<ChessDirection> upSide() {
+        return Set.of(UP, UP_LEFT, UP_RIGHT);
+    }
+
+    public static Set<ChessDirection> downSide() {
+        return Set.of(DOWN, DOWN_LEFT, DOWN_RIGHT);
+    }
+
+    public static Set<ChessDirection> combine(Set<ChessDirection>... directions) {
+        Set<ChessDirection> combinedDirections = new HashSet<>();
+        for (final Set<ChessDirection> chessDirections : directions) {
+            combinedDirections.addAll(chessDirections);
+        }
+        return combinedDirections;
     }
 
     public boolean isDiagonal() {
-        return List.of(UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT).contains(this);
-    }
-
-    public boolean isCross() {
-        return List.of(UP, DOWN, RIGHT, LEFT).contains(this);
+        return diagonal().contains(this);
     }
 
     public boolean isVertical() {
         return List.of(UP, DOWN).contains(this);
     }
 
-    public boolean isHorizontal() {
-        return List.of(LEFT, RIGHT).contains(this);
+    public int x() {
+        return x;
     }
 
-    public boolean isUpSide() {
-        return List.of(UP, UP_LEFT, UP_RIGHT).contains(this);
-    }
-
-    public boolean isDownSide() {
-        return List.of(DOWN, DOWN_LEFT, DOWN_RIGHT).contains(this);
-    }
-
-    public boolean isLeftSide() {
-        return List.of(LEFT, UP_LEFT, DOWN_LEFT).contains(this);
+    public int y() {
+        return y;
     }
 }

@@ -1,56 +1,70 @@
 package chess.domain.piece.type;
 
-import chess.domain.PieceRelation;
 import chess.domain.piece.Piece;
 import chess.domain.piece.PieceColor;
-import chess.domain.piece.PieceType;
-import chess.domain.position.ChessRank;
+import chess.domain.piece.PieceRelation;
 import chess.domain.position.ChessDirection;
-import chess.domain.position.Movement;
+import chess.domain.position.ChessRank;
+import chess.domain.position.Position;
+
+import java.util.Set;
 
 public final class Pawn extends Piece {
+    private static final Set<ChessDirection> WHITE_DIRECTIONS = ChessDirection.upSide();
+    private static final Set<ChessDirection> BLACK_DIRECTIONS = ChessDirection.downSide();
 
     public Pawn(final PieceColor color) {
-        super(color, PieceType.PAWN);
+        super(color);
     }
 
     @Override
-    public boolean isMovable(final Movement movement, final PieceRelation pieceRelation, final boolean isOpened) {
-        return isMovableDirection(movement, pieceRelation) && isMovableDistance(movement) && isOpened;
+    public boolean isMovable(final Position source, final Position target, final PieceRelation pieceRelation) {
+        return isMovableDirection(source, target, pieceRelation) && isMovableDistance(source, target);
     }
 
-    private boolean isMovableDirection(final Movement movement, final PieceRelation targetStatus) {
-        if (targetStatus.isEnemy()) {
-            return canAttack(movement);
+    @Override
+    public boolean isPawn() {
+        return true;
+    }
+
+    private boolean isMovableDirection(final Position source, final Position target, final PieceRelation pieceRelation) {
+        if (pieceRelation.isEnemy()) {
+            return canAttack(source, target);
         }
-        return canMove(movement);
+        return canMove(source, target);
     }
 
-    private boolean canMove(final Movement movement) {
-        ChessDirection chessDirection = movement.findDirection();
+    private boolean canAttack(final Position source, final Position target) {
+        ChessDirection chessDirection = findDirection(source, target);
         if (color.isWhite()) {
-            return chessDirection.isVertical() && chessDirection.isUpSide();
+            return WHITE_DIRECTIONS.contains(chessDirection) && chessDirection.isDiagonal();
         }
-        return chessDirection.isVertical() && chessDirection.isDownSide();
+        return BLACK_DIRECTIONS.contains(chessDirection) && chessDirection.isDiagonal();
     }
 
-    private boolean canAttack(final Movement movement) {
-        ChessDirection chessDirection = movement.findDirection();
+    private boolean canMove(final Position source, final Position target) {
+        ChessDirection chessDirection = findDirection(source, target);
         if (color.isWhite()) {
-            return chessDirection.isDiagonal() && chessDirection.isUpSide();
+            return WHITE_DIRECTIONS.contains(chessDirection) && chessDirection.isVertical();
         }
-        return chessDirection.isDiagonal() && chessDirection.isDownSide();
+        return BLACK_DIRECTIONS.contains(chessDirection) && chessDirection.isVertical();
     }
 
-    private boolean isMovableDistance(final Movement movement) {
-        int distance = movement.calculateDistance();
-        ChessDirection chessDirection = movement.findDirection();
-        if (color.isWhite() && movement.isSourceRank(ChessRank.TWO) && chessDirection == ChessDirection.UP) {
+    private boolean isMovableDistance(final Position source, final Position target) {
+        int distance = source.calculateDistanceTo(target);
+        ChessDirection chessDirection = findDirection(source, target);
+        if (color.isWhite() && source.isRank(ChessRank.TWO) && chessDirection == ChessDirection.UP) {
             return (distance == 1 || distance == 2);
         }
-        if (color.isBlack() && movement.isSourceRank(ChessRank.SEVEN) && chessDirection == ChessDirection.DOWN) {
+        if (color.isBlack() && source.isRank(ChessRank.SEVEN) && chessDirection == ChessDirection.DOWN) {
             return (distance == 1 || distance == 2);
         }
         return distance == 1;
+    }
+
+    private ChessDirection findDirection(final Position source, final Position target) {
+        int fileDifference = source.calculateFileDifferenceTo(target);
+        int rankDifference = source.calculateRankDifferenceTo(target);
+        return ChessDirection.findDirection(fileDifference, rankDifference);
     }
 }

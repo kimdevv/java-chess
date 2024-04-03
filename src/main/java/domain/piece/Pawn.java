@@ -1,14 +1,9 @@
 package domain.piece;
 
-import static domain.PieceMoveResult.CATCH;
-import static domain.PieceMoveResult.FAILURE;
-import static domain.PieceMoveResult.SUCCESS;
-import static domain.piece.PieceType.PAWN;
-
 import domain.PieceMoveResult;
-import domain.PiecesOnChessBoard;
 import domain.Position;
 import domain.Team;
+import domain.board.PiecesOnChessBoard;
 import java.util.List;
 
 public final class Pawn extends Piece {
@@ -23,15 +18,15 @@ public final class Pawn extends Piece {
     @Override
     public PieceMoveResult tryMove(Position targetPosition, PiecesOnChessBoard piecesOnChessBoard) {
         if (isMoveForward(targetPosition) && isEmpty(targetPosition, piecesOnChessBoard)) {
-            return SUCCESS;
+            return PieceMoveResult.SUCCESS;
         }
         if (isMoveForwardTwo(targetPosition, piecesOnChessBoard) && isEmpty(targetPosition, piecesOnChessBoard)) {
-            return SUCCESS;
+            return PieceMoveResult.SUCCESS;
         }
         if (isMoveDiagonal(targetPosition) && isOtherTeam(targetPosition, piecesOnChessBoard)) {
-            return CATCH;
+            return getCatchKingOrOther(targetPosition, piecesOnChessBoard);
         }
-        return FAILURE;
+        return PieceMoveResult.FAILURE;
     }
 
     private boolean isMoveForward(Position targetPosition) {
@@ -82,8 +77,20 @@ public final class Pawn extends Piece {
         return targetTeam.equals(getTeam().otherTeam());
     }
 
+    private PieceMoveResult getCatchKingOrOther(Position targetPosition, PiecesOnChessBoard piecesOnChessBoard) {
+        if (isKing(targetPosition, piecesOnChessBoard)) {
+            return PieceMoveResult.CATCH_KING;
+        }
+        return PieceMoveResult.CATCH;
+    }
+
+    private boolean isKing(Position targetPosition, PiecesOnChessBoard piecesOnChessBoard) {
+        PieceType pieceType = piecesOnChessBoard.whichPieceType(targetPosition);
+        return pieceType.equals(PieceType.KING);
+    }
+
     @Override
     public PieceType getPieceType() {
-        return PAWN;
+        return PieceType.PAWN;
     }
 }

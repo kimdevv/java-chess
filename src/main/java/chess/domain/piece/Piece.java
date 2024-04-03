@@ -1,6 +1,7 @@
 package chess.domain.piece;
 
 import chess.domain.Movement;
+import chess.domain.game.Turn;
 import java.util.Objects;
 
 public abstract class Piece {
@@ -17,7 +18,9 @@ public abstract class Piece {
 
     public abstract boolean canMove(final Movement movement, final Piece destinationPiece);
 
-    public void validate(final Movement movement, final Piece destinationPiece) {
+    public abstract double score();
+
+    public void validateArrival(final Movement movement, final Piece destinationPiece) {
         validateSameColor(destinationPiece);
         validateDestinationMove(movement, destinationPiece);
     }
@@ -45,12 +48,28 @@ public abstract class Piece {
         return this.color == color;
     }
 
-    public Color color() {
-        return color;
+    public boolean isSameColor(final Turn turn) {
+        return this.color.name().equals(turn.name());
+    }
+
+    public boolean isKnight() {
+        return this.type.equals(Type.KNIGHT);
+    }
+
+    public boolean isPawn() {
+        return this.type.equals(Type.PAWN);
+    }
+
+    public boolean isKing() {
+        return this.type.equals(Type.KING);
     }
 
     public Type type() {
         return type;
+    }
+
+    public Color color() {
+        return color;
     }
 
     @Override

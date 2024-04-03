@@ -19,7 +19,6 @@ public class Movement {
         this.target = target;
     }
 
-
     private void validateSameSquare(final Square source, final Square target) {
         if (source.equals(target)) {
             throw new IllegalArgumentException(INVALID_PIECE_MOVEMENT);
@@ -30,7 +29,7 @@ public class Movement {
         int maxDistance = calculateMaxDistance();
         Set<Square> route = new HashSet<>();
         IntStream.range(1, maxDistance)
-                .forEach(distance -> route.add(findSquareBy(distance)));
+                .forEach(distance -> route.add(findSquareBy(maxDistance, distance)));
         return route;
     }
 
@@ -38,26 +37,35 @@ public class Movement {
         return Math.max(Math.abs(getFileDifference()), Math.abs(getRankDifference()));
     }
 
-    private Square findSquareBy(final int distance) {
-        Rank nextRank = Rank.of(source.getRankIndex(), target.getRankIndex() * distance);
-        File nextFile = File.of(source.getRankIndex(), target.getRankIndex() * distance);
-        return Square.of(nextRank, nextFile);
+    private Square findSquareBy(final int maxDistance, final int distance) {
+        int nextRank = (getRankDifference() / maxDistance) * distance;
+        int nextFile = (getFileDifference() / maxDistance) * distance;
+        Rank newRank = Rank.of(source.getRankIndex(), nextRank);
+        File newFile = File.of(source.getFileIndex(), nextFile);
+        return Square.of(newRank, newFile);
     }
 
-    public int getFileDifference() {
+    public Direction direction() {
+        int unitDivider = Math.abs(gcd(getFileDifference(), getRankDifference()));
+        return Direction.of(getFileDifference() / unitDivider, getRankDifference() / unitDivider);
+    }
+
+    private int gcd(int a, int b) {
+        if (b == 0) {
+            return a;
+        }
+        return gcd(b, a % b);
+    }
+
+    private int getFileDifference() {
         return target.getFileIndex() - source.getFileIndex();
     }
 
-    public int getRankDifference() {
+    private int getRankDifference() {
         return target.getRankIndex() - source.getRankIndex();
     }
 
     public int getSourceRankIndex() {
         return source.getRankIndex();
-    }
-
-    public Direction direction() {
-        int maxDistance = calculateMaxDistance();
-        return Direction.of(getFileDifference() / maxDistance, getRankDifference() / maxDistance);
     }
 }

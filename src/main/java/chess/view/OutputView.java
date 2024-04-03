@@ -39,6 +39,10 @@ public class OutputView {
                 .toList();
     }
 
+    public static void printCurrentTurn(final PieceColor turn) {
+        System.out.printf("%n> " + ColorMapper.findNameByColor(turn) + " 진영의 턴입니다.%n");
+    }
+
     public static void printGameResult(
             final PieceColor winnerTeamColor, final double whiteTeamScore, final double blackTeamScore) {
         printScoreByColor(PieceColor.WHITE, whiteTeamScore);
@@ -56,13 +60,8 @@ public class OutputView {
 
     public static void printFinalGameResult(
             final PieceColor winnerTeamColor, final double whiteTeamScore, final double blackTeamScore) {
-        printGameOverMessage();
         printGameResult(winnerTeamColor, whiteTeamScore, blackTeamScore);
         printFinalWinnerTeam(winnerTeamColor);
-    }
-
-    private static void printGameOverMessage() {
-        System.out.println("> 킹이 잡혀 게임을 종료합니다.");
     }
 
     private static void printFinalWinnerTeam(final PieceColor teamColor) {

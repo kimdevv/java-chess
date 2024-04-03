@@ -1,16 +1,26 @@
 package chess.domain.position;
 
+import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toMap;
 
 public class RowPosition {
     public static final int MIN_NUMBER = 0;
     public static final int MAX_NUMBER = 7;
+    public static final LinkedHashMap<Integer, RowPosition> POOL = IntStream.rangeClosed(MIN_NUMBER, MAX_NUMBER)
+            .boxed()
+            .collect(toMap(i -> i, RowPosition::new, (v1, v2) -> v2, LinkedHashMap::new));
 
     private final int rowNumber;
 
-    public RowPosition(int rowNumber) {
-        validateNumberRange(rowNumber);
+    private RowPosition(int rowNumber) {
         this.rowNumber = rowNumber;
+    }
+
+    public static RowPosition from(int rowNumber) {
+        return POOL.get(rowNumber);
     }
 
     public int findRowIntervalWith(int rowInterval) {
@@ -33,12 +43,6 @@ public class RowPosition {
         return rowNumber < target.rowNumber;
     }
 
-    private void validateNumberRange(int rowNumber) {
-        if (MIN_NUMBER > rowNumber || rowNumber > MAX_NUMBER) {
-            throw new IllegalStateException("체스판의 행 번호는 " + rowNumber + "가 될 수 없습니다.");
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -57,7 +61,11 @@ public class RowPosition {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "ROW : " + rowNumber;
+    }
+
+    public int getRowNumber() {
+        return rowNumber;
     }
 }

@@ -1,12 +1,13 @@
 package chess.domain.piece;
 
+import chess.domain.board.Score;
 import chess.domain.position.Position;
 
 public final class NullPiece extends Piece {
-    private static final NullPiece instance = new NullPiece(Team.EMPTY);
+    private static final NullPiece instance = new NullPiece(Team.NONE);
 
     private NullPiece(Team team) {
-        super(team);
+        super(team, Score.from(0));
     }
 
     public static NullPiece getInstance() {
@@ -21,5 +22,10 @@ public final class NullPiece extends Piece {
     @Override
     public boolean isEmpty() {
         return true;
+    }
+
+    @Override
+    public Score getScore() {
+        throw new UnsupportedOperationException("NullPiece 객체입니다");
     }
 }

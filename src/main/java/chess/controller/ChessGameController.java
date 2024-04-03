@@ -1,7 +1,10 @@
 package chess.controller;
 
 import chess.controller.command.Command;
+import chess.dao.BoardDaoImpl;
+import chess.dao.TurnDaoImpl;
 import chess.domain.game.ChessGame;
+import chess.service.ChessGameService;
 import chess.view.CommandMapper;
 import chess.view.InputView;
 import chess.view.OutputView;
@@ -20,19 +23,22 @@ public class ChessGameController {
 
     public void run() {
         Command command;
-        ChessGame game = ChessGame.newGame();
-        startChessGame(game);
+        ChessGameService gameService = ChessGameService.of(BoardDaoImpl.of(), TurnDaoImpl.of());
+        ChessGame game = startChessGame(gameService);
 
         do {
             command = retryUntilNoError(this::readCommand);
-            command.execute(game, outputView);
-        } while (!command.isEnd());
+            command.execute(gameService, outputView);
+        } while (!command.isEnd() && !gameService.isEndGame());
+
+        outputView.printStatusMessage(game);
     }
 
-    private void startChessGame(ChessGame game) {
+    private ChessGame startChessGame(ChessGameService service) {
         outputView.printStartMessage();
         Command startCommand = retryUntilNoError(this::readStartCommand);
-        startCommand.execute(game, outputView);
+        startCommand.execute(service, outputView);
+        return service.getGame();
     }
 
     private Command readStartCommand() {

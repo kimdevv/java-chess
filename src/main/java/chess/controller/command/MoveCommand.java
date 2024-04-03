@@ -1,13 +1,13 @@
 package chess.controller.command;
 
-import chess.domain.game.ChessGame;
 import chess.domain.position.Position;
 import chess.domain.position.RowPosition;
+import chess.service.ChessGameService;
 import chess.view.OutputView;
 
 import java.util.List;
 
-public class MoveCommand implements Command {
+public final class MoveCommand implements Command {
     private static final int RANK_BASE_NUMBER = RowPosition.MAX_NUMBER + 1;
     private static final int FILE_BASE_NUMBER = 'a';
     private static final String COMMAND_DELIMITER = " ";
@@ -38,9 +38,9 @@ public class MoveCommand implements Command {
     }
 
     @Override
-    public void execute(ChessGame game, OutputView outputView) {
-        game.playTurn(start, destination);
-        outputView.printChessBoardMessage(game.getBoard());
+    public void execute(ChessGameService service, OutputView outputView) {
+        service.playTurn(start, destination);
+        outputView.printChessBoardMessage(service.gameBoard());
     }
 
     @Override

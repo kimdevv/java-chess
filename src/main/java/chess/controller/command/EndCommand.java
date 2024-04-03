@@ -1,9 +1,9 @@
 package chess.controller.command;
 
-import chess.domain.game.ChessGame;
+import chess.service.ChessGameService;
 import chess.view.OutputView;
 
-public class EndCommand implements Command {
+public final class EndCommand implements Command {
     private EndCommand() {
     }
 
@@ -12,7 +12,8 @@ public class EndCommand implements Command {
     }
 
     @Override
-    public void execute(ChessGame game, OutputView outputView) {
+    public void execute(ChessGameService service, OutputView outputView) {
+        service.end();
     }
 
     @Override

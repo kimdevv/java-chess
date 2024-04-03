@@ -1,5 +1,6 @@
 package chess.domain.piece;
 
+import chess.domain.board.Score;
 import chess.domain.position.Position;
 
 public sealed abstract class Pawn extends Piece
@@ -7,19 +8,19 @@ public sealed abstract class Pawn extends Piece
     protected static final int FORWARDING_SQUARED_DISTANCE = 1;
     protected static final int KILL_PASSING_DISTANCE = 2;
     protected static final int FIRST_FORWARDING_SQUARED_DISTANCE = 4;
+    private static final Score score = Score.from(1);
+
 
     public Pawn(Team team) {
-        super(team);
+        super(team, score);
     }
 
-    public static Pawn blackPawn() {
-        return new BlackPawn();
-    }
-
-    public static Pawn whitePawn() {
+    public static Pawn of(Team team) {
+        if (team == Team.BLACK) {
+            return new BlackPawn();
+        }
         return new WhitePawn();
     }
-
 
     abstract boolean isInitialPawnRow(Position start);
 
@@ -48,5 +49,10 @@ public sealed abstract class Pawn extends Piece
         return isForward(start, destination)
                 && start.squaredDistanceWith(destination) == KILL_PASSING_DISTANCE
                 && isOtherTeam(pieceAtDestination);
+    }
+
+    @Override
+    public boolean isPawn() {
+        return true;
     }
 }

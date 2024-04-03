@@ -1,5 +1,6 @@
 package chess.domain.piece;
 
+import chess.domain.board.Score;
 import chess.domain.position.Direction;
 import chess.domain.position.DirectionJudge;
 import chess.domain.position.Position;
@@ -10,9 +11,10 @@ import static chess.domain.position.Direction.*;
 
 public class Queen extends Piece {
     private static final List<Direction> PASSING = List.of(UP, DOWN, RIGHT, LEFT, UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT);
+    private static final Score score = Score.from(9);
 
     public Queen(Team team) {
-        super(team);
+        super(team, score);
     }
 
     @Override

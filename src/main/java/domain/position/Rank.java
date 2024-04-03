@@ -23,16 +23,12 @@ public enum Rank {
         this.number = number;
     }
 
-    public static Rank fromNumber(int number) {
+    private static Rank fromNumber(int number) {
         return Arrays.stream(values())
                 .filter(rank -> rank.number == number)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         String.format("rejected value: %d - 존재하지 않은 rank입니다.", number)));
-    }
-
-    public static Rank fromNumber(char number) {
-        return fromNumber(Character.getNumericValue(number));
     }
 
     public List<Rank> findRanksBetween(Rank other) {
@@ -44,22 +40,10 @@ public enum Rank {
     }
 
     private Comparator<Rank> comparator(Rank other) {
-        if (this.isUpperThan(other)) {
+        if (this.number > other.number) {
             return (r1, r2) -> r2.number - r1.number;
         }
         return Comparator.comparingInt(r -> r.number);
-    }
-
-    int subtract(Rank rank) {
-        return this.number - rank.number;
-    }
-
-    boolean isUpperThan(Rank rank) {
-        return this.number > rank.number;
-    }
-
-    boolean isLowerThan(Rank rank) {
-        return this.number < rank.number;
     }
 
     public int number() {

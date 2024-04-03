@@ -13,7 +13,7 @@ public class Empty implements Piece {
     }
 
     @Override
-    public void validateMovement(Position source, Position target, Piece other) {
+    public void validateMovement(Position source, Position target, Color targetColor) {
         throw new IllegalStateException("빈 칸입니다.");
     }
 
@@ -24,6 +24,6 @@ public class Empty implements Piece {
 
     @Override
     public Type type() {
-        throw new IllegalStateException("빈 칸입니다.");
+        return Type.EMPTY;
     }
 }

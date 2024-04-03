@@ -12,15 +12,15 @@ public abstract class NonPawn implements Piece {
     }
 
     @Override
-    public void validateMovement(Position source, Position target, Piece other) {
+    public void validateMovement(Position source, Position target, Color targetColor) {
         source.validateDifferentPosition(target);
         validateDirection(source, target);
         validateMoveCount(source, target);
-        validateDifferentColorFromOtherPiece(other);
+        validateDifferentColorFromOtherPiece(targetColor);
     }
 
-    private void validateDifferentColorFromOtherPiece(Piece other) {
-        if (color().isSameColor(other.color())) {
+    private void validateDifferentColorFromOtherPiece(Color targetColor) {
+        if (isSameColor(targetColor)) {
             throw new IllegalArgumentException("같은 색의 기물이 존재합니다.");
         }
     }

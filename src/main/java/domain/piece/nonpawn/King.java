@@ -13,10 +13,9 @@ public class King extends NonPawn {
 
     @Override
     protected void validateDirection(Position source, Position target) {
-        if (source.isStraightDirectionTo(target) || source.isDiagonalDirectionTo(target)) {
-            return;
+        if (!source.isStraightDirectionTo(target) && !source.isDiagonalDirectionTo(target)) {
+            throw new IllegalArgumentException("King은 대각선 또는 직선 방향으로 이동해야 합니다.");
         }
-        throw new IllegalArgumentException("King은 대각선 또는 직선 방향으로 이동해야 합니다.");
     }
 
     @Override

@@ -1,17 +1,40 @@
 package domain.position;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Position {
+    private static final Map<String, Position> POSITION_CACHE;
+
+    static {
+        POSITION_CACHE = Arrays.stream(File.values())
+                .flatMap(file -> Arrays.stream(Rank.values())
+                        .map(rank -> Map.entry(file.expression() + rank.number(), new Position(file, rank))))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     private final File file;
     private final Rank rank;
 
-    public Position(File file, Rank rank) {
+    private Position(File file, Rank rank) {
         this.file = file;
         this.rank = rank;
+    }
+
+    public static Position from(String position) {
+        if (!POSITION_CACHE.containsKey(position)) {
+            throw new IllegalArgumentException("존재하지 않는 위치입니다.");
+        }
+        return POSITION_CACHE.get(position);
+    }
+
+    public static Position of(File file, Rank rank) {
+        return from(file.expression() + rank.number());
     }
 
     public List<Position> findPathTo(Position target) {
@@ -83,19 +106,19 @@ public class Position {
     }
 
     private int calculateRankGap(Position target) {
-        return Math.abs(this.rank.subtract(target.rank));
+        return Math.abs(this.rank.number() - target.rank.number());
     }
 
     private int calculateFileGap(Position target) {
-        return Math.abs(this.file.subtract(target.file));
+        return Math.abs(this.file.order() - target.file.order());
     }
 
     public boolean isUpperRankThan(Position target) {
-        return this.rank.isUpperThan(target.rank);
+        return this.rank.number() > target.rank.number();
     }
 
     public boolean isLowerRankThan(Position target) {
-        return this.rank.isLowerThan(target.rank);
+        return this.rank.number() < target.rank.number();
     }
 
     public boolean isSameRank(Rank rank) {

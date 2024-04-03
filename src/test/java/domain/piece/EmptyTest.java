@@ -3,29 +3,26 @@ package domain.piece;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import domain.piece.pawn.BlackPawn;
-import domain.position.File;
 import domain.position.Position;
-import domain.position.Rank;
+import fixture.PositionFixture;
 import org.junit.jupiter.api.Test;
 
 class EmptyTest {
     private final Piece empty = Empty.create();
+    private final Color targetColor = Color.BLACK;
 
     @Test
     void Empty_기물의_움직임을_검증하면_예외가_발생한다() {
-        Position source = new Position(File.A, Rank.ONE);
-        Position target = new Position(File.A, Rank.TWO);
-        Piece other = new BlackPawn();
+        Position source = PositionFixture.A8;
+        Position target = PositionFixture.B3;
 
-        assertThatThrownBy(() -> empty.validateMovement(source, target, other))
+        assertThatThrownBy(() -> empty.validateMovement(source, target, targetColor))
                 .isExactlyInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    void Empty_기물의_타입을_호출하면_예외가_발생한다() {
-        assertThatThrownBy(empty::type)
-                .isExactlyInstanceOf(IllegalStateException.class);
+    void Empty_기물의_타입은_빈_타입이다() {
+        assertThat(empty.type()).isEqualTo(Type.EMPTY);
     }
 
     @Test

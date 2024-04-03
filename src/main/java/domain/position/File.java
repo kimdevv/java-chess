@@ -17,24 +17,12 @@ public enum File {
 
     private static final int DISCARDING_COUNT_FROM_FRONT = 1;
 
-    private final String name;
+    private final String expression;
     private final int order;
 
-    File(String name, int order) {
-        this.name = name;
+    File(String expression, int order) {
+        this.expression = expression;
         this.order = order;
-    }
-
-    public static File fromName(String name) {
-        return Arrays.stream(values())
-                .filter(file -> file.name.equals(name))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("rejected value: %s - 존재하지 않은 file입니다.", name)));
-    }
-
-    public static File fromName(char name) {
-        return fromName(String.valueOf(name));
     }
 
     private static File fromOrder(int order) {
@@ -60,8 +48,8 @@ public enum File {
         return Comparator.comparingInt(f -> f.order);
     }
 
-    int subtract(File file) {
-        return this.order - file.order;
+    public String expression() {
+        return expression;
     }
 
     public int order() {

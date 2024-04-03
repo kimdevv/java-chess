@@ -33,21 +33,21 @@ class ChessBoardFactoryTest {
 
         Map<Position, Piece> pieces = chessBoard.getPositionAndPieces();
         assertAll(
-                () -> assertThat(pieces.get(new Position(File.A, rank))).isExactlyInstanceOf(Rook.class)
+                () -> assertThat(pieces.get(Position.of(File.A, rank))).isExactlyInstanceOf(Rook.class)
                         .extracting(Piece::color).isEqualTo(color),
-                () -> assertThat(pieces.get(new Position(File.B, rank))).isExactlyInstanceOf(Knight.class)
+                () -> assertThat(pieces.get(Position.of(File.B, rank))).isExactlyInstanceOf(Knight.class)
                         .extracting(Piece::color).isEqualTo(color),
-                () -> assertThat(pieces.get(new Position(File.C, rank))).isExactlyInstanceOf(Bishop.class)
+                () -> assertThat(pieces.get(Position.of(File.C, rank))).isExactlyInstanceOf(Bishop.class)
                         .extracting(Piece::color).isEqualTo(color),
-                () -> assertThat(pieces.get(new Position(File.D, rank))).isExactlyInstanceOf(Queen.class)
+                () -> assertThat(pieces.get(Position.of(File.D, rank))).isExactlyInstanceOf(Queen.class)
                         .extracting(Piece::color).isEqualTo(color),
-                () -> assertThat(pieces.get(new Position(File.E, rank))).isExactlyInstanceOf(King.class)
+                () -> assertThat(pieces.get(Position.of(File.E, rank))).isExactlyInstanceOf(King.class)
                         .extracting(Piece::color).isEqualTo(color),
-                () -> assertThat(pieces.get(new Position(File.F, rank))).isExactlyInstanceOf(Bishop.class)
+                () -> assertThat(pieces.get(Position.of(File.F, rank))).isExactlyInstanceOf(Bishop.class)
                         .extracting(Piece::color).isEqualTo(color),
-                () -> assertThat(pieces.get(new Position(File.G, rank))).isExactlyInstanceOf(Knight.class)
+                () -> assertThat(pieces.get(Position.of(File.G, rank))).isExactlyInstanceOf(Knight.class)
                         .extracting(Piece::color).isEqualTo(color),
-                () -> assertThat(pieces.get(new Position(File.H, rank))).isExactlyInstanceOf(Rook.class)
+                () -> assertThat(pieces.get(Position.of(File.H, rank))).isExactlyInstanceOf(Rook.class)
                         .extracting(Piece::color).isEqualTo(color)
         );
     }
@@ -59,14 +59,14 @@ class ChessBoardFactoryTest {
 
         Map<Position, Piece> pieces = chessBoard.getPositionAndPieces();
         assertAll(
-                () -> assertThat(pieces.get(new Position(File.A, rank))).isExactlyInstanceOf(pawnClass),
-                () -> assertThat(pieces.get(new Position(File.B, rank))).isExactlyInstanceOf(pawnClass),
-                () -> assertThat(pieces.get(new Position(File.C, rank))).isExactlyInstanceOf(pawnClass),
-                () -> assertThat(pieces.get(new Position(File.D, rank))).isExactlyInstanceOf(pawnClass),
-                () -> assertThat(pieces.get(new Position(File.E, rank))).isExactlyInstanceOf(pawnClass),
-                () -> assertThat(pieces.get(new Position(File.F, rank))).isExactlyInstanceOf(pawnClass),
-                () -> assertThat(pieces.get(new Position(File.G, rank))).isExactlyInstanceOf(pawnClass),
-                () -> assertThat(pieces.get(new Position(File.H, rank))).isExactlyInstanceOf(pawnClass)
+                () -> assertThat(pieces.get(Position.of(File.A, rank))).isExactlyInstanceOf(pawnClass),
+                () -> assertThat(pieces.get(Position.of(File.B, rank))).isExactlyInstanceOf(pawnClass),
+                () -> assertThat(pieces.get(Position.of(File.C, rank))).isExactlyInstanceOf(pawnClass),
+                () -> assertThat(pieces.get(Position.of(File.D, rank))).isExactlyInstanceOf(pawnClass),
+                () -> assertThat(pieces.get(Position.of(File.E, rank))).isExactlyInstanceOf(pawnClass),
+                () -> assertThat(pieces.get(Position.of(File.F, rank))).isExactlyInstanceOf(pawnClass),
+                () -> assertThat(pieces.get(Position.of(File.G, rank))).isExactlyInstanceOf(pawnClass),
+                () -> assertThat(pieces.get(Position.of(File.H, rank))).isExactlyInstanceOf(pawnClass)
         );
     }
 
@@ -84,14 +84,14 @@ class ChessBoardFactoryTest {
 
         Map<Position, Piece> pieces = chessBoard.getPositionAndPieces();
         assertAll(
-                () -> assertThat(pieces.get(new Position(File.A, rank))).isNull(),
-                () -> assertThat(pieces.get(new Position(File.B, rank))).isNull(),
-                () -> assertThat(pieces.get(new Position(File.C, rank))).isNull(),
-                () -> assertThat(pieces.get(new Position(File.D, rank))).isNull(),
-                () -> assertThat(pieces.get(new Position(File.E, rank))).isNull(),
-                () -> assertThat(pieces.get(new Position(File.F, rank))).isNull(),
-                () -> assertThat(pieces.get(new Position(File.G, rank))).isNull(),
-                () -> assertThat(pieces.get(new Position(File.H, rank))).isNull()
+                () -> assertThat(pieces.get(Position.of(File.A, rank))).isNull(),
+                () -> assertThat(pieces.get(Position.of(File.B, rank))).isNull(),
+                () -> assertThat(pieces.get(Position.of(File.C, rank))).isNull(),
+                () -> assertThat(pieces.get(Position.of(File.D, rank))).isNull(),
+                () -> assertThat(pieces.get(Position.of(File.E, rank))).isNull(),
+                () -> assertThat(pieces.get(Position.of(File.F, rank))).isNull(),
+                () -> assertThat(pieces.get(Position.of(File.G, rank))).isNull(),
+                () -> assertThat(pieces.get(Position.of(File.H, rank))).isNull()
         );
     }
 }

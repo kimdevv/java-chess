@@ -10,10 +10,8 @@ public abstract class SingleMovePiece extends Piece {
         super(type, team);
     }
 
-    public abstract boolean isMovablePoint(final Point departure, final Point destination);
-
     @Override
-    public boolean isMovable(final Point departure, final Point destination, final Map<Point, Piece> board) {
+    public boolean canMove(final Point departure, final Point destination, final Map<Point, Piece> board) {
         if (hasSameTeamPieceAtDestination(board.get(departure), board.get(destination))) {
             return false;
         }

@@ -37,7 +37,7 @@ public class OutputView {
         }
     }
 
-    private String findNameOf(Piece piece) {
+    private String findNameOf(final Piece piece) {
         final Type pieceType = piece.getType();
         final String name = NAME_CLASSIFIER.get(pieceType);
 
@@ -56,7 +56,11 @@ public class OutputView {
                 > 게임 이동 : move source위치 target위치 - 예. move b2 b3""");
     }
 
-    public void printErrorMessage(String errorMessage) {
+    public void printScore(final double whiteScore, final double blackScore) {
+        System.out.printf("흰색 : %.1f, 검은색 : %.1f%n", whiteScore, blackScore);
+    }
+
+    public void printErrorMessage(final String errorMessage) {
         System.out.printf("%s %s%n", ERROR_SUFFIX, errorMessage);
     }
 }

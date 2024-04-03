@@ -1,4 +1,4 @@
-package chess.domain.game;
+package chess.view;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

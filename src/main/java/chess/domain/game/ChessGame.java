@@ -18,6 +18,11 @@ public class ChessGame {
         this.state = new Ready(Team.WHITE);
     }
 
+    public ChessGame(final Map<Point, Piece> board, final Team team) {
+        this.board = new Board(board);
+        this.state = new Ready(team.opposite());
+    }
+
     public boolean isPlayable() {
         return !state.isEnd();
     }
@@ -32,6 +37,18 @@ public class ChessGame {
 
     public void move(final Point departure, final Point destination) {
         state = state.move(board, departure, destination);
+    }
+
+    public double calculateScore(final Team team) {
+        return state.calculateScore(board, team);
+    }
+
+    public boolean isGameOver() {
+        return board.isKingDead();
+    }
+
+    public Team getTeam() {
+        return state.getTeam();
     }
 
     public Map<Point, Piece> getBoard() {

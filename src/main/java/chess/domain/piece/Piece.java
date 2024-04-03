@@ -14,14 +14,32 @@ public abstract class Piece {
         this.team = team;
     }
 
-    public abstract boolean isMovable(final Point departure, final Point destination, final Map<Point, Piece> board);
+    public abstract boolean canMove(final Point departure, final Point destination, final Map<Point, Piece> board);
 
-    public boolean hasSameTeamPieceAtDestination(final Piece pieceAtDeparture, final Piece pieceAtDestination) {
+    protected abstract boolean isMovablePoint(final Point departure, final Point destination);
+
+    public boolean isTeamMatch(final Team team) {
+        return this.team == team;
+    }
+
+    protected boolean isNotSamePoint(final Point departure, final Point destination) {
+        return !departure.equals(destination);
+    }
+
+    protected boolean hasSameTeamPieceAtDestination(final Piece pieceAtDeparture, final Piece pieceAtDestination) {
         return pieceAtDeparture.team == pieceAtDestination.team;
     }
 
-    public boolean isSameTeam(final Team team) {
-        return this.team == team;
+    public boolean isKing() {
+        return false;
+    }
+
+    public boolean isPawn() {
+        return false;
+    }
+
+    public double getScore() {
+        return type.getScore();
     }
 
     public Type getType() {

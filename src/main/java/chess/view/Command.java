@@ -1,4 +1,4 @@
-package chess.domain.game;
+package chess.view;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 public enum Command {
     START("start"),
     MOVE("move"),
+    STATUS("status"),
     END("end");
 
     private static final Map<String, Command> CACHED_COMMAND = Arrays.stream(values())
@@ -32,6 +33,10 @@ public enum Command {
 
     public boolean isMove() {
         return this == MOVE;
+    }
+
+    public boolean isStatus() {
+        return this == STATUS;
     }
 
     public boolean isEnd() {

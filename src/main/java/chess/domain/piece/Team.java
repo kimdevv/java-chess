@@ -5,11 +5,14 @@ public enum Team {
     WHITE,
     EMPTY;
 
+    private static final int UPPER_DIRECTION = 1;
+    private static final int LOWER_DIRECTION = -1;
+
     public int forwardDirection() {
         if (isWhite()) {
-            return 1;
+            return UPPER_DIRECTION;
         }
-        return -1;
+        return LOWER_DIRECTION;
     }
 
     public Team opposite() {

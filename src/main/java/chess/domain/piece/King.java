@@ -9,7 +9,13 @@ public final class King extends SingleMovePiece {
     }
 
     @Override
-    public boolean isMovablePoint(final Point departure, final Point destination) {
-        return departure.isAround(destination);
+    protected boolean isMovablePoint(final Point departure, final Point destination) {
+        return isNotSamePoint(departure, destination) &&
+                departure.isAround(destination);
+    }
+
+    @Override
+    public boolean isKing() {
+        return true;
     }
 }

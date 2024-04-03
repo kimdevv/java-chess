@@ -9,7 +9,8 @@ public final class Rook extends MultiMovePiece {
     }
 
     @Override
-    public boolean isMovableDirection(final Point departure, final Point destination) {
-        return departure.isStraight(destination);
+    protected boolean isMovablePoint(final Point departure, final Point destination) {
+        return isNotSamePoint(departure, destination) &&
+                departure.isStraight(destination);
     }
 }

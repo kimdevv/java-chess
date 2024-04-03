@@ -9,7 +9,8 @@ public final class Knight extends SingleMovePiece {
     }
 
     @Override
-    public boolean isMovablePoint(final Point departure, final Point destination) {
-        return Math.abs(departure.multiplyAxis(destination)) == 2;
+    protected boolean isMovablePoint(final Point departure, final Point destination) {
+        return isNotSamePoint(departure, destination) &&
+                Math.abs(departure.multiplyAxis(destination)) == 2;
     }
 }

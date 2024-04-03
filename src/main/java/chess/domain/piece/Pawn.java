@@ -13,8 +13,10 @@ public class Pawn extends Piece {
     private static final int STEP_LIMIT = 1;
     private static final Rank FIRST_RANK_BLACK = Rank.SEVEN;
     private static final Rank FIRST_RANK_WHITE = Rank.TWO;
-    private static final String ERROR_CANNOT_REACH = "폰의 이동 방법으로 갈 수 없는 곳입니다.";
-    private static final String ERROR_OBSTACLE_ON_PATH = "폰의 이동 경로 중 장애물이 존재합니다.";
+    private static final String MESSAGE_CANNOT_REACH = "폰의 이동 방법으로 갈 수 없는 곳입니다.";
+    private static final double NORMAL_SCORE = 1;
+    private static final double SPECIAL_SCORE = 0.5;
+    private static final int PAWN_COUNT_FOR_SPECIAL = 2;
 
     public Pawn(final PieceColor color, final Square square) {
         super(color, square);
@@ -32,8 +34,8 @@ public class Pawn extends Piece {
     }
 
     private void validateAttackStepLimit(final Square target) {
-        if (square.distanceRankFrom(target) > STEP_LIMIT) {
-            throw new IllegalArgumentException(ERROR_CANNOT_REACH);
+        if (square.calculateRankDistance(target) > STEP_LIMIT) {
+            throw new IllegalArgumentException(MESSAGE_CANNOT_REACH);
         }
     }
 
@@ -45,14 +47,14 @@ public class Pawn extends Piece {
 
     private void validateMoveDirection(final Square target) {
         if (!isForward(target) || !square.isSameFile(target)) {
-            throw new IllegalArgumentException(ERROR_CANNOT_REACH);
+            throw new IllegalArgumentException(MESSAGE_CANNOT_REACH);
         }
     }
 
     private void validateMoveStepLimit(final Square target) {
-        if ((!isFirstStep() && square.distanceRankFrom(target) > STEP_LIMIT) ||
-                square.distanceRankFrom(target) > FIRST_STEP_LIMIT) {
-            throw new IllegalArgumentException(ERROR_CANNOT_REACH);
+        if ((!isFirstStep() && square.calculateRankDistance(target) > STEP_LIMIT) ||
+                square.calculateRankDistance(target) > FIRST_STEP_LIMIT) {
+            throw new IllegalArgumentException(MESSAGE_CANNOT_REACH);
         }
     }
 
@@ -60,19 +62,19 @@ public class Pawn extends Piece {
         List<Square> path = new ArrayList<>(square.generatePath(target));
         path.add(target);
         if (path.stream().anyMatch(board::existOnSquare)) {
-            throw new IllegalArgumentException(ERROR_OBSTACLE_ON_PATH);
+            throw new IllegalArgumentException("폰의 이동 경로 중 장애물이 존재합니다.");
         }
     }
 
     private boolean isForward(final Square target) {
-        if (getColor() == PieceColor.BLACK) {
+        if (color == PieceColor.BLACK) {
             return square.isUpperThan(target);
         }
         return square.isLowerThan(target);
     }
 
     private boolean isFirstStep() {
-        if (getColor() == PieceColor.BLACK) {
+        if (color == PieceColor.BLACK) {
             return square.isSameRank(FIRST_RANK_BLACK);
         }
         return square.isSameRank(FIRST_RANK_WHITE);
@@ -83,11 +85,19 @@ public class Pawn extends Piece {
     }
 
     private boolean existEnemyOnTarget(Board board, Square target) {
-        return board.existOnSquareWithColor(target, getColor().opposite());
+        return board.existOnSquareWithColor(target, color.opposite());
     }
 
     @Override
     public PieceType getType() {
         return PieceType.PAWN;
+    }
+
+    @Override
+    public double getScore(Board board) {
+        if (board.getPawnCountOnSameFile(square, color) >= PAWN_COUNT_FOR_SPECIAL) {
+            return SPECIAL_SCORE;
+        }
+        return NORMAL_SCORE;
     }
 }

@@ -1,17 +1,23 @@
 package chess.domain.square;
 
 public enum Rank {
-    EIGHT,
-    SEVEN,
-    SIX,
-    FIVE,
-    FOUR,
-    THREE,
-    TWO,
-    ONE;
+
+    EIGHT(0),
+    SEVEN(1),
+    SIX(2),
+    FIVE(3),
+    FOUR(4),
+    THREE(5),
+    TWO(6),
+    ONE(7);
 
     private static final char FIRST_INPUT = '8';
-    private static final String ERROR_OUT_OF_RANGE = "범위 밖의 랭크 입니다.";
+
+    private final int index;
+
+    Rank(int index) {
+        this.index = index;
+    }
 
     public static Rank from(final char input) {
         int index = FIRST_INPUT - input;
@@ -21,12 +27,12 @@ public enum Rank {
 
     private static void validateRange(final int value) {
         if (value < 0 || value >= values().length) {
-            throw new IllegalArgumentException(ERROR_OUT_OF_RANGE);
+            throw new IllegalArgumentException("범위 밖의 랭크 입니다.");
         }
     }
 
     public Rank add(final int value) {
-        int sum = ordinal() + value;
+        int sum = index + value;
         validateRange(sum);
         return values()[sum];
     }
@@ -39,7 +45,11 @@ public enum Rank {
         return Math.abs(compareTo(other));
     }
 
-    public char toInput() {
-        return (char) (FIRST_INPUT - ordinal());
+    public char convertToKey() {
+        return (char) (FIRST_INPUT - index);
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

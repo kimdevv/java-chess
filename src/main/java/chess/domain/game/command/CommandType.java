@@ -1,14 +1,17 @@
-package chess.view;
+package chess.domain.game.command;
 
 import java.util.Arrays;
 
 public enum CommandType {
 
-    START("start", 0),
+    START("start", 2),
+    RESUME("resume", 1),
+    ROOM("room", 0),
+    USER("user", 1),
     MOVE("move", 2),
+    STATUS("status", 0),
     END("end", 0);
 
-    private static final String ERROR_INVALID_COMMAND = " 은(는) 존재하지 않는 명령어 입니다.";
     private final String value;
     private final int argumentCount;
 
@@ -21,7 +24,7 @@ public enum CommandType {
         return Arrays.stream(values())
                 .filter(commandType -> commandType.value.equals(input))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException(input + ERROR_INVALID_COMMAND));
+                .orElseThrow(() -> new IllegalArgumentException(input + " 은(는) 존재하지 않는 명령어 입니다."));
     }
 
     public int getArgumentCount() {

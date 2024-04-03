@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Square {
-    private static final String ERROR_INVALID_PATTERN = "문자 1개 숫자 1개를 붙인 위치형식으로 입력해 주세요.";
+
     private static final String FILE_AND_RANK_PATTERN = "^[a-z][0-9]$";
     private static final Map<String, Square> CACHE = new HashMap<>();
 
@@ -28,18 +28,18 @@ public class Square {
     }
 
     public static Square of(final File file, final Rank rank) {
-        String squareKey = generateSquareKey(file, rank);
+        String squareKey = generateKey(file, rank);
         return CACHE.computeIfAbsent(squareKey, k -> new Square(file, rank));
     }
 
     private static void validatePattern(final String square) {
         if (!square.matches(FILE_AND_RANK_PATTERN)) {
-            throw new IllegalArgumentException(ERROR_INVALID_PATTERN);
+            throw new IllegalArgumentException("문자 1개 숫자 1개를 붙인 위치형식으로 입력해 주세요.");
         }
     }
 
-    private static String generateSquareKey(final File file, final Rank rank) {
-        return file.name().toLowerCase() + rank.toInput();
+    private static String generateKey(final File file, final Rank rank) {
+        return String.valueOf(file.convertToKey()) + rank.convertToKey();
     }
 
     public List<Square> generatePath(final Square target) {
@@ -63,27 +63,27 @@ public class Square {
         return file == other.file;
     }
 
-    public boolean isSameFile(final File otherFile) {
-        return file == otherFile;
+    public boolean isSameFile(final File file) {
+        return this.file == file;
     }
 
     public boolean isSameRank(final Square other) {
         return rank == other.rank;
     }
 
-    public boolean isSameRank(final Rank otherRank) {
-        return rank == otherRank;
+    public boolean isSameRank(final Rank rank) {
+        return this.rank == rank;
     }
 
     public boolean isSameDiagonal(final Square other) {
-        return distanceRankFrom(other) == distanceFileFrom(other);
+        return calculateRankDistance(other) == calculateFileDistance(other);
     }
 
-    public int distanceFileFrom(final Square other) {
+    public int calculateFileDistance(final Square other) {
         return file.distanceFrom(other.file);
     }
 
-    public int distanceRankFrom(final Square other) {
+    public int calculateRankDistance(final Square other) {
         return rank.distanceFrom(other.rank);
     }
 
@@ -95,12 +95,16 @@ public class Square {
         return rank.compareTo(other.rank) > 0;
     }
 
-    public int getFileOrdinal() {
-        return file.ordinal();
+    public int getFileIndex() {
+        return file.getIndex();
     }
 
-    public int getRankOrdinal() {
-        return rank.ordinal();
+    public int getRankIndex() {
+        return rank.getIndex();
+    }
+
+    public String convertToKey() {
+        return generateKey(file, rank);
     }
 
     @Override

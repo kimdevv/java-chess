@@ -2,85 +2,139 @@ package chess.controller;
 
 import chess.domain.board.Board;
 import chess.domain.board.BoardFactory;
+import chess.domain.game.command.Command;
+import chess.domain.game.command.CommandType;
+import chess.domain.game.room.Room;
+import chess.domain.game.room.RoomId;
+import chess.domain.game.state.GameState;
+import chess.domain.game.state.Ready;
 import chess.domain.piece.PieceColor;
-import chess.domain.square.Square;
-import chess.view.Command;
-import chess.view.CommandType;
+import chess.domain.square.Move;
+import chess.dto.UserStatus;
+import chess.repository.MoveRepository;
+import chess.repository.MoveRepositoryImpl;
+import chess.repository.RoomRepository;
+import chess.repository.RoomRepositoryImpl;
 import chess.view.InputView;
 import chess.view.OutputView;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ChessGame {
 
-    private static final String ERROR_NOT_STARTED = "아직 게임이 시작되지 않았습니다.";
-    private static final String ERROR_ALREADY_STARTED = "이미 게임이 시작되었습니다.";
-    private static final PieceColor START_TURN = PieceColor.WHITE;
+    private final InputView inputView = new InputView();
+    private final OutputView outputView = new OutputView();
+    private final RoomRepository roomRepository = new RoomRepositoryImpl();
+    private final MoveRepository moveRepository = new MoveRepositoryImpl();
+    private final Map<CommandType, Consumer<Command>> invokers;
 
-    private final InputView inputView;
-    private final OutputView outputView;
+    private Room room;
+    private Board board;
 
-    public ChessGame(final InputView inputView, final OutputView outputView) {
-        this.inputView = inputView;
-        this.outputView = outputView;
+    public ChessGame() {
+        invokers = Map.of(
+                CommandType.START, this::startNewGame,
+                CommandType.RESUME, this::resumeGame,
+                CommandType.ROOM, this::printRoom,
+                CommandType.USER, this::printUser,
+                CommandType.MOVE, this::moveAndPrint,
+                CommandType.STATUS, this::printScores
+        );
     }
 
     public void run() {
         outputView.printStartMessage();
-        Command command = processStartAndGetCommand();
-        Board board = BoardFactory.createBoard();
-        outputView.printBoard(board.getStatus());
-        processMove(command, board);
+        GameState state = new Ready();
+
+        while (!state.isEnd()) {
+            GameState currentState = state;
+            Command command = requestUntilValid(() -> Command.from(inputView.readCommand()));
+            state = tryGet(() -> playAndPrint(currentState, command)).orElse(state);
+        }
+        saveAndPrintWinner();
     }
 
-    private Command processStartAndGetCommand() {
-        Command command;
-        do {
-            command = requestUntilValid(this::requestCommandOnStart);
-        } while (!command.isType(CommandType.START));
-        return command;
+    private GameState playAndPrint(GameState state, Command command) {
+        final GameState newState = state.play(command, board);
+        if (invokers.containsKey(command.type())) {
+            invokers.get(command.type()).accept(command);
+        }
+        return newState;
     }
 
-    private void processMove(Command command, final Board board) {
-        PieceColor turn = START_TURN;
-        while (!command.isType(CommandType.END)) {
-            command = requestUntilValid(this::requestMove);
-            turn = processMoveAndGetNextTurn(command, board, turn);
+    private void startNewGame(Command command) {
+        Room roomWithoutId = Room.of(command.getArgument(1), command.getArgument(2));
+        room = roomRepository.save(roomWithoutId);
+        board = BoardFactory.createBoard();
+        outputView.printRoom(room);
+        outputView.printBoard(board.getPiecesStatus());
+    }
+
+    private void resumeGame(Command command) {
+        RoomId roomId = RoomId.from(command.getArgument(1));
+        room = roomRepository.findById(roomId.value())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방입니다."));
+        board = BoardFactory.createBoard();
+        List<Move> moves = moveRepository.findAllByRoomId(room.getId());
+        moves.forEach(move -> board.move(move.source(), move.target()));
+        outputView.printRoom(room);
+        outputView.printBoard(board.getPiecesStatus());
+        if (board.isKingCaptured()) {
+            throw new IllegalArgumentException("이미 게임이 종료된 방 입니다.");
         }
     }
 
-    private Command requestCommandOnStart() {
-        Command command = requestCommand();
-        if (command.isType(CommandType.MOVE)) {
-            throw new IllegalArgumentException(ERROR_NOT_STARTED);
-        }
-        return command;
+    private void printRoom(Command command) {
+        final List<Room> rooms = roomRepository.findAllInProgress();
+        outputView.printRooms(rooms);
     }
 
-    private Command requestCommand() {
-        return requestUntilValid(() -> Command.from(inputView.readCommand()));
+    private void printUser(Command command) {
+        String username = command.getArgument(1);
+        List<Room> rooms = roomRepository.findAllByUserWhite(username);
+        if (rooms.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 유저 입니다");
+        }
+        rooms.addAll(roomRepository.findAllByUserBlack(username));
+        UserStatus userStatus = UserStatus.from(rooms, username);
+        outputView.printUser(userStatus.win(), userStatus.lose(), userStatus.inProgress());
     }
 
-    private Command requestMove() {
-        Command command = requestCommand();
-        if (command.isType(CommandType.START)) {
-            throw new IllegalArgumentException(ERROR_ALREADY_STARTED);
-        }
-        return command;
+    private void moveAndPrint(Command command) {
+        int roomId = room.getId();
+        String source = command.getArgument(1);
+        String target = command.getArgument(2);
+        moveRepository.save(Move.from(roomId, source, target));
+        outputView.printBoard(board.getPiecesStatus());
     }
 
-    private PieceColor processMoveAndGetNextTurn(final Command command, final Board board, final PieceColor turn) {
-        try {
-            Square source = Square.from(command.getArgument(1));
-            Square target = Square.from(command.getArgument(2));
-            board.move(source, target, turn);
-            outputView.printBoard(board.getStatus());
-        } catch (IllegalArgumentException e) {
-            outputView.printErrorMessage(e.getMessage());
-            return turn;
+    private void printScores(Command command) {
+        outputView.printRoom(room);
+        outputView.printScores(board.getGameStatus());
+    }
+
+    private void saveAndPrintWinner() {
+        if (board == null || !board.isKingCaptured()) {
+            return;
         }
-        return turn.opposite();
+        final String winnerUsername = getWinnerUsername();
+        roomRepository.updateWinnerById(room.getId(), winnerUsername);
+        outputView.printWinner(winnerUsername);
+    }
+
+    private String getWinnerUsername() {
+        PieceColor winnerColor = board.getWinnerColor();
+        if (winnerColor == PieceColor.WHITE) {
+            return room.getUserWhiteName();
+        }
+        if (winnerColor == PieceColor.BLACK) {
+            return room.getUserBlackName();
+        }
+        return "";
     }
 
     private <T> T requestUntilValid(final Supplier<T> supplier) {
@@ -94,7 +148,7 @@ public class ChessGame {
     private <T> Optional<T> tryGet(final Supplier<T> supplier) {
         try {
             return Optional.of(supplier.get());
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
             outputView.printErrorMessage(e.getMessage());
             return Optional.empty();
         }

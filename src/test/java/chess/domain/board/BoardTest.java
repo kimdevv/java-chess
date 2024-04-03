@@ -1,9 +1,13 @@
 package chess.domain.board;
 
+import chess.domain.piece.King;
 import chess.domain.piece.Knight;
+import chess.domain.piece.Pawn;
 import chess.domain.piece.PieceColor;
+import chess.domain.piece.Queen;
 import chess.domain.piece.Rook;
 import chess.domain.square.Square;
+import chess.dto.GameStatus;
 import chess.dto.PieceDrawing;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,11 +27,11 @@ class BoardTest {
         // given
         Square source = Square.from("b3");
         Square target = Square.from("b4");
-        Rook piece = new Rook(PieceColor.BLACK, source);
+        Rook piece = new Rook(PieceColor.WHITE, source);
         Board board = new Board(Set.of(piece));
 
         // when
-        board.move(source, target, piece.getColor());
+        board.move(source, target);
 
         // then
         assertThat(board.existOnSquare(target)).isTrue();
@@ -43,7 +47,7 @@ class BoardTest {
         Board board = new Board(Set.of(piece));
 
         // when & then
-        assertThatCode(() -> board.move(source, target, piece.getColor().opposite()))
+        assertThatCode(() -> board.move(source, target))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("선택한 기물의 팀의 차례가 아닙니다.");
 
@@ -55,11 +59,11 @@ class BoardTest {
         // given
         Square source = Square.from("b3");
         Square target = Square.from("b3");
-        Rook piece = new Rook(PieceColor.BLACK, source);
+        Rook piece = new Rook(PieceColor.WHITE, source);
         Board board = new Board(Set.of(piece));
 
         // when & then
-        assertThatCode(() -> board.move(source, target, piece.getColor()))
+        assertThatCode(() -> board.move(source, target))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("제자리로 이동할 수 없습니다.");
     }
@@ -73,7 +77,7 @@ class BoardTest {
         Square target = Square.from("b4");
 
         // when & then
-        assertThatCode(() -> board.move(source, target, PieceColor.BLACK))
+        assertThatCode(() -> board.move(source, target))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("해당 위치에 기물이 존재하지 않습니다.");
     }
@@ -155,12 +159,12 @@ class BoardTest {
         // given
         Square source = Square.from("b3");
         Square target = Square.from("b4");
-        Rook piece = new Rook(PieceColor.BLACK, source);
-        Rook enemy = new Rook(PieceColor.WHITE, target);
+        Rook piece = new Rook(PieceColor.WHITE, source);
+        Rook enemy = new Rook(PieceColor.BLACK, target);
         Board board = new Board(Set.of(piece, enemy));
 
         // when
-        board.move(source, target, piece.getColor());
+        board.move(source, target);
         boolean targetColor = board.existOnSquareWithColor(target, piece.getColor());
 
         // then
@@ -182,9 +186,96 @@ class BoardTest {
         );
 
         // when
-        List<PieceDrawing> pieceDrawings = board.getStatus();
+        List<PieceDrawing> pieceDrawings = board.getPiecesStatus();
 
         // then
         assertThat(pieceDrawings).containsExactlyInAnyOrderElementsOf(expected);
+    }
+
+    @Test
+    @DisplayName("특정한 파일에 검은색 폰이 2개 존재 한다.")
+    void getBlackPawnCountOnSameFile() {
+        // given
+        Pawn blackPawn = new Pawn(PieceColor.BLACK, Square.from("b2"));
+        Board board = new Board(Set.of(
+                blackPawn,
+                new Pawn(PieceColor.BLACK, Square.from("b4")),
+                new Pawn(PieceColor.WHITE, Square.from("e3")),
+                new Pawn(PieceColor.WHITE, Square.from("e5"))
+        ));
+
+        // when
+        int pawnCount = board.getPawnCountOnSameFile(blackPawn.getSquare(), blackPawn.getColor());
+
+        // then
+        assertThat(pawnCount).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("특정한 파일에 흰색 폰이 1개 존재 한다.")
+    void getWhitePawnCountOnSameFile() {
+        // given
+        Pawn whitePawn = new Pawn(PieceColor.WHITE, Square.from("e3"));
+        Board board = new Board(Set.of(
+                new Pawn(PieceColor.BLACK, Square.from("b2")),
+                new Pawn(PieceColor.BLACK, Square.from("b4")),
+                new Pawn(PieceColor.WHITE, Square.from("d3")),
+                whitePawn
+        ));
+
+        // when
+        int pawnCount = board.getPawnCountOnSameFile(whitePawn.getSquare(), whitePawn.getColor());
+
+        // then
+        assertThat(pawnCount).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("초기 진영은 점수가 같아 승자가 존재 하지 않는다.")
+    void getGameStatusSameTest() {
+        // given
+        Board board = BoardFactory.createBoard();
+
+        // when
+        GameStatus gameStatus = board.getGameStatus();
+
+        // then
+        assertThat(gameStatus).isEqualTo(GameStatus.from(38, 38));
+    }
+
+    @Test
+    @DisplayName("현재 게임의 점수와 승자 상태를 계산 한다.")
+    void getGameStatusDiffTest() {
+        // given
+        Board board = new Board(Set.of(
+                new Queen(PieceColor.BLACK, Square.from("a1")),
+                new Rook(PieceColor.BLACK, Square.from("a2")),
+                new Pawn(PieceColor.BLACK, Square.from("b2")),
+                new Pawn(PieceColor.BLACK, Square.from("b4")),
+                new Queen(PieceColor.WHITE, Square.from("f1")),
+                new Pawn(PieceColor.WHITE, Square.from("e3")),
+                new Pawn(PieceColor.WHITE, Square.from("f5"))
+        ));
+
+        // when
+        GameStatus gameStatus = board.getGameStatus();
+
+        // then
+        assertThat(gameStatus).isEqualTo(GameStatus.from(11, 15));
+    }
+
+    @Test
+    @DisplayName("승자를 판별한다.")
+    void getWinnerColor() {
+        // given
+        Board board = new Board(Set.of(
+                new King(PieceColor.BLACK, Square.from("a1"))
+        ));
+
+        // when
+        PieceColor pieceColor = board.getWinnerColor();
+
+        // then
+        assertThat(pieceColor).isEqualTo(PieceColor.BLACK);
     }
 }

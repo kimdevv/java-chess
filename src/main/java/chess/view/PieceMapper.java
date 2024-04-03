@@ -3,6 +3,7 @@ package chess.view;
 import chess.domain.piece.PieceColor;
 
 public enum PieceMapper {
+
     KING('k'),
     QUEEN('q'),
     ROOK('r'),
@@ -17,9 +18,10 @@ public enum PieceMapper {
     }
 
     public static char map(final String typeName, final String colorName) {
+        char symbol = valueOf(typeName).symbol;
         if (PieceColor.BLACK.isSame(colorName)) {
-            return Character.toUpperCase(valueOf(typeName).symbol);
+            return Character.toUpperCase(symbol);
         }
-        return valueOf(typeName).symbol;
+        return symbol;
     }
 }

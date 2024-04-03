@@ -2,17 +2,22 @@ package chess.domain.square;
 
 public enum File {
 
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H;
+    A(0),
+    B(1),
+    C(2),
+    D(3),
+    E(4),
+    F(5),
+    G(6),
+    H(7);
 
     private static final char FIRST_INPUT = 'a';
-    private static final String ERROR_OUT_OF_RANGE = "범위 밖의 파일 입니다.";
+
+    private final int index;
+
+    File(int index) {
+        this.index = index;
+    }
 
     public static File from(final char input) {
         int index = input - FIRST_INPUT;
@@ -22,12 +27,12 @@ public enum File {
 
     private static void validateRange(final int value) {
         if (value < 0 || value >= values().length) {
-            throw new IllegalArgumentException(ERROR_OUT_OF_RANGE);
+            throw new IllegalArgumentException("범위 밖의 파일 입니다.");
         }
     }
 
     public File add(final int value) {
-        int sum = ordinal() + value;
+        int sum = index + value;
         validateRange(sum);
         return values()[sum];
     }
@@ -38,5 +43,13 @@ public enum File {
 
     public int distanceFrom(final File other) {
         return Math.abs(compareTo(other));
+    }
+
+    public char convertToKey() {
+        return (char) (FIRST_INPUT + index);
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

@@ -3,6 +3,7 @@ package chess.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import chess.domain.position.Direction;
 import chess.domain.position.Position;
 import chess.fixture.PositionFixture;
 import java.util.stream.Stream;

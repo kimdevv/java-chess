@@ -3,7 +3,9 @@ package chess.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import chess.domain.piece.Empty;
+import chess.domain.board.Board;
+import chess.domain.board.BoardFactory;
+import chess.domain.game.Color;
 import chess.domain.piece.Knight;
 import chess.domain.piece.Piece;
 import chess.domain.piece.Rook;
@@ -34,7 +36,7 @@ class BoardTest {
 
         Piece findPiece = board.findPieceByPosition(PositionFixture.A3);
 
-        assertThat(findPiece).isEqualTo(new Empty());
+        assertThat(findPiece.isEmpty()).isTrue();
     }
 
     @DisplayName("기물을 이동하는 경우 ")
@@ -65,14 +67,14 @@ class BoardTest {
 
         @DisplayName("내 말이 아니면 예외를 발생한다")
         @Test
-        void notMyTurn() {
-            Color turn = Color.BLACK;
+        void notMyColor() {
+            Color color = Color.BLACK;
             Board board = BoardFactory.createInitialBoard();
             Position sourcePosition = PositionFixture.A1;
             Position targetPosition = PositionFixture.A2;
 
             assertThatThrownBy(
-                    () -> board.move(sourcePosition, targetPosition, turn))
+                    () -> board.move(sourcePosition, targetPosition, color))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 

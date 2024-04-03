@@ -1,8 +1,8 @@
 package chess.domain.piece;
 
-import chess.domain.Board;
-import chess.domain.Color;
-import chess.domain.Direction;
+import chess.domain.board.Board;
+import chess.domain.game.Color;
+import chess.domain.position.Direction;
 import chess.domain.position.Position;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,17 +10,35 @@ import java.util.Set;
 public class Pawn extends Piece {
     private static final int DEFAULT_WHITE_RANK = 2;
     private static final int DEFAULT_BLACK_RANK = 7;
-    public static final Pawn BLACK = new Pawn(Color.BLACK, Direction.ofBlackPawn);
-    public static final Pawn WHITE = new Pawn(Color.WHITE, Direction.ofWhitePawn);
+    public static final Pawn BLACK = new Pawn(Color.BLACK);
+    public static final Pawn WHITE = new Pawn(Color.WHITE);
 
-    private Pawn(Color color, Set<Direction> directions) {
-        super(color, PieceType.PAWN, directions);
+    private Pawn(Color color) {
+        super(color);
+    }
+
+    @Override
+    public PieceType pieceType() {
+        return PieceType.PAWN;
+    }
+
+    @Override
+    public Set<Direction> directions() {
+        if (isWhite()) {
+            return Direction.WHITE_PAWN;
+        }
+        return Direction.BLACK_PAWN;
+    }
+
+    @Override
+    public double score() {
+        return 1;
     }
 
     @Override
     public Set<Position> calculateMovablePositions(Position currentPosition, Board board) {
         Set<Position> movablePositions = new HashSet<>();
-        directions.forEach(direction -> {
+        directions().forEach(direction -> {
             if (!currentPosition.canMoveNext(direction)) {
                 return;
             }
@@ -47,8 +65,7 @@ public class Pawn extends Piece {
     }
 
     private void addMultipleForwardMoves(Board board, Direction direction, Set<Position> movablePositions,
-                                         int currentRank,
-                                         Position nextPosition) {
+                                         int currentRank, Position nextPosition) {
         if (!isStartingPosition(direction, currentRank)) {
             return;
         }
@@ -69,7 +86,7 @@ public class Pawn extends Piece {
         Position nextPosition = position.next(direction);
         Piece piece = board.findPieceByPosition(nextPosition);
 
-        if (!isSameColor(piece) && !piece.isEmpty()) {
+        if (isNotSameColor(piece) && !piece.isEmpty()) {
             movablePositions.add(nextPosition);
         }
     }

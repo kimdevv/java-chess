@@ -1,6 +1,7 @@
 package chess.domain.state;
 
-import chess.domain.Board;
+import chess.domain.board.Board;
+import chess.domain.game.Color;
 import chess.domain.position.Position;
 
 public interface GameState {
@@ -10,5 +11,9 @@ public interface GameState {
 
     GameState end();
 
+    GameState status();
+
     boolean isPlaying();
+
+    Color getCurrentColor();
 }

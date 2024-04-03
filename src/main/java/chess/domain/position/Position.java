@@ -1,6 +1,5 @@
 package chess.domain.position;
 
-import chess.domain.Direction;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -90,5 +89,9 @@ public class Position {
 
     public int getRank() {
         return rank.getValue();
+    }
+
+    public String getValue() {
+        return file.getCommand() + rank.getCommand();
     }
 }

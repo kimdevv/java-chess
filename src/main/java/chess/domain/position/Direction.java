@@ -1,4 +1,4 @@
-package chess.domain;
+package chess.domain.position;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,15 +25,15 @@ public enum Direction {
     WEST_WEST_SOUTH(-2, -1),
     ;
 
-    public static final Set<Direction> ofStraight = Set.of(NORTH, SOUTH, WEST, EAST);
-    public static final Set<Direction> ofDiagonal = Set.of(NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST);
-    public static final Set<Direction> ofAll = Stream.concat(ofStraight.stream(), ofDiagonal.stream())
+    public static final Set<Direction> STRAIGHT = Set.of(NORTH, SOUTH, WEST, EAST);
+    public static final Set<Direction> DIAGONAL = Set.of(NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST);
+    public static final Set<Direction> ALL = Stream.concat(STRAIGHT.stream(), DIAGONAL.stream())
             .collect(Collectors.toSet());
-    public static final Set<Direction> ofBlackPawn = Set.of(Direction.SOUTH, Direction.SOUTH_WEST,
+    public static final Set<Direction> BLACK_PAWN = Set.of(Direction.SOUTH, Direction.SOUTH_WEST,
             Direction.SOUTH_EAST);
-    public static final Set<Direction> ofWhitePawn = Set.of(Direction.NORTH, Direction.NORTH_WEST,
+    public static final Set<Direction> WHITE_PAWN = Set.of(Direction.NORTH, Direction.NORTH_WEST,
             Direction.NORTH_EAST);
-    public static final Set<Direction> ofKnight = Set.of(NORTH_NORTH_EAST, NORTH_NORTH_WEST, SOUTH_SOUTH_EAST,
+    public static final Set<Direction> KNIGHT = Set.of(NORTH_NORTH_EAST, NORTH_NORTH_WEST, SOUTH_SOUTH_EAST,
             SOUTH_SOUTH_WEST, EAST_EAST_NORTH, EAST_EAST_SOUTH,
             WEST_WEST_NORTH, WEST_WEST_SOUTH);
 
@@ -46,7 +46,7 @@ public enum Direction {
     }
 
     public boolean isDiagonal() {
-        return ofDiagonal.contains(this);
+        return DIAGONAL.contains(this);
     }
 
     public int getX() {

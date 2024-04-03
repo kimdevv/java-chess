@@ -1,21 +1,16 @@
 package chess.domain.piece;
 
-import chess.domain.Board;
-import chess.domain.Color;
-import chess.domain.Direction;
+import chess.domain.board.Board;
+import chess.domain.game.Color;
+import chess.domain.position.Direction;
 import chess.domain.position.Position;
-import java.util.Objects;
 import java.util.Set;
 
 public abstract class Piece {
-    protected final Set<Direction> directions;
     private final Color color;
-    private final PieceType pieceType;
 
-    protected Piece(Color color, PieceType pieceType, Set<Direction> directions) {
+    protected Piece(Color color) {
         this.color = color;
-        this.pieceType = pieceType;
-        this.directions = directions;
     }
 
     public abstract Set<Position> calculateMovablePositions(Position currentPosition, Board board);
@@ -24,36 +19,30 @@ public abstract class Piece {
         return color.isWhite();
     }
 
+    public abstract PieceType pieceType();
+
+    protected abstract Set<Direction> directions();
+
+    public abstract double score();
+
     public boolean isEmpty() {
-        return getPieceType() == PieceType.NONE;
+        return pieceType() == PieceType.NONE;
     }
 
-    public boolean isSameColor(Piece piece) {
-        return color.isSame(piece.color);
+    public boolean isKing() {
+        return pieceType() == PieceType.KING;
+    }
+
+    public boolean isPawn() {
+        return pieceType() == PieceType.PAWN;
+    }
+
+    public boolean isNotSameColor(Piece piece) {
+        return !color.isSame(piece.color);
     }
 
     public boolean isSameColor(Color other) {
         return color.isSame(other);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Piece piece)) {
-            return false;
-        }
-        return color == piece.color && pieceType == piece.pieceType;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(color, pieceType);
-    }
-
-    public PieceType getPieceType() {
-        return pieceType;
     }
 
     public Color getColor() {

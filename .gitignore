@@ -1,3 +1,5 @@
+docker/db/mysql/data/**
+
 HELP.md
 .gradle
 build/

@@ -1,75 +1,96 @@
 package chess.controller;
 
-import chess.domain.ChessGame;
-import chess.domain.command.CommandCondition;
-import chess.domain.command.CommandExecutor;
-import chess.domain.command.GameCommand;
+import chess.controller.command.CommandCondition;
+import chess.controller.command.CommandExecutor;
+import chess.controller.command.GameCommand;
+import chess.domain.game.ChessGame;
+import chess.domain.game.ChessGameStatus;
+import chess.domain.position.Move;
+import chess.domain.position.Position;
+import chess.service.ChessGameService;
 import chess.view.InputView;
 import chess.view.OutputView;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 public class ChessController {
-    private final Map<GameCommand, CommandExecutor> commands;
-    private final ChessGame chessGame;
+    private final ChessGameService chessGameService;
+    private final Map<GameCommand, CommandExecutor> commands = Map.of(
+            GameCommand.START, (chessGame, commandCondition) -> start(chessGame),
+            GameCommand.STATUS, (chessGame, commandCondition) -> status(chessGame),
+            GameCommand.END, (chessGame, commandCondition) -> end(chessGame),
+            GameCommand.MOVE, this::move
+    );
 
-    public ChessController(ChessGame chessGame) {
-        this.commands = new EnumMap<>(GameCommand.class);
-        this.chessGame = chessGame;
+    public ChessController(ChessGameService chessGameService) {
+        this.chessGameService = chessGameService;
     }
 
     public void run() {
-        registerCommands();
-        playChess();
-    }
-
-    private void registerCommands() {
-        commands.put(GameCommand.MOVE, this::move);
-        commands.put(GameCommand.START, args -> start());
-        commands.put(GameCommand.END, args -> end());
-    }
-
-    private void playChess() {
         OutputView.printGameStartMessage();
+        ChessGame chessGame = chessGameService.createInitialChessGame();
 
         while (chessGame.isPlaying()) {
-            retryOnException(this::executeCommand);
+            repeatUntilValidCommand(chessGame);
+        }
+
+        whenKingIsDead(chessGame);
+    }
+
+    private void executeCommand(ChessGame chessGame) {
+        List<String> inputCommand = InputView.readGameCommand();
+        CommandCondition commandCondition = CommandCondition.of(inputCommand);
+        GameCommand gameCommand = commandCondition.gameCommand();
+
+        commands.get(gameCommand).execute(chessGame, commandCondition);
+    }
+
+    private void repeatUntilValidCommand(ChessGame chessGame) {
+        try {
+            executeCommand(chessGame);
+        } catch (RuntimeException e) {
+            OutputView.printErrorMessage(e.getMessage());
+            repeatUntilValidCommand(chessGame);
         }
     }
 
-    private void executeCommand() {
-        List<String> inputCommand = InputView.readGameCommand();
-        CommandCondition commandCondition = CommandCondition.of(inputCommand);
-        GameCommand gameCommand = GameCommand.from(commandCondition);
+    private void whenKingIsDead(ChessGame chessGame) {
+        if (!chessGame.isKingDead()) {
+            return;
+        }
 
-        commands.get(gameCommand).execute(commandCondition);
+        OutputView.printGameResult(chessGame.gameResult());
+        chessGameService.deleteAllMoves();
     }
 
-    private void start() {
-        chessGame.start();
+    private void start(ChessGame chessGame) {
+        List<Move> moveHistories = chessGameService.getMoveHistories();
+        chessGame.start(moveHistories);
 
-        OutputView.printChessBoard(chessGame.getBoard());
+        printChessBoard(chessGame);
     }
 
-    private void move(CommandCondition commandCondition) {
-        String source = commandCondition.getSource();
-        String target = commandCondition.getTarget();
-        chessGame.movePiece(source, target);
+    private void move(ChessGame chessGame, CommandCondition commandCondition) {
+        Position source = Position.convert(commandCondition.getSource());
+        Position target = Position.convert(commandCondition.getTarget());
 
-        OutputView.printChessBoard(chessGame.getBoard());
+        chessGame.move(source, target);
+        chessGameService.addMoveHistory(source, target);
+
+        printChessBoard(chessGame);
     }
 
-    private void end() {
+    private void end(ChessGame chessGame) {
         chessGame.end();
     }
 
-    private void retryOnException(Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (RuntimeException e) {
-            OutputView.printErrorMessage(e.getMessage());
-            retryOnException(runnable);
-        }
+    private void status(ChessGame chessGame) {
+        ChessGameStatus chessGameStatus = chessGame.status();
+
+        OutputView.printChessGameStatus(chessGameStatus);
+    }
+
+    private void printChessBoard(ChessGame chessGame) {
+        OutputView.printChessBoard(chessGame.board(), chessGame.currentColor());
     }
 }

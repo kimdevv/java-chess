@@ -3,7 +3,7 @@ package chess.domain.piece;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import chess.domain.Board;
+import chess.domain.board.Board;
 import chess.domain.position.Position;
 import chess.fixture.PositionFixture;
 import java.util.Map;

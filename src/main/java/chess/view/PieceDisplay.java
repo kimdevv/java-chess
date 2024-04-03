@@ -39,7 +39,7 @@ public enum PieceDisplay {
     }
 
     private static boolean isSamePieceType(Piece piece, PieceDisplay pieceDisplay) {
-        PieceType pieceType = piece.getPieceType();
+        PieceType pieceType = piece.pieceType();
 
         return pieceType.equals(pieceDisplay.pieceType);
     }

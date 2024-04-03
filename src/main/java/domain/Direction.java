@@ -33,11 +33,11 @@ public enum Direction {
         this.column = column;
     }
 
-    public int row() {
+    public int getRow() {
         return row;
     }
 
-    public int column() {
+    public int getColumn() {
         return column;
     }
 }

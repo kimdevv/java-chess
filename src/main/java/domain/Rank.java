@@ -25,8 +25,8 @@ public enum Rank {
                 .orElseThrow(() -> new IllegalArgumentException(index + "번 랭크는 존재하지 않습니다."));
     }
 
-    public Rank move(final int i) {
-        return Rank.from(this.index + i);
+    public Rank move(final int index) {
+        return Rank.from(this.index + index);
     }
 
     public boolean canMove(final int column) {
@@ -36,5 +36,9 @@ public enum Rank {
             }
         }
         return false;
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

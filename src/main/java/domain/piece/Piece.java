@@ -4,9 +4,9 @@ import domain.Direction;
 import domain.Square;
 import domain.Team;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class Piece {
     protected final Team team;
@@ -15,33 +15,18 @@ public abstract class Piece {
         this.team = team;
     }
 
-    protected boolean checkMovable(final Square source, final Square target, final List<Direction> movableDirections, final Map<Square, Piece> pieces) {
-        final List<Square> movableSquares = new ArrayList<>();
+    protected abstract List<Direction> movableDirections();
 
-        for (final Direction movableDirection : movableDirections) {
-            addMovableSquares(source, movableDirection, movableSquares, pieces);
-        }
-
-        return movableSquares.contains(target);
-    }
-
-    protected void addMovableSquares(final Square source, final Direction direction, final List<Square> movableSquares, final Map<Square, Piece> pieces) {
-        Square movableSource = source;
-
-        while (movableSource.canMove(direction)) {
-            movableSource = movableSource.next(direction);
-            if (pieces.containsKey(movableSource)) {
-                break;
-            }
-            movableSquares.add(movableSource);
-        }
-    }
-
-    public boolean canNotMove(final Square source, final Square target, final Map<Square, Piece> pieces) {
+    public boolean cannotMove(final Square source, final Square target, final Map<Square, Piece> pieces) {
         return !canMove(source, target, pieces);
     }
 
     protected abstract boolean canMove(Square source, Square target, Map<Square, Piece> pieces);
+
+
+    protected boolean hasSameTeamPieceOnTarget(final Square source, final Square target, final Map<Square, Piece> pieces) {
+        return pieces.containsKey(target) && pieces.get(target).isSameTeam(pieces.get(source));
+    }
 
     public boolean isSameTeam(final Piece other) {
         return this.team == other.team;
@@ -53,5 +38,32 @@ public abstract class Piece {
 
     public boolean isBlack() {
         return this.team == Team.BLACK;
+    }
+
+    public boolean isPawn() {
+        return false;
+    }
+
+    public Team team() {
+        return team;
+    }
+
+    public abstract double getScore(Map<Square, Piece> pieces, Square square);
+
+    public boolean isKing() {
+        return false;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final Piece piece = (Piece) o;
+        return team == piece.team;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(team, getClass().getSimpleName());
     }
 }

@@ -3,14 +3,20 @@ package dto;
 import domain.File;
 import domain.Rank;
 import domain.Square;
-import domain.piece.*;
+import domain.piece.Piece;
+import domain.piece.jumping.King;
+import domain.piece.jumping.Knight;
+import domain.piece.pawn.Pawn;
+import domain.piece.sliding.Bishop;
+import domain.piece.sliding.Queen;
+import domain.piece.sliding.Rook;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public record ChessBoardDTO(List<String> pieces) {
-    public static ChessBoardDTO from(final Map<Square, Piece> pieceMap) {
+public record ChessBoardDto(List<String> pieces) {
+    public static ChessBoardDto from(final Map<Square, Piece> pieceMap) {
         final List<String> pieces = new ArrayList<>();
         for (int rank = 8; rank >= 1; rank--) {
             for (int file = 1; file <= 8; file++) {
@@ -20,7 +26,7 @@ public record ChessBoardDTO(List<String> pieces) {
                 pieces.add(pieceString);
             }
         }
-        return new ChessBoardDTO(pieces);
+        return new ChessBoardDto(pieces);
     }
 
     private static String getPieceString(final Piece piece) {

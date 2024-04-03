@@ -1,12 +1,4 @@
-# java-chess
-
-체스 미션 저장소
-
-## 우아한테크코스 코드리뷰
-
-- [온라인 코드 리뷰 과정](https://github.com/woowacourse/woowacourse-docs/blob/master/maincourse/README.md)
-
-## STEP2 기능 명세
+# 기능 명세서
 
 - [x] source위치 target위치 입력 받기
     - [x] 체스판에 없는 위치 검증
@@ -29,15 +21,14 @@
 - [x] 이동시 위치 변환
 - [x] 턴 전환(move 후 턴 전환)
 - [x] 내 말이 맞는지 검증(턴과 이동할 Piece 색 검증) - Table
-
-## STEP1 기능 구현
-
-### 체스말(Piece) -> VO
-
-#### 색 (Color) (흑백) enum
-
-### 타입
-
-### 체스판 -> 체스 움직임을 담당
-
-#### (Rank, File) -> Square
+- [x] King이 잡혔을 때 게임 종료.
+    - [x] King이 잡히는 경우 패배한다.
+- [x] "status" 명령을 입력할 수 있다.
+    - [x] 현재 남아 있는 말에 대한 점수를 구한다.
+        - [x] queen은 9점, rook은 5점, bishop은 3점, knight는 2.5점
+        - [x] pawn의 기본 점수는 1점이다.
+            - [x] 같은 세로줄에 같은 색의 폰이 있는 경우 1점이 아닌 0.5점
+        - [x] king은 점수가 없다.
+    - [x] 각 진영의 점수를 출력한다.
+    - [x] 진영의 승패를 출력한다.
+    - [x] 한 번에 한 쪽의 점수만을 계산해야 한다.

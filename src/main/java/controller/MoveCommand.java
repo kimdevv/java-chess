@@ -1,7 +1,6 @@
-package view;
+package controller;
 
 public record MoveCommand(String file, int rank) {
-
     public static final String COMMAND_REGEX = "[a-h][1-8]";
     public static final int FILE_INDEX = 0;
     public static final int RANK_INDEX = 1;

@@ -30,3 +30,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### docker ###
+docker/
+
+### properties ###
+/src/main/resources/application.properties

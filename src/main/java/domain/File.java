@@ -20,7 +20,7 @@ public enum File {
 
     public static File from(final String input) {
         return Arrays.stream(values())
-                .filter(file -> file.name().equals(input.toUpperCase()))
+                .filter(file -> file.name().equalsIgnoreCase(input))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 파일입니다."));
     }
@@ -33,9 +33,9 @@ public enum File {
     }
 
 
-    public File move(final int vector) {
+    public File move(final int nextIndex) {
         return Arrays.stream(values())
-                .filter(file -> file.index == this.index + vector)
+                .filter(file -> file.index == this.index + nextIndex)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 파일입니다."));
     }

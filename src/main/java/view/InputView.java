@@ -1,5 +1,7 @@
 package view;
 
+import controller.Menu;
+
 import java.util.Scanner;
 
 public class InputView {

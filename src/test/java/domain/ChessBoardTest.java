@@ -1,6 +1,13 @@
 package domain;
 
 import domain.piece.Piece;
+import domain.piece.jumping.King;
+import domain.piece.jumping.Knight;
+import domain.piece.pawn.BlackPawn;
+import domain.piece.pawn.WhitePawn;
+import domain.piece.sliding.Bishop;
+import domain.piece.sliding.Queen;
+import domain.piece.sliding.Rook;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,21 +22,21 @@ class ChessBoardTest {
     @Test
     void moveSamePlace() {
         // given
-        final ChessBoard chessBoard = ChessBoard.create();
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
 
         final Square source = new Square(File.A, Rank.TWO);
 
         // when & then
         assertThatThrownBy(() -> chessBoard.move(source, source))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("갈 수 없는 경로입니다.");
+                .hasMessage("제자리 이동은 불가능합니다.");
     }
 
     @DisplayName("기물이 이동할 수 없는 경로 이동은 불가능하다 : 폰 3칸")
     @Test
     void emptyPath() {
         // given
-        final ChessBoard chessBoard = ChessBoard.create();
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
 
         final Square source = new Square(File.A, Rank.TWO);
         final Square target = new Square(File.A, Rank.FIVE);
@@ -44,7 +51,7 @@ class ChessBoardTest {
     @Test
     void noPieceInSource() {
         // given
-        final ChessBoard chessBoard = ChessBoard.create();
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
 
         final Square source = new Square(File.A, Rank.THREE);
         final Square target = new Square(File.A, Rank.FOUR);
@@ -59,7 +66,7 @@ class ChessBoardTest {
     @Test
     void blockingPiece() {
         // given
-        final ChessBoard chessBoard = ChessBoard.create();
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
 
         final Square source = new Square(File.A, Rank.ONE);
         final Square target = new Square(File.A, Rank.EIGHT);
@@ -75,7 +82,7 @@ class ChessBoardTest {
     @Test
     void movePawn() {
         // given
-        final ChessBoard chessBoard = ChessBoard.create();
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
 
         final Square source = new Square(File.D, Rank.TWO);
         final Square target = new Square(File.D, Rank.FOUR);
@@ -99,7 +106,7 @@ class ChessBoardTest {
     @Test
     void killEnemy() {
         // given
-        final ChessBoard chessBoard = ChessBoard.create();
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
 
         final Square whiteSource = new Square(File.D, Rank.TWO);
         final Square whiteTarget = new Square(File.D, Rank.FOUR);
@@ -109,7 +116,6 @@ class ChessBoardTest {
 
         final Square blackSource = new Square(File.E, Rank.SEVEN);
         final Square blackTarget = new Square(File.E, Rank.FIVE);
-        final Piece blackPiece = chessBoard.getPieces().get(blackSource);
         chessBoard.move(blackSource, blackTarget);
 
         // when
@@ -128,7 +134,7 @@ class ChessBoardTest {
     @Test
     void myCamp() {
         // given
-        final ChessBoard chessBoard = ChessBoard.create();
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
 
         final Square source = new Square(File.A, Rank.SEVEN);
         final Square target = new Square(File.A, Rank.SIX);
@@ -143,7 +149,7 @@ class ChessBoardTest {
     @Test
     void pawnAttack() {
         // given
-        final ChessBoard chessBoard = ChessBoard.create();
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
 
         final Square whiteSource = new Square(File.D, Rank.TWO);
         final Square whiteTarget = new Square(File.D, Rank.FOUR);
@@ -158,5 +164,89 @@ class ChessBoardTest {
         assertThatThrownBy(() -> chessBoard.move(whiteTarget, blackTarget))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("갈 수 없는 경로입니다.");
+    }
+
+    @DisplayName("각 진영의 점수 현황을 반환한다 - 백.")
+    @Test
+    void statusWhite() {
+        // given 
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
+        // when 
+        final Map<Team, Double> result = chessBoard.status();
+        //then
+        assertThat(result).containsEntry(Team.WHITE, 38.0);
+    }
+
+    @DisplayName("각 진영의 점수 현황을 반환한다 - 흑")
+    @Test
+    void statusBlack() {
+        // given
+        final ChessBoard chessBoard = ChessBoardInitializer.initialize();
+        chessBoard.move(new Square(File.A, Rank.TWO), new Square(File.A, Rank.THREE));
+        // when
+        final Map<Team, Double> result = chessBoard.status();
+        //then
+        assertThat(result).containsEntry(Team.BLACK, 38.0);
+    }
+
+    @DisplayName("각 진영의 점수 현황을 반환한다 - 흑 20점")
+    @Test
+    void black20() {
+        // given
+        /*
+        *
+        .KR.....  8
+        P.PB....  7
+        .P..Q...  6
+        ........  5
+        ........  4
+        ........  3
+        ........  2
+        ........  1
+        * */
+        final ChessBoard chessBoard = new ChessBoard(Map.of(
+                new Square(File.B, Rank.EIGHT), new King(Team.BLACK),
+                new Square(File.C, Rank.EIGHT), new Rook(Team.BLACK),
+                new Square(File.A, Rank.SEVEN), new BlackPawn(),
+                new Square(File.C, Rank.SEVEN), new BlackPawn(),
+                new Square(File.D, Rank.SEVEN), new Bishop(Team.BLACK),
+                new Square(File.B, Rank.SIX), new BlackPawn(),
+                new Square(File.E, Rank.SIX), new Queen(Team.BLACK)
+        ));
+        // when
+        final Map<Team, Double> result = chessBoard.status();
+        //then
+        assertThat(result).containsEntry(Team.BLACK, 20.0);
+    }
+
+    @DisplayName("각 진영의 점수 현황을 반환한다 - 백 19.5")
+    @Test
+    void white19Dot5() {
+        // given
+        /*
+        *
+        ........  8
+        ........  7
+        ........  6
+        ........  5
+        .....nq.  4
+        .....p.p  3
+        .....pp.  2
+        ....rk..  1
+        * */
+        final ChessBoard chessBoard = new ChessBoard(Map.of(
+                new Square(File.F, Rank.FOUR), new Knight(Team.WHITE),
+                new Square(File.G, Rank.FOUR), new Queen(Team.WHITE),
+                new Square(File.F, Rank.THREE), new WhitePawn(),
+                new Square(File.H, Rank.THREE), new WhitePawn(),
+                new Square(File.F, Rank.TWO), new WhitePawn(),
+                new Square(File.G, Rank.TWO), new WhitePawn(),
+                new Square(File.E, Rank.ONE), new Rook(Team.WHITE),
+                new Square(File.F, Rank.ONE), new King(Team.WHITE)
+        ));
+        // when
+        final Map<Team, Double> result = chessBoard.status();
+        //then
+        assertThat(result).containsEntry(Team.WHITE, 19.5);
     }
 }

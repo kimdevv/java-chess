@@ -1,72 +1,103 @@
 package controller;
 
-import domain.ChessBoard;
+import dao.ChessBoardDao;
+import dao.MySqlConnectionPool;
+import dao.TurnDao;
 import domain.File;
 import domain.Rank;
 import domain.Square;
-import dto.ChessBoardDTO;
+import dto.ChessBoardDto;
+import dto.StatusDto;
+import service.ChessService;
 import view.InputView;
-import view.Menu;
-import view.MoveCommand;
 import view.OutputView;
 
+import java.sql.SQLException;
+
 public class ChessController {
-    private final InputView inputView;
-    private final OutputView outputView;
+    private static final InputView INPUT_VIEW = new InputView();
+    private static final OutputView OUTPUT_VIEW = new OutputView();
+
+    private final ChessService chessService;
 
     public ChessController() {
-        this.inputView = new InputView();
-        this.outputView = new OutputView();
+        chessService = createChessService();
+    }
+
+    private ChessService createChessService() {
+        final MySqlConnectionPool mySqlConnectionPool = new MySqlConnectionPool();
+        final ChessBoardDao chessBoardDao = new ChessBoardDao(mySqlConnectionPool);
+        final TurnDao turnDao = new TurnDao(mySqlConnectionPool);
+        return new ChessService(chessBoardDao, turnDao);
     }
 
     public void run() {
-        outputView.printHeader();
-        ChessBoard chessBoard = new ChessBoard();
-        Menu prevMenu = Menu.DEFAULT;
-        while (true) {
+        OUTPUT_VIEW.printHeader();
+        Status status = Status.READY;
+        while (status.isContinue()) {
             try {
-                final Menu menu = inputView.readMenu();
-
-                if (menu.isStart()) {
-                    if (prevMenu.isMove() || prevMenu.isStart()) {
-                        outputView.printReplayMessage();
-                    }
-                    chessBoard = ChessBoard.create();
-                    outputView.printChessBoard(ChessBoardDTO.from(chessBoard.getPieces()));
-                }
-                if (menu.isEnd()) {
-                    break;
-                }
-                if (menu.isMove()) {
-                    play(chessBoard);
-                }
-
-                prevMenu = menu;
+                final Menu menu = INPUT_VIEW.readMenu();
+                status = execute(menu);
             } catch (final Exception e) {
-                outputView.printError(e.getMessage());
+                OUTPUT_VIEW.printError(e.getMessage());
             }
         }
+        OUTPUT_VIEW.printEndMessage();
     }
 
-    private void play(final ChessBoard chessBoard) {
-        validateGameState(chessBoard);
+    public Status execute(final Menu menu) throws SQLException {
+        if (menu.isStart()) {
+            return startGame();
+        }
+        if (menu.isMove()) {
+            return playGame();
+        }
+        if (menu.isStatus()) {
+            return printStatus();
+        }
+        if (menu.isEnd()) {
+            return endGame();
+        }
+        throw new IllegalStateException("예기치 못한 오류가 발생했습니다.");
+    }
 
+    private Status startGame() {
+        chessService.start();
+        printChessBoard();
+        return Status.RUNNING;
+    }
+
+    private Status playGame() {
         final Square source = readSquare();
         final Square target = readSquare();
+        chessService.move(source, target);
 
-        chessBoard.move(source, target);
+        if (chessService.isFinished()) {
+            return Status.END;
+        }
 
-        outputView.printChessBoard(ChessBoardDTO.from(chessBoard.getPieces()));
+        printChessBoard();
+        return Status.RUNNING;
     }
 
     private Square readSquare() {
-        final MoveCommand moveCommand = MoveCommand.fromInput(inputView.readMoveCommand());
+        final MoveCommand moveCommand = MoveCommand.fromInput(new InputView().readMoveCommand());
         return new Square(File.from(moveCommand.file()), Rank.from(moveCommand.rank()));
     }
 
-    private static void validateGameState(final ChessBoard chessBoard) {
-        if (chessBoard.isEmpty()) {
-            throw new IllegalStateException("게임을 시작해주세요.");
-        }
+    private Status printStatus() {
+        final StatusDto statusDto = StatusDto.from(chessService.status());
+        OUTPUT_VIEW.printStatus(statusDto);
+        return Status.RUNNING;
+    }
+
+    private void printChessBoard() {
+        final ChessBoardDto chessBoardDto = ChessBoardDto.from(chessService.getChessBoard());
+        OUTPUT_VIEW.printChessBoard(chessBoardDto);
+    }
+
+    private Status endGame() throws SQLException {
+        chessService.end();
+        return Status.END;
     }
 }

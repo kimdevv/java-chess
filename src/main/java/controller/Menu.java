@@ -1,10 +1,10 @@
-package view;
+package controller;
 
 public enum Menu {
     START("start"),
     MOVE("move"),
-    END("end"),
-    DEFAULT("default");
+    STATUS("status"),
+    END("end");
 
     private final String command;
 
@@ -25,11 +25,15 @@ public enum Menu {
         return this == START;
     }
 
-    public boolean isEnd() {
-        return this == END;
-    }
-
     public boolean isMove() {
         return this == MOVE;
+    }
+
+    public boolean isStatus() {
+        return this == STATUS;
+    }
+
+    public boolean isEnd() {
+        return this == END;
     }
 }

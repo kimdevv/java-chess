@@ -1,16 +1,23 @@
-package domain.piece;
+package domain.piece.sliding;
 
-import domain.*;
+import domain.File;
+import domain.Rank;
+import domain.Square;
+import domain.Team;
+import domain.piece.Piece;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class QueenTest {
+    Map<Square, Piece> pieces = Map.of();
+
     @DisplayName("퀸은 상하좌우 대각선으로 여러칸 움직일 수 있다.")
     @ParameterizedTest
     @MethodSource(value = "canMoveArguments")
@@ -18,7 +25,7 @@ class QueenTest {
         final Queen queen = new Queen(Team.BLACK);
         final Square source = new Square(File.D, Rank.FOUR);
         // when
-        final boolean canMove = queen.canMove(source, target, new ChessBoard().getPieces());
+        final boolean canMove = queen.canMove(source, target, pieces);
 
         // then
         assertThat(canMove).isTrue();
@@ -43,7 +50,7 @@ class QueenTest {
         final Queen queen = new Queen(Team.BLACK);
         final Square source = new Square(File.D, Rank.FOUR);
         // when
-        final boolean canMove = queen.canMove(source, target, new ChessBoard().getPieces());
+        final boolean canMove = queen.canMove(source, target, pieces);
 
         // then
         assertThat(canMove).isFalse();

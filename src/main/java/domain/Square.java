@@ -12,18 +12,22 @@ public class Square {
     }
 
     public Square next(final Direction direction) {
-        final File newFile = this.file.move(direction.row());
-        final Rank newRank = this.rank.move(direction.column());
+        final File newFile = this.file.move(direction.getRow());
+        final Rank newRank = this.rank.move(direction.getColumn());
 
         return new Square(newFile, newRank);
     }
 
     public boolean canMove(final Direction direction) {
-        return file.canMove(direction.row()) && rank.canMove(direction.column());
+        return file.canMove(direction.getRow()) && rank.canMove(direction.getColumn());
     }
 
     public boolean isRank(final Rank rank) {
         return this.rank == rank;
+    }
+
+    public boolean isSameFile(final Square square) {
+        return this.file == square.file;
     }
 
     @Override
@@ -35,6 +39,14 @@ public class Square {
             return false;
         }
         return rank == square.rank && file == square.file;
+    }
+
+    public File file() {
+        return file;
+    } // TODO: get 으로 바꾸기
+
+    public Rank rank() {
+        return rank;
     }
 
     @Override

@@ -2,8 +2,9 @@ package chess.domain.chessGame;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import chess.domain.Board;
-import chess.domain.ChessGame;
+import chess.domain.board.ChessBoardService;
+import chess.domain.board.MemoryBoardRepository;
+import chess.domain.ChessGameService;
 import chess.domain.Color;
 import chess.domain.position.Column;
 import chess.domain.Piece;
@@ -33,7 +34,7 @@ class KingTest {
     void generateMovablePositions() {
         Position targetPosition = new Position(Row.RANK2, Column.D);
         Color currentTurn = Color.WHITE;
-        ChessGame chessGame = new ChessGame(new Board(
+        ChessBoardService chessBoardService = new ChessBoardService(new MemoryBoardRepository(
                 Map.of(
                         targetPosition, new Piece(PieceType.KING, currentTurn),
                         new Position(Row.RANK2, Column.E), new Piece(PieceType.WHITE_PAWN, currentTurn),
@@ -46,9 +47,9 @@ class KingTest {
                         new Position(Row.RANK2, Column.C), new Piece(PieceType.BLACK_PAWN, currentTurn.opposite())
 
                 )
-        ), currentTurn);
+        ));
 
-        List<Position> result = chessGame.generateMovablePositions(targetPosition);
+        List<Position> result = chessBoardService.generateMovablePositions(targetPosition, currentTurn);
 
         assertThat(result).containsExactlyInAnyOrder(
                 new Position(Row.RANK3, Column.D),

@@ -52,8 +52,20 @@ public class Piece {
         return true;
     }
 
+    public boolean isKing() {
+        return pieceType.isKing();
+    }
+
+    public double getScore() {
+        return pieceType.getScore();
+    }
+
     public PieceType getPieceType() {
         return pieceType;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     @Override
@@ -71,5 +83,13 @@ public class Piece {
     @Override
     public int hashCode() {
         return Objects.hash(pieceType, color);
+    }
+
+    @Override
+    public String toString() {
+        return "Piece{" +
+                "pieceType=" + pieceType +
+                ", color=" + color +
+                '}';
     }
 }

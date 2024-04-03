@@ -1,36 +1,39 @@
-package chess.domain;
+package chess.domain.board;
 
+import chess.domain.Piece;
 import chess.domain.position.Position;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Board {
+public class MemoryBoardRepository implements BoardRepository{
 
     private final Map<Position, Piece> board;
 
-    public Board() {
-        this.board = new HashMap<>();
-    }
-
-    public Board(Map<Position, Piece> board) {
+    public MemoryBoardRepository(Map<Position, Piece> board) {
         this.board = board;
     }
 
-    public void putPiece(Position position, Piece piece) {
+    @Override
+    public void placePiece(Position position, Piece piece) {
         board.put(position, piece);
     }
 
-    public void movePiece(Position from, Position to) {
-        Piece piece = board.get(from);
-        board.put(to, piece);
-        board.remove(from);
+    @Override
+    public void removePiece(Position position) {
+        board.remove(position);
     }
 
+    @Override
+    public void clearBoard() {
+        board.clear();
+    }
+
+    @Override
     public boolean hasPiece(Position position) {
         return board.containsKey(position);
     }
 
+    @Override
     public Piece findPieceByPosition(Position position) {
         if (hasPiece(position)) {
             return board.get(position);
@@ -38,13 +41,11 @@ public class Board {
         throw new IllegalArgumentException("해당 위치에 기물이 없습니다.");
     }
 
-    public boolean isEmptySpace(Position position) {
-        return !hasPiece(position);
-    }
-
+    @Override
     public Map<Position, Piece> getBoard() {
         return board;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -54,8 +55,8 @@ public class Board {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Board board1 = (Board) o;
-        return Objects.equals(board, board1.board);
+        MemoryBoardRepository memoryBoardRepository1 = (MemoryBoardRepository) o;
+        return Objects.equals(board, memoryBoardRepository1.board);
     }
 
     @Override

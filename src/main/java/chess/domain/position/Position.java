@@ -48,6 +48,10 @@ public class Position {
         return column.getIndex();
     }
 
+    public Column getColumn() {
+        return column;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -68,8 +72,8 @@ public class Position {
     @Override
     public String toString() {
         return "Position{" +
-                "column=" + column +
-                ", row=" + row +
+                "row=" + row +
+                ", column=" + column +
                 '}';
     }
 }

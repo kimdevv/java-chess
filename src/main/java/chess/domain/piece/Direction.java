@@ -4,6 +4,7 @@ import chess.domain.File;
 import chess.domain.Rank;
 
 import java.util.Arrays;
+import java.util.Set;
 
 public enum Direction {
 
@@ -15,15 +16,20 @@ public enum Direction {
     LEFT_DOWN(-1, -1),
     RIGHT_UP(1, 1),
     RIGHT_DOWN(1, -1),
-    KNIGHT_LEFT_UP(-2, 1),
-    KNIGHT_LEFT_DOWN(-2, -1),
-    KNIGHT_RIGHT_UP(2, 1),
-    KNIGHT_RIGHT_DOWN(2, -1),
-    KNIGHT_UP_LEFT(-1, 2),
-    KNIGHT_UP_RIGHT(1, 2),
-    KNIGHT_DOWN_LEFT(-1, -2),
-    KNIGHT_DOWN_RIGHT(1, -2),
+    LEFT_LEFT_UP(-2, 1),
+    LEFT_LEFT_DOWN(-2, -1),
+    RIGHT_RIGHT_UP(2, 1),
+    RIGHT_RIGHT_DOWN(2, -1),
+    LEFT_UP_UP(-1, 2),
+    RIGHT_UP_UP(1, 2),
+    LEFT_DOWN_DOWN(-1, -2),
+    RIGHT_DOWN_DOWN(1, -2),
     ;
+
+    public static final Set<Direction> HORIZON_VERTICAL = Set.of(LEFT, RIGHT, UP, DOWN);
+    public static final Set<Direction> DIAGONAL = Set.of(LEFT_UP, LEFT_DOWN, RIGHT_UP, RIGHT_DOWN);
+    public static final Set<Direction> HORIZON_VERTICAL_DIAGONAL = Set.of(LEFT, RIGHT, UP, DOWN, LEFT_UP, LEFT_DOWN, RIGHT_UP, RIGHT_DOWN);
+    public static final Set<Direction> L_SHAPE = Set.of(LEFT_LEFT_UP, LEFT_LEFT_DOWN, RIGHT_RIGHT_UP, RIGHT_RIGHT_DOWN, LEFT_UP_UP, RIGHT_UP_UP, LEFT_DOWN_DOWN, RIGHT_DOWN_DOWN);
 
     private final int x;
     private final int y;
@@ -48,11 +54,11 @@ public enum Direction {
         return currentRank.moveByOffset(this.y);
     }
 
-    private boolean isSameGradiant(int dx, int dy) {
+    private boolean isSameGradiant(final int dx, final int dy) {
         return (double) this.x / this.y == (double) dx / dy;
     }
 
-    private boolean isSameSign(int dx, int dy) {
+    private boolean isSameSign(final int dx, final int dy) {
         return this.x * dx >= 0 && this.y * dy >= 0;
     }
 }

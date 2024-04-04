@@ -86,6 +86,10 @@ public enum Position {
         return Math.abs(target.rank.index() - rank.index());
     }
 
+    public boolean isFile(ChessFile file) {
+        return this.file == file;
+    }
+
     public boolean isRank(final ChessRank rank) {
         return this.rank == rank;
     }
@@ -96,6 +100,14 @@ public enum Position {
 
     public int indexOfRank() {
         return rank.index();
+    }
+
+    public ChessFile file() {
+        return file;
+    }
+
+    public ChessRank rank() {
+        return rank;
     }
 
     @Override

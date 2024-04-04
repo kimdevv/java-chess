@@ -1,11 +1,10 @@
 package chess.view;
 
-import chess.domain.position.Position;
-import chess.dto.CommandInfo;
-import chess.view.matcher.ChessFileMatcher;
-import chess.view.matcher.ChessRankMatcher;
+import chess.dto.CommandInfoDto;
 import chess.view.matcher.CommandMatcher;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class InputView {
@@ -21,29 +20,25 @@ public class InputView {
         return INSTANCE;
     }
 
-    public CommandInfo readCommand() {
+    public CommandInfoDto readCommand() {
         String[] commandText = scanner.nextLine().split(" ");
-        if (commandText.length == 1) {
-            return CommandInfo.fromNonMovable(CommandMatcher.matchByText(commandText[0]));
-        }
-        if (commandText.length == 3) {
-            validatePosition(commandText[1], commandText[2]);
-            return CommandInfo.ofMovable(
-                    CommandMatcher.matchByText(commandText[0]), extractPosition(commandText[1]), extractPosition(commandText[2]));
-        }
-        throw new IllegalArgumentException("명령 입력 형식이 올바르지 않습니다.");
+        Command command = CommandMatcher.matchByText(commandText[0]);
+
+        return CommandInfoDto.of(command, commandText);
     }
 
-    private void validatePosition(final String source, final String target) {
-        if (source.length() != 2 || target.length() != 2) {
-            throw new IllegalArgumentException("위치 입력 형식이 올바르지 않습니다.");
-        }
+    public GameOption readGameOption() {
+        System.out.println("> 게임 생성 : game new");
+        System.out.println("> 게임 불러오기 : game load");
+        System.out.print("> ");
+        List<String> gameOption = Arrays.asList(scanner.nextLine().split(" "));
+        validateGameOption(gameOption);
+        return GameOption.findByText(gameOption.get(1));
     }
 
-    private Position extractPosition(final String positionText) {
-        String file = String.valueOf(positionText.charAt(0));
-        String rank = String.valueOf(positionText.charAt(1));
-
-        return Position.of(ChessFileMatcher.matchByText(file), ChessRankMatcher.matchByText(rank));
+    private void validateGameOption(final List<String> gameCommand) {
+        if (gameCommand.size() != 2 || !gameCommand.get(0).equals("game")) {
+            throw new IllegalArgumentException("게임 명령어 입력 형식이 올바르지 않습니다.");
+        }
     }
 }

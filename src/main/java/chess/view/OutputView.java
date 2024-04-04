@@ -1,9 +1,11 @@
 package chess.view;
 
+import chess.domain.game.GameResult;
+import chess.domain.game.Winner;
 import chess.domain.position.ChessFile;
 import chess.domain.position.ChessRank;
-import chess.dto.BoardStatus;
-import chess.dto.PieceInfo;
+import chess.dto.BoardStatusDto;
+import chess.dto.PieceInfoDto;
 import chess.view.matcher.PieceNameMatcher;
 
 import java.util.ArrayList;
@@ -23,16 +25,18 @@ public class OutputView {
     }
 
     public void printGameStartMessage() {
-        StringJoiner startMessageJoiner = new StringJoiner(System.lineSeparator());
-        startMessageJoiner.add("> 체스 게임을 시작합니다.");
-        startMessageJoiner.add("> 게임 시작 : start");
-        startMessageJoiner.add("> 게임 종료 : end");
-        startMessageJoiner.add("> 게임 이동 : move source위치 target위치 - 예. move b2 b3");
-
-        System.out.println(startMessageJoiner);
+        System.out.println("> 체스 게임을 시작합니다.");
     }
 
-    public void printChessBoard(final BoardStatus status) {
+    public void printCommandInfoMessage() {
+        StringJoiner readCommandMessageJoiner = new StringJoiner(System.lineSeparator());
+        readCommandMessageJoiner.add("> 게임 시작 : start");
+        readCommandMessageJoiner.add("> 게임 종료 : end");
+        readCommandMessageJoiner.add("> 게임 이동 : move source위치 target위치 - 예. move b2 b3");
+        System.out.println(readCommandMessageJoiner);
+    }
+
+    public void printChessBoard(final BoardStatusDto status) {
         List<List<String>> board = createInitBoard();
         applyBoardStatus(status, board);
 
@@ -53,11 +57,11 @@ public class OutputView {
         return board;
     }
 
-    private void applyBoardStatus(final BoardStatus status, final List<List<String>> board) {
-        for (PieceInfo pieceInfo : status.pieceInfos()) {
-            int rankIndex = ChessRank.maxIndex() - pieceInfo.rankIndex();
-            int fileIndex = pieceInfo.fileIndex();
-            board.get(rankIndex).set(fileIndex, PieceNameMatcher.matchByType(pieceInfo.type()));
+    private void applyBoardStatus(final BoardStatusDto status, final List<List<String>> board) {
+        for (PieceInfoDto pieceInfoDto : status.pieceInfoDtos()) {
+            int rankIndex = ChessRank.maxIndex() - pieceInfoDto.rankIndex();
+            int fileIndex = pieceInfoDto.fileIndex();
+            board.get(rankIndex).set(fileIndex, PieceNameMatcher.matchByType(pieceInfoDto.type(), pieceInfoDto.color()));
         }
     }
 
@@ -67,5 +71,28 @@ public class OutputView {
             lineBuilder.append(point);
         }
         return lineBuilder;
+    }
+
+    public void printGameStatus(final GameResult gameResult) {
+        StringJoiner gameStatusMessage = new StringJoiner(System.lineSeparator());
+        gameStatusMessage.add(String.format("> 검은색: %.1f", gameResult.blackScore()));
+        gameStatusMessage.add(String.format("> 흰색: %.1f", gameResult.whiteScore()));
+        gameStatusMessage.add(String.format("> 게임 결과: %s", getGameResultText(gameResult)));
+
+        System.out.println(gameStatusMessage);
+    }
+
+    private String getGameResultText(GameResult gameResult) {
+        if (gameResult.winnerTeam() == Winner.BLACK) {
+            return "검정색 승";
+        }
+        if (gameResult.winnerTeam() == Winner.WHITE) {
+            return "흰색 승";
+        }
+        return "비김";
+    }
+
+    public void printErrorMessage(String errorMessage) {
+        System.out.println(String.format("[ERROR] %s%n", errorMessage));
     }
 }

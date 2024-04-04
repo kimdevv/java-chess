@@ -1,12 +1,11 @@
 package chess.domain.piece;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.List;
-import chess.domain.board.Coordinate;
-import chess.domain.board.Pieces;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,6 +18,27 @@ class QueenTest {
     void create() {
         assertThatCode(() -> new Queen(Team.WHITE))
                 .doesNotThrowAnyException();
+    }
+
+    @DisplayName("퀸은 킹이 아니다.")
+    @Test
+    void isKing() {
+        Queen queen = new Queen(Team.WHITE);
+
+        assertThat(queen.isKing()).isFalse();
+    }
+
+    @DisplayName("퀸의 점수를 계산한다.")
+    @Test
+    void calculateScore() {
+        Queen queen = new Queen(Team.WHITE);
+        HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+        Pieces pieces = new Pieces(piecesMap);
+        Coordinate source = new Coordinate(3, 'e');
+
+        Score result = queen.calculateScore(source, pieces);
+
+        assertThat(result.value()).isEqualTo(9);
     }
 
     @DisplayName("target 좌표에 아군 기물이 있다면, 이동할 수 없다.")
@@ -109,6 +129,66 @@ class QueenTest {
         assertThatThrownBy(() -> queen.validateMovable(source, target, pieces))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("기물로 막혀있어 이동할 수 없습니다.");
+    }
+
+    /***
+     * ........ 8
+     * ........ 7
+     * .E...... 6  E: Enemy
+     * ..T..... 5  T: target
+     * ........ 4
+     * ....Q... 3  Q: Queen
+     * ........ 2
+     * ........ 1
+     * --------
+     * abcdefgh
+     */
+    @DisplayName("target 으로 가는 대각선 경로에 기물이 없다면, 이동할 수 있다.")
+    @Test
+    void noObstacleDiagonal() {
+        Queen queen = new Queen(Team.WHITE);
+        Pawn enemy = new Pawn(Team.BLACK);
+        HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+        Coordinate source = new Coordinate(3, 'e');
+        Coordinate target = new Coordinate(5, 'c');
+        Coordinate obstacle = new Coordinate(6, 'b');
+        piecesMap.put(source, queen);
+        piecesMap.put(obstacle, enemy);
+
+        Pieces pieces = new Pieces(piecesMap);
+
+        assertThatCode(() -> queen.validateMovable(source, target, pieces))
+                .doesNotThrowAnyException();
+    }
+
+    /***
+     * ........ 8
+     * ....E... 7  E: Enemy
+     * ........ 6
+     * ....T... 5  T: target
+     * ........ 4
+     * ....Q... 3  R: Rook
+     * ........ 2
+     * ........ 1
+     * --------
+     * abcdefgh
+     */
+    @DisplayName("target 으로 가는 세로 경로에 기물이 없다면, 이동할 수 있다.")
+    @Test
+    void noObstacleStraight() {
+        Queen queen = new Queen(Team.WHITE);
+        Pawn enemy = new Pawn(Team.BLACK);
+        HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+        Coordinate source = new Coordinate(3, 'e');
+        Coordinate target = new Coordinate(5, 'e');
+        Coordinate obstacle = new Coordinate(7, 'e');
+        piecesMap.put(source, queen);
+        piecesMap.put(obstacle, enemy);
+
+        Pieces pieces = new Pieces(piecesMap);
+
+        assertThatCode(() -> queen.validateMovable(source, target, pieces))
+                .doesNotThrowAnyException();
     }
 
     @DisplayName("퀸은 대각과 가로, 세로로 제한없이 움직일 수 있다.")

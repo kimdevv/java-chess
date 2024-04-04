@@ -27,4 +27,12 @@ public enum Team {
 
         return EMPTY;
     }
+
+    public boolean isEmpty() {
+        return this == EMPTY;
+    }
+
+    public boolean isEnemy(Team team) {
+        return this.opposite() == team;
+    }
 }

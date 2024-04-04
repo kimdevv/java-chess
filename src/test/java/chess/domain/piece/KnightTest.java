@@ -1,12 +1,11 @@
 package chess.domain.piece;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.List;
-import chess.domain.board.Coordinate;
-import chess.domain.board.Pieces;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,7 +18,27 @@ class KnightTest {
     void create() {
         assertThatCode(() -> new Knight(Team.WHITE))
                 .doesNotThrowAnyException();
+    }
 
+    @DisplayName("나이트는 킹이 아니다.")
+    @Test
+    void isKing() {
+        Knight knight = new Knight(Team.WHITE);
+
+        assertThat(knight.isKing()).isFalse();
+    }
+
+    @DisplayName("나이트의 점수를 계산한다.")
+    @Test
+    void calculateScore() {
+        Knight knight = new Knight(Team.WHITE);
+        HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+        Pieces pieces = new Pieces(piecesMap);
+        Coordinate source = new Coordinate(3, 'e');
+
+        Score result = knight.calculateScore(source, pieces);
+
+        assertThat(result.value()).isEqualTo(2.5);
     }
 
     @DisplayName("target 좌표에 아군 기물이 있다면, 이동할 수 없다.")

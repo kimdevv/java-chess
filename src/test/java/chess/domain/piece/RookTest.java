@@ -1,12 +1,11 @@
 package chess.domain.piece;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.List;
-import chess.domain.board.Coordinate;
-import chess.domain.board.Pieces;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,6 +18,27 @@ class RookTest {
     void create() {
         assertThatCode(() -> new Rook(Team.WHITE))
                 .doesNotThrowAnyException();
+    }
+
+    @DisplayName("룩은 킹이 아니다.")
+    @Test
+    void isKing() {
+        Rook rook = new Rook(Team.WHITE);
+
+        assertThat(rook.isKing()).isFalse();
+    }
+
+    @DisplayName("룩의 점수를 계산한다.")
+    @Test
+    void calculateScore() {
+        Rook rook = new Rook(Team.WHITE);
+        HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+        Pieces pieces = new Pieces(piecesMap);
+        Coordinate source = new Coordinate(3, 'e');
+
+        Score result = rook.calculateScore(source, pieces);
+
+        assertThat(result.value()).isEqualTo(5);
     }
 
     @DisplayName("target 좌표에 아군 기물이 있다면, 이동할 수 없다.")
@@ -79,6 +99,36 @@ class RookTest {
         assertThatThrownBy(() -> rook.validateMovable(source, target, pieces))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("기물로 막혀있어 이동할 수 없습니다.");
+    }
+
+    /***
+     * ........ 8
+     * ....E... 7  E: Enemy
+     * ........ 6
+     * ....T... 5  T: target
+     * ........ 4
+     * ....Q... 3  R: Rook
+     * ........ 2
+     * ........ 1
+     * --------
+     * abcdefgh
+     */
+    @DisplayName("target 으로 가는 경로에 기물이 존재하지 않으면, 이동할 수 있다.")
+    @Test
+    void noObstacle() {
+        Rook rook = new Rook(Team.WHITE);
+        Pawn enemy = new Pawn(Team.BLACK);
+        HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+        Coordinate source = new Coordinate(3, 'e');
+        Coordinate target = new Coordinate(5, 'e');
+        Coordinate obstacle = new Coordinate(7, 'e');
+        piecesMap.put(source, rook);
+        piecesMap.put(obstacle, enemy);
+
+        Pieces pieces = new Pieces(piecesMap);
+
+        assertThatCode(() -> rook.validateMovable(source, target, pieces))
+                .doesNotThrowAnyException();
     }
 
     @DisplayName("룩은 가로, 세로로 제한없이 움직일 수 있다.")

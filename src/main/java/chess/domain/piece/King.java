@@ -2,7 +2,7 @@ package chess.domain.piece;
 
 import java.util.List;
 
-public class King extends AbstractNonSlidingPiece {
+public class King extends AbstractNonPathPiece {
 
     public King(Team team) {
         super(PieceType.KING, team, List.of(
@@ -15,5 +15,15 @@ public class King extends AbstractNonSlidingPiece {
                 Direction.UP_RIGHT,
                 Direction.DOWN_RIGHT
         ));
+    }
+
+    @Override
+    public Score calculateScore(Coordinate source, Pieces pieces) {
+        return new Score(0);
+    }
+
+    @Override
+    public boolean isKing() {
+        return true;
     }
 }

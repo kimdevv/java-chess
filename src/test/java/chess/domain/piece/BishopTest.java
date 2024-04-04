@@ -1,12 +1,11 @@
 package chess.domain.piece;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.List;
-import chess.domain.board.Coordinate;
-import chess.domain.board.Pieces;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,6 +18,27 @@ class BishopTest {
     void create() {
         assertThatCode(() -> new Bishop(Team.WHITE))
                 .doesNotThrowAnyException();
+    }
+
+    @DisplayName("비숍은 킹이 아니다.")
+    @Test
+    void isKing() {
+        Bishop bishop = new Bishop(Team.WHITE);
+
+        assertThat(bishop.isKing()).isFalse();
+    }
+
+    @DisplayName("비숍의 점수를 계산한다.")
+    @Test
+    void calculateScore() {
+        Bishop bishop = new Bishop(Team.WHITE);
+        HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+        Pieces pieces = new Pieces(piecesMap);
+        Coordinate source = new Coordinate(3, 'e');
+
+        Score result = bishop.calculateScore(source, pieces);
+
+        assertThat(result.value()).isEqualTo(3);
     }
 
     @DisplayName("target 좌표에 아군 기물이 있다면, 이동할 수 없다.")
@@ -81,6 +101,36 @@ class BishopTest {
                 .hasMessage("기물로 막혀있어 이동할 수 없습니다.");
     }
 
+    /***
+     * ........ 8
+     * ........ 7
+     * .O...... 6  O: Obstacle
+     * ..T..... 5  T: target
+     * ........ 4
+     * ....B... 3  B: Bishop
+     * ........ 2
+     * ........ 1
+     * --------
+     * abcdefgh
+     */
+    @DisplayName("target 으로 가는 경로에 기물이 없다면, 이동할 수 있다.")
+    @Test
+    void noObstacle() {
+        Bishop bishop = new Bishop(Team.WHITE);
+        Queen enemy = new Queen(Team.BLACK);
+        HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+        Coordinate source = new Coordinate(3, 'e');
+        Coordinate target = new Coordinate(5, 'c');
+        Coordinate obstacle = new Coordinate(6, 'b');
+        piecesMap.put(source, bishop);
+        piecesMap.put(obstacle, enemy);
+
+        Pieces pieces = new Pieces(piecesMap);
+
+        assertThatCode(() -> bishop.validateMovable(source, target, pieces))
+                .doesNotThrowAnyException();
+    }
+
     @DisplayName("비숍은 대각으로 제한없이 움직일 수 있다.")
     @MethodSource("createTargetForHappyCase")
     @ParameterizedTest
@@ -116,7 +166,7 @@ class BishopTest {
      * ........ 6
      * ........ 5
      * ........ 4
-     * ....Q... 3  B: Bishop
+     * ....B... 3  B: Bishop
      * ........ 2
      * ........ 1
      * --------

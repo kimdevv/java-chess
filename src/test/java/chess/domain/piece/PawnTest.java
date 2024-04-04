@@ -1,11 +1,10 @@
 package chess.domain.piece;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
-import chess.domain.board.Coordinate;
-import chess.domain.board.Pieces;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,11 +18,46 @@ class PawnTest {
                 .doesNotThrowAnyException();
     }
 
+    @DisplayName("폰은 킹이 아니다.")
+    @Test
+    void isKing() {
+        Pawn knight = new Pawn(Team.WHITE);
+
+        assertThat(knight.isKing()).isFalse();
+    }
+
     @DisplayName("흰색 폰은")
     @Nested
     class WhitePawnTest {
 
         private final Pawn sut = new Pawn(Team.WHITE);
+
+        @DisplayName("기본 점수는 1점이다.")
+        @Test
+        void calculateScore() {
+            HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+            Pieces pieces = new Pieces(piecesMap);
+            Coordinate source = new Coordinate(3, 'e');
+
+            Score result = sut.calculateScore(source, pieces);
+
+            assertThat(result.value()).isEqualTo(1);
+        }
+
+        @DisplayName("같은 세로줄(file)에 같은 색의 폰이 있는 경우 1점이 아닌 0.5점을 준다.")
+        @Test
+        void whenOtherPawnExist() {
+            HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+            Coordinate sutCoordinate = new Coordinate(3, 'a');
+            Coordinate down = new Coordinate(2, 'a');
+            piecesMap.put(sutCoordinate, sut);
+            piecesMap.put(down, new Pawn(Team.WHITE));
+            Pieces pieces = new Pieces(piecesMap);
+
+            Score result = sut.calculateScore(sutCoordinate, pieces);
+
+            assertThat(result.value()).isEqualTo(0.5);
+        }
 
         @DisplayName("target 좌표에 아군 기물이 있다면, 이동할 수 없다.")
         @Test
@@ -213,6 +247,33 @@ class PawnTest {
     class BlackPawnTest {
 
         private final Pawn sut = new Pawn(Team.BLACK);
+
+        @DisplayName("기본 점수는 1점이다.")
+        @Test
+        void calculateScore() {
+            HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+            Pieces pieces = new Pieces(piecesMap);
+            Coordinate source = new Coordinate(3, 'e');
+
+            Score result = sut.calculateScore(source, pieces);
+
+            assertThat(result.value()).isEqualTo(1);
+        }
+
+        @DisplayName("같은 세로줄(file)에 같은 색의 폰이 있는 경우 1점이 아닌 0.5점을 준다.")
+        @Test
+        void whenOtherPawnExist() {
+            HashMap<Coordinate, Piece> piecesMap = new HashMap<>();
+            Coordinate sutCoordinate = new Coordinate(3, 'a');
+            Coordinate down = new Coordinate(2, 'a');
+            piecesMap.put(sutCoordinate, sut);
+            piecesMap.put(down, new Pawn(Team.BLACK));
+            Pieces pieces = new Pieces(piecesMap);
+
+            Score result = sut.calculateScore(sutCoordinate, pieces);
+
+            assertThat(result.value()).isEqualTo(0.5);
+        }
 
         @DisplayName("target 좌표에 아군 기물이 있다면 이동할 수 없다.")
         @Test

@@ -1,9 +1,6 @@
 package chess.domain.piece;
 
-import chess.domain.board.Coordinate;
-import chess.domain.board.Pieces;
-
-public class EmptyPiece extends AbstractPiece {
+class EmptyPiece extends AbstractPiece {
 
     private static final Piece INSTANCE = new EmptyPiece();
 
@@ -18,5 +15,15 @@ public class EmptyPiece extends AbstractPiece {
     @Override
     void validatePieceMoveRule(Coordinate source, Coordinate target, Pieces pieces) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Score calculateScore(Coordinate source, Pieces pieces) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isKing() {
+        return false;
     }
 }

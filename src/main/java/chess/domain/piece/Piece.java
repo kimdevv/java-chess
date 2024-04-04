@@ -1,15 +1,16 @@
 package chess.domain.piece;
 
-import chess.domain.board.Coordinate;
-import chess.domain.board.Pieces;
-
 public interface Piece {
 
     void validateMovable(Coordinate source, Coordinate target, Pieces pieces);
 
+    Score calculateScore(Coordinate source, Pieces pieces);
+
     boolean isSameTeam(Team team);
 
     boolean isEnemy(Piece other);
+
+    boolean isKing();
 
     PieceType getType();
 

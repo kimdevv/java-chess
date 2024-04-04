@@ -1,8 +1,6 @@
 package chess.domain.piece;
 
 import java.util.Objects;
-import chess.domain.board.Coordinate;
-import chess.domain.board.Pieces;
 
 abstract class AbstractPiece implements Piece {
 
@@ -43,7 +41,7 @@ abstract class AbstractPiece implements Piece {
 
     @Override
     public boolean isEnemy(Piece other) {
-        return this.team.opposite() == other.getTeam();
+        return this.team.isEnemy(other.getTeam());
     }
 
     @Override

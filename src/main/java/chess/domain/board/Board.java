@@ -1,14 +1,16 @@
 package chess.domain.board;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
+import chess.domain.piece.Coordinate;
 import chess.domain.piece.Piece;
+import chess.domain.piece.Pieces;
+import chess.domain.piece.PiecesFactory;
+import chess.domain.piece.Score;
 import chess.domain.piece.Team;
 
 public class Board {
 
-    private final Pieces pieces;
-    private Team turn;
+    private MutableBoard board;
 
     public Board(Map<Coordinate, Piece> pieces) {
         this(new Pieces(pieces));
@@ -19,41 +21,30 @@ public class Board {
     }
 
     public Board(Pieces pieces) {
-        this.pieces = pieces;
-        this.turn = Team.WHITE;
+        this(new PlayingBoard(pieces, new Turn(Team.WHITE)));
+    }
+
+    public Board(MutableBoard board) {
+        this.board = board;
     }
 
     public void move(Coordinate source, Coordinate target) {
-        validateSourceExist(source);
-        validateTurn(source);
-        validateMovable(source, target);
-        updateBoard(source, target);
+        board = board.move(source, target);
     }
 
-    private void validateSourceExist(Coordinate source) {
-        if (!pieces.isPiecePresent(source)) {
-            throw new NoSuchElementException("보드에 움직일 대상이 없습니다.");
-        }
+    public Map<Team, Score> showScore() {
+        return board.showScore();
     }
 
-    private void validateTurn(Coordinate source) {
-        Piece sourcePiece = pieces.findByCoordinate(source);
-        if (!sourcePiece.isSameTeam(turn)) {
-            throw new IllegalStateException("상대방이 기물을 둘 차례입니다.");
-        }
+    public ChessResult showResult() {
+        return board.showResult();
     }
 
-    private void validateMovable(Coordinate source, Coordinate target) {
-        Piece sourcePiece = pieces.findByCoordinate(source);
-        sourcePiece.validateMovable(source, target, pieces);
-    }
-
-    private void updateBoard(Coordinate source, Coordinate target) {
-        pieces.swap(source, target);
-        turn = turn.opposite();
+    public boolean isPlaying() {
+        return board.isPlaying();
     }
 
     public Pieces getPieces() {
-        return pieces;
+        return board.getPieces();
     }
 }

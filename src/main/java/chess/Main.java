@@ -1,15 +1,15 @@
 package chess;
 
-import chess.view.InputView;
-import chess.view.OutputView;
+import chess.application.ChessService;
+import chess.persistence.mysql.MySqlBoardRepository;
+import chess.presentation.controller.ChessGame;
 
 class Main {
 
     public static void main(String[] args) {
-        InputView inputView = new InputView();
-        OutputView outputView = new OutputView();
-        ChessController controller = new ChessController(inputView, outputView);
+        ChessService chessService = new ChessService(new MySqlBoardRepository());
+        ChessGame chessGame = new ChessGame(chessService);
 
-        controller.run();
+        chessGame.execute();
     }
 }

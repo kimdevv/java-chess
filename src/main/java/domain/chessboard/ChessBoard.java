@@ -1,32 +1,38 @@
 package domain.chessboard;
 
 import domain.coordinate.Coordinate;
-import domain.coordinate.Position;
 import domain.direction.Direction;
 import domain.piece.Blank;
 import domain.piece.Color;
 import domain.piece.base.ChessPiece;
-import java.util.List;
+import domain.piece.type.PieceType;
+import java.util.Map;
 
 public class ChessBoard {
 
-    private final List<Row> board;
+    public static final int SIZE = 8;
+    private final Map<Coordinate, ChessPiece> board;
 
-    public ChessBoard() {
-        this.board = ChessBoardInitializer.createInitialBoard();
+    public ChessBoard(Map<Coordinate, ChessPiece> board) {
+        this.board = board;
     }
 
-    public void movePiece(Coordinate start, Coordinate destination, Color currentTurnColor) {
-        ChessPiece movingPiece = getMovingPiece(start, currentTurnColor);
+    public ChessBoard() {
+        this(ChessBoardInitializer.createInitialBoard());
+    }
+
+    public MovingResult movePiece(Coordinate start, Coordinate destination, Color currentTurnColor) {
+        Direction direction = getMovingPiece(start, currentTurnColor).getDirection(start, destination);
         validateDestination(destination, currentTurnColor);
-        validatePath(movingPiece, start, destination);
-        move(start, destination);
+        validatePath(direction, start, destination);
+
+        return move(start, destination);
     }
 
     private ChessPiece getMovingPiece(Coordinate start, Color currentTurnColor) {
         ChessPiece piece = getPiece(start);
 
-        if (!piece.hasSameColor(currentTurnColor)) {
+        if (!isEmptyCoordinate(start) && !piece.hasSameColor(currentTurnColor)) {
             throw new IllegalArgumentException("색상이 다른 말을 움직일 수 없습니다.");
         }
         return piece;
@@ -41,8 +47,7 @@ public class ChessBoard {
         }
     }
 
-    private void validatePath(ChessPiece piece, Coordinate start, Coordinate destination) {
-        Direction direction = piece.getDirection(start, destination);
+    private void validatePath(Direction direction, Coordinate start, Coordinate destination) {
         Coordinate current = start.moveOneStep(direction);
 
         while (!current.equals(destination)) {
@@ -58,31 +63,29 @@ public class ChessBoard {
     }
 
     private boolean isEmptyCoordinate(Coordinate coordinate) {
-        return getPiece(coordinate) instanceof Blank;
+        ChessPiece piece = getPiece(coordinate);
+        return piece.isSameType(PieceType.BLANK);
     }
 
-    private void move(Coordinate start, Coordinate destination) {
-        ChessPiece movingPiece = getPiece(start);
-        replacePiece(start, Blank.getInstance());
-        replacePiece(destination, movingPiece);
-    }
+    private MovingResult move(Coordinate start, Coordinate destination) {
+        ChessPiece movingPiece = board.get(start);
+        ChessPiece removedPiece = board.get(destination);
 
-    private void replacePiece(Coordinate coordinate, ChessPiece chessPiece) {
-        Row row = getRow(coordinate.getRow());
-        row.replace(coordinate.getColumn(), chessPiece);
+        board.put(start, Blank.getInstance());
+        board.put(destination, movingPiece);
+
+        return new MovingResult(movingPiece, removedPiece);
     }
 
     private ChessPiece getPiece(Coordinate coordinate) {
-        Row row = getRow(coordinate.getRow());
-
-        return row.getPiece(coordinate.getColumn());
+        ChessPiece piece = board.get(coordinate);
+        if (piece == null) {
+            throw new IllegalArgumentException("올바른 위치가 아닙니다.");
+        }
+        return piece;
     }
 
-    private Row getRow(Position row) {
-        return board.get(row.getValue());
-    }
-
-    public List<Row> getBoard() {
-        return List.copyOf(board);
+    public Map<Coordinate, ChessPiece> getBoard() {
+        return Map.copyOf(board);
     }
 }

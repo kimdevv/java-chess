@@ -3,8 +3,11 @@ package domain.piece;
 import domain.coordinate.Coordinate;
 import domain.direction.Direction;
 import domain.piece.base.ChessPiece;
+import domain.piece.type.PieceType;
 
 public class Blank implements ChessPiece {
+
+    private static final double NONE = 0d;
 
     private static final Blank instance = new Blank();
 
@@ -21,7 +24,27 @@ public class Blank implements ChessPiece {
     }
 
     @Override
+    public double getDefaultScore() {
+        return NONE;
+    }
+
+    @Override
     public boolean hasSameColor(Color color) {
         return true;
+    }
+
+    @Override
+    public boolean isSameType(PieceType pieceType) {
+        return PieceType.BLANK == pieceType;
+    }
+
+    @Override
+    public PieceType getType() {
+        return PieceType.BLANK;
+    }
+
+    @Override
+    public Color getColor() {
+        return Color.ANY;
     }
 }

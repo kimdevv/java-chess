@@ -1,5 +1,6 @@
 package domain.direction;
 
+import static domain.direction.KnightDirection.getDirection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -15,10 +16,10 @@ class KnightDirectionTest {
     @DisplayName("나이트의 방향을 얻을 수 없다.")
     class InvalidInput {
 
-        @DisplayName("좌표간의 차이가 없는 경우")
+        @DisplayName("이동하지 않은 경우")
         @Test
         void getDirection_WhenSameCoordinate() {
-            assertThatThrownBy(() -> KnightDirection.getDirection(0, 0))
+            assertThatThrownBy(() -> getDirection(0, 0))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("이동할 수 없는 위치입니다.");
         }
@@ -27,7 +28,7 @@ class KnightDirectionTest {
         @CsvSource(value = {"1,0", "-1,0"}, delimiter = ',')
         @DisplayName("상,하로만 이동한 경우")
         void getDirection_WhenOnlyUpOrDown(int rowDifference, int columnDifference) {
-            assertThatThrownBy(() -> KnightDirection.getDirection(rowDifference, columnDifference))
+            assertThatThrownBy(() -> getDirection(rowDifference, columnDifference))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("이동할 수 없는 위치입니다.");
         }
@@ -36,7 +37,7 @@ class KnightDirectionTest {
         @CsvSource(value = {"0,1", "0,-1"}, delimiter = ',')
         @DisplayName("좌,우로만 이동한 경우")
         void getDirection_WhenOnlyLeftOrRight(int rowDifference, int columnDifference) {
-            assertThatThrownBy(() -> KnightDirection.getDirection(rowDifference, columnDifference))
+            assertThatThrownBy(() -> getDirection(rowDifference, columnDifference))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("이동할 수 없는 위치입니다.");
         }
@@ -45,93 +46,80 @@ class KnightDirectionTest {
         @CsvSource(value = {"1,1", "-3,-3"}, delimiter = ',')
         @DisplayName("대각선으로 이동한 경우")
         void getDirection_WhenOtherCase(int rowDifference, int columnDifference) {
-            assertThatThrownBy(() -> KnightDirection.getDirection(rowDifference, columnDifference))
+            assertThatThrownBy(() -> getDirection(rowDifference, columnDifference))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("이동할 수 없는 위치입니다.");
         }
     }
 
     @Nested
-    @DisplayName("오른쪽 위")
-    class UpRight {
+    @DisplayName("나이트의 이동 방향을 얻는다.")
+    class GetKnightDirectionTest {
 
-        Direction upRightDirection = KnightDirection.UP_RIGHT;
+        Direction expected;
 
-        @DisplayName("행과 열 값의 차이를 이용하여 방향을 얻는다.")
+        @DisplayName("위로 한칸 이동 후, 왼쪽 위 대각선으로 이동한다.")
         @Test
-        void getDirection() {
-            assertThat(KnightDirection.getDirection(-2, 1))
-                    .isEqualTo(upRightDirection);
+        void upAndUpLeftDiagonal() {
+            expected = KnightDirection.UP_LEFT;
+
+            assertThat(getDirection(-2, -1)).isEqualTo(expected);
         }
 
-        @DisplayName("나이트의 이동 거리는 1이다.")
+        @DisplayName("위로 한칸 이동 후, 오른쪽 위 대각선으로 이동한다.")
         @Test
-        void calculateDistance() {
-            assertThat(upRightDirection.calculateDistance(-2, 1))
-                    .isEqualTo(1);
-        }
-    }
+        void upAndUpRightDiagonal() {
+            expected = KnightDirection.UP_RIGHT;
 
-    @Nested
-    @DisplayName("왼쪽 위")
-    class UpLeft {
-
-        Direction upLeftDirection = KnightDirection.UP_LEFT;
-
-        @DisplayName("행과 열 값의 차이를 이용하여 방향을 얻는다.")
-        @Test
-        void getDirection() {
-            assertThat(KnightDirection.getDirection(-2, -1))
-                    .isEqualTo(upLeftDirection);
+            assertThat(getDirection(-2, 1)).isEqualTo(expected);
         }
 
-        @DisplayName("나이트의 이동 거리는 1이다.")
+        @DisplayName("아래로 한칸 이동 후, 왼쪽 아래 대각선으로 이동한다.")
         @Test
-        void calculateDistance() {
-            assertThat(upLeftDirection.calculateDistance(-2, -1))
-                    .isEqualTo(1);
-        }
-    }
+        void downAndDownLeftDiagonal() {
+            expected = KnightDirection.DOWN_LEFT;
 
-    @Nested
-    @DisplayName("오른쪽 아래")
-    class DownRight {
-
-        Direction downRightDirection = KnightDirection.DOWN_RIGHT;
-
-        @DisplayName("행과 열 값의 차이를 이용하여 방향을 얻는다.")
-        @Test
-        void getDirection() {
-            assertThat(KnightDirection.getDirection(2, 1))
-                    .isEqualTo(downRightDirection);
+            assertThat(getDirection(2, -1)).isEqualTo(expected);
         }
 
-        @DisplayName("나이트의 이동 거리는 1이다.")
+        @DisplayName("아래로 한칸 이동 후, 오른쪽 아래 대각선으로 이동한다.")
         @Test
-        void calculateDistance() {
-            assertThat(downRightDirection.calculateDistance(2, 1))
-                    .isEqualTo(1);
-        }
-    }
+        void downAndDownRightDiagonal() {
+            expected = KnightDirection.DOWN_RIGHT;
 
-    @Nested
-    @DisplayName("왼쪽 아래")
-    class DownLeft {
-
-        Direction downLeft = KnightDirection.DOWN_LEFT;
-
-        @DisplayName("행과 열 값의 차이를 이용하여 방향을 얻는다.")
-        @Test
-        void getDirection() {
-            assertThat(KnightDirection.getDirection(2, -1))
-                    .isEqualTo(downLeft);
+            assertThat(getDirection(2, 1)).isEqualTo(expected);
         }
 
-        @DisplayName("나이트의 이동 거리는 1이다.")
+        @DisplayName("왼쪽으로 한칸 이동 후, 왼쪽 위 대각선으로 이동한다.")
         @Test
-        void calculateDistance() {
-            assertThat(downLeft.calculateDistance(2, -1))
-                    .isEqualTo(1);
+        void leftAndUpLeftDiagonal() {
+            expected = KnightDirection.LEFt_UP;
+
+            assertThat(getDirection(-1, -2)).isEqualTo(expected);
+        }
+
+        @DisplayName("왼쪽으로 한칸 이동 후, 왼쪽 아래 대각선으로 이동한다.")
+        @Test
+        void leftAndDownLeftDiagonal() {
+            expected = KnightDirection.LEFT_DOWN;
+
+            assertThat(getDirection(1, -2)).isEqualTo(expected);
+        }
+
+        @DisplayName("오른쪽으로 한칸 이동 후, 오른쪽 위 대각선으로 이동한다.")
+        @Test
+        void rightAndUpRightDiagonal() {
+            expected = KnightDirection.RIGHT_UP;
+
+            assertThat(getDirection(-1, 2)).isEqualTo(expected);
+        }
+
+        @DisplayName("오른쪽으로 한칸 이동 후, 오른쪽 아래 대각선으로 이동한다.")
+        @Test
+        void rightAndDownRightDiagonal() {
+            expected = KnightDirection.RIGHT_DOWN;
+
+            assertThat(getDirection(1, 2)).isEqualTo(expected);
         }
     }
 }

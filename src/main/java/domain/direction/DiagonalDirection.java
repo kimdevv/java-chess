@@ -1,8 +1,10 @@
 package domain.direction;
 
 import java.util.Arrays;
+import util.Calculator;
 
 public enum DiagonalDirection implements Direction {
+
     UP_RIGHT(-1, 1),
     UP_LEFT(-1, -1),
     DOWN_RIGHT(1, 1),
@@ -32,7 +34,8 @@ public enum DiagonalDirection implements Direction {
         if (Math.abs(rowDifference) != Math.abs(columnDifference)) {
             return false;
         }
-        return this.rowOffset == normalize(rowDifference) && this.columnOffset == normalize(columnDifference);
+        return this.rowOffset == Calculator.normalize(rowDifference)
+                && this.columnOffset == Calculator.normalize(columnDifference);
     }
 
     @Override

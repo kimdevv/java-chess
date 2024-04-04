@@ -1,5 +1,6 @@
 package domain.chessboard;
 
+import domain.coordinate.Coordinate;
 import domain.piece.Bishop;
 import domain.piece.BlackPawn;
 import domain.piece.Blank;
@@ -10,29 +11,32 @@ import domain.piece.Queen;
 import domain.piece.Rook;
 import domain.piece.WhitePawn;
 import domain.piece.base.ChessPiece;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChessBoardInitializer {
 
-    private static final int CHESS_BOARD_SIZE = 8;
-
-    public static List<Row> createInitialBoard() {
-        return List.of(
-                createFirstRank(Color.BLACK),
-                createSamePiecesRow(getPawnByColor(Color.BLACK)),
-                createSamePiecesRow(Blank.getInstance()),
-                createSamePiecesRow(Blank.getInstance()),
-                createSamePiecesRow(Blank.getInstance()),
-                createSamePiecesRow(Blank.getInstance()),
-                createSamePiecesRow(getPawnByColor(Color.WHITE)),
-                createFirstRank(Color.WHITE)
-        );
+    private ChessBoardInitializer() {
     }
 
-    private static Row createFirstRank(Color color) {
-        return new Row(Arrays.asList(
+    public static Map<Coordinate, ChessPiece> createInitialBoard() {
+        Map<Coordinate, ChessPiece> board = new HashMap<>();
+        for (int column = 0; column < ChessBoard.SIZE; column++) {
+            board.put(new Coordinate(0, column), createFirstRank(Color.BLACK).get(column));
+            board.put(new Coordinate(1, column), new BlackPawn());
+            board.put(new Coordinate(2, column), Blank.getInstance());
+            board.put(new Coordinate(3, column), Blank.getInstance());
+            board.put(new Coordinate(4, column), Blank.getInstance());
+            board.put(new Coordinate(5, column), Blank.getInstance());
+            board.put(new Coordinate(6, column), new WhitePawn());
+            board.put(new Coordinate(7, column), createFirstRank(Color.WHITE).get(column));
+        }
+        return board;
+    }
+
+    private static List<ChessPiece> createFirstRank(Color color) {
+        return List.of(
                 new Rook(color),
                 new Knight(color),
                 new Bishop(color),
@@ -41,21 +45,6 @@ public class ChessBoardInitializer {
                 new Bishop(color),
                 new Knight(color),
                 new Rook(color)
-        ));
-    }
-
-    private static Row createSamePiecesRow(ChessPiece piece) {
-        List<ChessPiece> row = new ArrayList<>();
-        for (int i = 0; i < CHESS_BOARD_SIZE; i++) {
-            row.add(piece);
-        }
-        return new Row(row);
-    }
-
-    private static ChessPiece getPawnByColor(Color color) {
-        if (color == Color.WHITE) {
-            return new WhitePawn();
-        }
-        return new BlackPawn();
+        );
     }
 }

@@ -1,6 +1,7 @@
 package domain.direction;
 
 import java.util.Arrays;
+import util.Calculator;
 
 public enum StraightDirection implements Direction {
 
@@ -26,7 +27,8 @@ public enum StraightDirection implements Direction {
 
     @Override
     public boolean isSameDirection(int rowDifference, int columnDifference) {
-        return this.rowOffset == normalize(rowDifference) && this.columnOffset == normalize(columnDifference);
+        return this.rowOffset == Calculator.normalize(rowDifference)
+                && this.columnOffset == Calculator.normalize(columnDifference);
     }
 
     @Override

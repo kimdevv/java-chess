@@ -3,10 +3,15 @@ package domain.direction;
 import java.util.Arrays;
 
 public enum KnightDirection implements Direction {
+
     UP_RIGHT(-2, 1),
     UP_LEFT(-2, -1),
     DOWN_RIGHT(2, 1),
-    DOWN_LEFT(2, -1);
+    DOWN_LEFT(2, -1),
+    RIGHT_UP(-1, 2),
+    RIGHT_DOWN(1, 2),
+    LEFt_UP(-1, -2),
+    LEFT_DOWN(1, -2);
 
     private final int rowOffset;
     private final int columnOffset;

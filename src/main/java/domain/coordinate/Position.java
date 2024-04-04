@@ -1,5 +1,6 @@
 package domain.coordinate;
 
+import domain.chessboard.ChessBoard;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -11,7 +12,7 @@ public class Position {
     private final int value;
 
     static {
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < ChessBoard.SIZE; i++) {
             CACHE.put(i, new Position(i));
         }
     }
@@ -35,10 +36,6 @@ public class Position {
 
     public int calculateDifference(Position other) {
         return other.value - value;
-    }
-
-    public int getValue() {
-        return value;
     }
 
     @Override

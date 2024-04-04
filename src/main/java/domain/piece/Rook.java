@@ -4,11 +4,14 @@ import domain.coordinate.Coordinate;
 import domain.direction.Direction;
 import domain.direction.StraightDirection;
 import domain.piece.base.ChessPieceBase;
+import domain.piece.type.PieceType;
 
 public class Rook extends ChessPieceBase {
 
+    private static final double ROOK_DEFAULT_SCORE = 5d;
+
     public Rook(Color color) {
-        super(color);
+        super(PieceType.ROOK, color);
     }
 
     @Override
@@ -17,5 +20,10 @@ public class Rook extends ChessPieceBase {
         int columnDifference = start.calculateColumnDifference(destination);
 
         return StraightDirection.getDirection(rowDifference, columnDifference);
+    }
+
+    @Override
+    public double getDefaultScore() {
+        return ROOK_DEFAULT_SCORE;
     }
 }

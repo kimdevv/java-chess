@@ -8,7 +8,7 @@ public class Coordinate {
     private final Position row;
     private final Position column;
 
-    public Coordinate(Position row, Position column) {
+    private Coordinate(Position row, Position column) {
         this.row = row;
         this.column = column;
     }
@@ -42,12 +42,12 @@ public class Coordinate {
         );
     }
 
-    public Position getRow() {
-        return row;
+    public boolean isSameRow(int row) {
+        return this.row.equals(Position.of(row));
     }
 
-    public Position getColumn() {
-        return column;
+    public boolean isSameColumn(int column) {
+        return this.column.equals(Position.of(column));
     }
 
     @Override

@@ -5,11 +5,14 @@ import domain.direction.DiagonalDirection;
 import domain.direction.Direction;
 import domain.direction.StraightDirection;
 import domain.piece.base.ChessPieceBase;
+import domain.piece.type.PieceType;
 
 public class King extends ChessPieceBase {
 
+    private static final double NONE = 0d;
+
     public King(Color color) {
-        super(color);
+        super(PieceType.KING, color);
     }
 
     @Override
@@ -20,6 +23,11 @@ public class King extends ChessPieceBase {
         validateDistance(start, destination, direction);
 
         return direction;
+    }
+
+    @Override
+    public double getDefaultScore() {
+        return NONE;
     }
 
     private Direction getKingDirection(int rowDifference, int columnDifference) {

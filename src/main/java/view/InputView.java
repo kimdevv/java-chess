@@ -1,8 +1,8 @@
 package view;
 
-import java.util.List;
 import java.util.Scanner;
-import view.dto.Commands;
+import view.dto.CommandRequest;
+import view.util.Command;
 
 public class InputView {
 
@@ -12,11 +12,15 @@ public class InputView {
         this.scanner = scanner;
     }
 
-    public Commands receiveCommands() {
-        return new Commands(splitCommand(scanner.nextLine()));
+    public Command receiveInitialCommand() {
+        return Command.getInitialCommand(scanner.nextLine());
     }
 
-    private List<String> splitCommand(String input) {
-        return List.of(input.split(" "));
+    public CommandRequest receivePlayingCommand() {
+        Command command = Command.getPlayingCommand(scanner.next());
+        if (command == Command.MOVE) {
+            return new CommandRequest(command, scanner.next(), scanner.next());
+        }
+        return new CommandRequest(command);
     }
 }

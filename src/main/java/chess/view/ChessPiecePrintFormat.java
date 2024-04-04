@@ -1,8 +1,8 @@
 package chess.view;
 
 import chess.domain.chesspiece.Camp;
+import chess.domain.chesspiece.ChessPiece;
 import chess.domain.chesspiece.ChessPieceType;
-import chess.dto.ChessPieceDto;
 import java.util.Arrays;
 
 public enum ChessPiecePrintFormat {
@@ -23,9 +23,9 @@ public enum ChessPiecePrintFormat {
         this.type = type;
     }
 
-    public static String findChessPieceNotation(ChessPieceDto chessPieceDto) {
-        ChessPieceType chessPieceType = chessPieceDto.chessPieceType();
-        Camp camp = chessPieceDto.camp();
+    public static String findChessPieceNotation(ChessPiece chessPiece) {
+        ChessPieceType chessPieceType = chessPiece.getChessPieceType();
+        Camp camp = chessPiece.getCamp();
 
         return Arrays.stream(ChessPiecePrintFormat.values())
                 .filter(chessPieceFormat -> chessPieceFormat.type == chessPieceType)

@@ -11,13 +11,11 @@ class NumberingTest {
 
     @Test
     void 현재_넘버링이_제일_위쪽에_위치해_있으면_다음_넘버링이_없어_예외를_발생시킨다() {
-        assertThatThrownBy(() ->
-                Numbering.findNextNumbering(Numbering.EIGHT)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(Numbering.EIGHT::findNextNumbering).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 현재_넘버링이_제일_아래쪽에_위치해_있으면_이전_넘버링이_없어_예외를_발생시킨다() {
-        assertThatThrownBy(() ->
-                Numbering.findPreviousNumbering(Numbering.ONE)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(Numbering.ONE::findPreviousNumbering).isInstanceOf(IllegalArgumentException.class);
     }
 }

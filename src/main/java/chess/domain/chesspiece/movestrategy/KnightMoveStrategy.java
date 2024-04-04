@@ -22,7 +22,6 @@ public class KnightMoveStrategy implements MoveStrategy {
         moveRange.addForwardRightLShape(chessBoard, startSquare);
         moveRange.addBackwardLeftLShape(chessBoard, startSquare);
         moveRange.addBackwardRightLShape(chessBoard, startSquare);
-        moveRange.addBackwardRightLShape(chessBoard, startSquare);
         moveRange.addLeftForwardLShape(chessBoard, startSquare);
         moveRange.addLeftBackwardLShape(chessBoard, startSquare);
         moveRange.addRightForwardLShape(chessBoard, startSquare);

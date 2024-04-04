@@ -15,7 +15,7 @@ class ChessPieceTest {
         //given
         Camp camp = Camp.BLACK;
         ChessPieceProperty chessPieceProperty = new ChessPieceProperty(ChessPieceType.BISHOP, new BishopMoveStrategy());
-        ChessPiece chessPiece = new ChessPiece(camp, chessPieceProperty);
+        ChessPiece chessPiece = ChessPiece.of(camp, chessPieceProperty);
 
         //when
         boolean isBlackCamp = chessPiece.getCamp().equals(Camp.BLACK);
@@ -29,7 +29,7 @@ class ChessPieceTest {
         //given
         Camp camp = Camp.WHITE;
         ChessPieceProperty chessPieceProperty = new ChessPieceProperty(ChessPieceType.BISHOP, new BishopMoveStrategy());
-        ChessPiece chessPiece = new ChessPiece(camp, chessPieceProperty);
+        ChessPiece chessPiece = ChessPiece.of(camp, chessPieceProperty);
 
         //when
         boolean isBlackCamp = chessPiece.getCamp().equals(Camp.BLACK);
@@ -43,7 +43,7 @@ class ChessPieceTest {
         //given
         Camp camp = Camp.WHITE;
         ChessPieceProperty chessPieceProperty = new ChessPieceProperty(ChessPieceType.BISHOP, new BishopMoveStrategy());
-        ChessPiece chessPiece = new ChessPiece(camp, chessPieceProperty);
+        ChessPiece chessPiece = ChessPiece.of(camp, chessPieceProperty);
 
         //when
         boolean isWhiteCamp = chessPiece.getCamp().equals(Camp.WHITE);
@@ -57,7 +57,7 @@ class ChessPieceTest {
         //given
         Camp camp = Camp.BLACK;
         ChessPieceProperty chessPieceProperty = new ChessPieceProperty(ChessPieceType.BISHOP, new BishopMoveStrategy());
-        ChessPiece chessPiece = new ChessPiece(camp, chessPieceProperty);
+        ChessPiece chessPiece = ChessPiece.of(camp, chessPieceProperty);
 
         //when
         boolean isWhiteCamp = chessPiece.getCamp().equals(Camp.WHITE);

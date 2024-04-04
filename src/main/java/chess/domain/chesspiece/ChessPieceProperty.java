@@ -15,7 +15,14 @@ public class ChessPieceProperty {
     }
 
     public void executeMoveStrategy(ChessBoard chessBoard, Square startSquare, Square targetSquare) {
+        validateEmptyChessPiece();
         moveStrategy.move(chessBoard, startSquare, targetSquare);
+    }
+
+    private void validateEmptyChessPiece() {
+        if (chessPieceType == ChessPieceType.NONE) {
+            throw new IllegalArgumentException("[ERROR] 이동할 체스말이 없습니다.");
+        }
     }
 
     public ChessPieceType getChessPieceType() {

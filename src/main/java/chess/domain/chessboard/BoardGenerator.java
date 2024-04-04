@@ -1,9 +1,11 @@
 package chess.domain.chessboard;
 
+import chess.domain.chesspiece.Camp;
 import chess.domain.chesspiece.ChessPiece;
-import chess.domain.chesspiece.ChessPieceGenerator;
+import chess.domain.chesspiece.ChessPieceProperty;
 import chess.domain.chesspiece.ChessPieceStartingPosition;
 import chess.domain.chesspiece.ChessPieceType;
+import chess.domain.chesspiece.movestrategy.EmptyMoveStrategy;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,9 +50,10 @@ public class BoardGenerator {
     }
 
     private static ChessPiece createChessPieceForSquare(Square square) {
-        ChessPieceGenerator chessPieceGenerator = ChessPieceGenerator.getInstance();
+        Camp camp = ChessPiece.determineCamp(square.getNumbering());
         ChessPieceType chessPieceType = determineChessPieceType(square);
-        return chessPieceGenerator.generate(chessPieceType, square.getNumbering());
+        ChessPieceProperty chessPieceProperty = new ChessPieceProperty(chessPieceType, new EmptyMoveStrategy());
+        return ChessPiece.of(camp, chessPieceProperty);
     }
 
     private static ChessPieceType determineChessPieceType(Square square) {

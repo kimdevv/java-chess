@@ -26,19 +26,23 @@ public enum Lettering {
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] 일치하는 레터링 값을 찾을 수 없습니다."));
     }
 
-    public static Lettering findNextLettering(Lettering lettering) {
-        if (lettering == Lettering.H) {
+    public Lettering findNextLettering() {
+        if (this == Lettering.H) {
             throw new IllegalArgumentException("[ERROR] 현재 맨 오른쪽입니다. 오른쪽 레터링이 존재하지 않습니다.");
         }
-        int findLetteringValue = lettering.value + 1;
+        int findLetteringValue = value + 1;
         return findLettering(findLetteringValue);
     }
 
-    public static Lettering findPreviousLettering(Lettering lettering) {
-        if (lettering == Lettering.A) {
+    public Lettering findPreviousLettering() {
+        if (this == Lettering.A) {
             throw new IllegalArgumentException("[ERROR] 현재 맨 왼쪽입니다. 왼쪽 레터링이 존재하지 않습니다.");
         }
-        int findLetteringValue = lettering.value - 1;
+        int findLetteringValue = value - 1;
         return findLettering(findLetteringValue);
+    }
+
+    public int getValue() {
+        return value;
     }
 }

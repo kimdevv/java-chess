@@ -20,7 +20,8 @@ public class MoveRange {
         }
         Square forwardSquare = chessBoard.findForwardSquare(startSquare);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(forwardSquare);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(forwardSquare);
         }
     }
@@ -29,7 +30,12 @@ public class MoveRange {
         while (!startSquare.isForwardMost()) {
             Square forwardSquare = chessBoard.findForwardSquare(startSquare);
             ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(forwardSquare);
-            if (!chessPiece.isEmptyChessPiece()) {
+            ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+            if (chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                break;
+            }
+            if (!chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                moveRange.add(forwardSquare);
                 break;
             }
             moveRange.add(forwardSquare);
@@ -43,7 +49,8 @@ public class MoveRange {
         }
         Square backwardSquare = chessBoard.findBackwardSquare(startSquare);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(backwardSquare);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(backwardSquare);
         }
     }
@@ -52,7 +59,12 @@ public class MoveRange {
         while (!startSquare.isBackwardMost()) {
             Square backwardSquare = chessBoard.findBackwardSquare(startSquare);
             ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(backwardSquare);
-            if (!chessPiece.isEmptyChessPiece()) {
+            ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+            if (chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                break;
+            }
+            if (!chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                moveRange.add(backwardSquare);
                 break;
             }
             moveRange.add(backwardSquare);
@@ -66,7 +78,8 @@ public class MoveRange {
         }
         Square leftSquare = chessBoard.findLeftSquare(startSquare);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(leftSquare);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(leftSquare);
         }
     }
@@ -75,7 +88,12 @@ public class MoveRange {
         while (!startSquare.isLeftMost()) {
             Square leftSquare = chessBoard.findLeftSquare(startSquare);
             ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(leftSquare);
-            if (!chessPiece.isEmptyChessPiece()) {
+            ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+            if (chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                break;
+            }
+            if (!chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                moveRange.add(leftSquare);
                 break;
             }
             moveRange.add(leftSquare);
@@ -89,7 +107,8 @@ public class MoveRange {
         }
         Square rightSquare = chessBoard.findRightSquare(startSquare);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(rightSquare);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(rightSquare);
         }
     }
@@ -98,7 +117,12 @@ public class MoveRange {
         while (!startSquare.isRightMost()) {
             Square rightSquare = chessBoard.findRightSquare(startSquare);
             ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(rightSquare);
-            if (!chessPiece.isEmptyChessPiece()) {
+            ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+            if (chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                break;
+            }
+            if (!chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                moveRange.add(rightSquare);
                 break;
             }
             moveRange.add(rightSquare);
@@ -112,19 +136,26 @@ public class MoveRange {
         }
         Square leftForwardDiagonalSquare = chessBoard.findLeftForwardDiagonalSquare(startSquare);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(leftForwardDiagonalSquare);
-        if (chessPiece.isChessPiecePawn() && !chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (movingChessPiece.isChessPiecePawn() && !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(leftForwardDiagonalSquare);
+            return;
         }
-        if (chessPiece.isEmptyChessPiece()) {
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(leftForwardDiagonalSquare);
         }
     }
 
     public void addContinuousLeftForwardDiagonal(ChessBoard chessBoard, Square startSquare) {
-        while (!startSquare.isLeftMost() || !startSquare.isForwardMost()) {
+        while (!startSquare.isLeftMost() && !startSquare.isForwardMost()) {
             Square leftForwadDiagonalSquare = chessBoard.findLeftForwardDiagonalSquare(startSquare);
             ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(leftForwadDiagonalSquare);
-            if (!chessPiece.isEmptyChessPiece()) {
+            ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+            if (chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                break;
+            }
+            if (!chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                moveRange.add(leftForwadDiagonalSquare);
                 break;
             }
             moveRange.add(leftForwadDiagonalSquare);
@@ -138,10 +169,12 @@ public class MoveRange {
         }
         Square rightForwardDiagonalSquare = chessBoard.findRightForwardDiagonalSquare(startSquare);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(rightForwardDiagonalSquare);
-        if (chessPiece.isChessPiecePawn() && !chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (movingChessPiece.isChessPiecePawn() && !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(rightForwardDiagonalSquare);
+            return;
         }
-        if (chessPiece.isEmptyChessPiece()) {
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(rightForwardDiagonalSquare);
         }
     }
@@ -151,7 +184,12 @@ public class MoveRange {
         while (!square.isRightMost() && !square.isForwardMost()) {
             square = chessBoard.findRightForwardDiagonalSquare(square);
             ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-            if (!chessPiece.isEmptyChessPiece()) {
+            ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+            if (chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                break;
+            }
+            if (!chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                moveRange.add(square);
                 break;
             }
             moveRange.add(square);
@@ -164,7 +202,8 @@ public class MoveRange {
         }
         Square leftBackwardDiagonalSquare = chessBoard.findLeftBackwardDiagonalSquare(startSquare);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(leftBackwardDiagonalSquare);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(leftBackwardDiagonalSquare);
         }
     }
@@ -174,7 +213,12 @@ public class MoveRange {
         while (!square.isLeftMost() && !square.isBackwardMost()) {
             square = chessBoard.findLeftBackwardDiagonalSquare(square);
             ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-            if (!chessPiece.isEmptyChessPiece()) {
+            ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+            if (chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                break;
+            }
+            if (!chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                moveRange.add(square);
                 break;
             }
             moveRange.add(square);
@@ -187,7 +231,8 @@ public class MoveRange {
         }
         Square rightBackwardDiagonalSquare = chessBoard.findRightBackwardDiagonalSquare(startSquare);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(rightBackwardDiagonalSquare);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(rightBackwardDiagonalSquare);
         }
     }
@@ -197,7 +242,12 @@ public class MoveRange {
         while (!square.isRightMost() && !square.isBackwardMost()) {
             square = chessBoard.findRightBackwardDiagonalSquare(square);
             ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-            if (!chessPiece.isEmptyChessPiece()) {
+            ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+            if (chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                break;
+            }
+            if (!chessPiece.isChessPieceSameCamp(movingChessPiece) && !chessPiece.isEmptyChessPiece()) {
+                moveRange.add(square);
                 break;
             }
             moveRange.add(square);
@@ -219,7 +269,8 @@ public class MoveRange {
         }
         square = chessBoard.findRightSquare(square);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(square);
         }
     }
@@ -239,7 +290,8 @@ public class MoveRange {
         }
         square = chessBoard.findLeftSquare(square);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(square);
         }
     }
@@ -259,7 +311,8 @@ public class MoveRange {
         }
         square = chessBoard.findRightSquare(square);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(square);
         }
     }
@@ -279,7 +332,8 @@ public class MoveRange {
         }
         square = chessBoard.findLeftSquare(square);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(square);
         }
     }
@@ -299,7 +353,8 @@ public class MoveRange {
         }
         square = chessBoard.findForwardSquare(square);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(square);
         }
     }
@@ -319,7 +374,8 @@ public class MoveRange {
         }
         square = chessBoard.findBackwardSquare(square);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(square);
         }
     }
@@ -330,7 +386,7 @@ public class MoveRange {
             return;
         }
         square = chessBoard.findRightSquare(square);
-        if (startSquare.isRightMost()) {
+        if (square.isRightMost()) {
             return;
         }
         square = chessBoard.findRightSquare(square);
@@ -339,7 +395,8 @@ public class MoveRange {
         }
         square = chessBoard.findForwardSquare(square);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(square);
         }
     }
@@ -350,7 +407,7 @@ public class MoveRange {
             return;
         }
         square = chessBoard.findRightSquare(square);
-        if (startSquare.isRightMost()) {
+        if (square.isRightMost()) {
             return;
         }
         square = chessBoard.findRightSquare(square);
@@ -359,7 +416,8 @@ public class MoveRange {
         }
         square = chessBoard.findBackwardSquare(square);
         ChessPiece chessPiece = chessBoard.findChessPieceOnSquare(square);
-        if (chessPiece.isEmptyChessPiece()) {
+        ChessPiece movingChessPiece = chessBoard.findChessPieceOnSquare(startSquare);
+        if (chessPiece.isEmptyChessPiece() || !chessPiece.isChessPieceSameCamp(movingChessPiece)) {
             moveRange.add(square);
         }
     }

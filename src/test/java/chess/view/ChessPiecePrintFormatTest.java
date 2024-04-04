@@ -18,15 +18,15 @@ class ChessPiecePrintFormatTest {
     void 체스_말의_진영이_흰색인_경우_알맞은_표기법을_소문자로_반환한다() {
         Camp camp = Camp.WHITE;
         ChessPieceProperty chessPieceProperty = new ChessPieceProperty(ChessPieceType.KING, new KingMoveStrategy());
-        ChessPiece chessPiece = new ChessPiece(camp, chessPieceProperty);
-        assertThat(ChessPiecePrintFormat.findChessPieceNotation(chessPiece.createDto())).isEqualTo("k");
+        ChessPiece chessPiece = ChessPiece.of(camp, chessPieceProperty);
+        assertThat(ChessPiecePrintFormat.findChessPieceNotation(chessPiece)).isEqualTo("k");
     }
 
     @Test
     void 체스_말의_진영이_검정색인_경우_알맞은_표기법을_대문자로_반환한다() {
         Camp camp = Camp.BLACK;
         ChessPieceProperty chessPieceProperty = new ChessPieceProperty(ChessPieceType.KING, new KingMoveStrategy());
-        ChessPiece chessPiece = new ChessPiece(camp, chessPieceProperty);
-        assertThat(ChessPiecePrintFormat.findChessPieceNotation(chessPiece.createDto())).isEqualTo("K");
+        ChessPiece chessPiece = ChessPiece.of(camp, chessPieceProperty);
+        assertThat(ChessPiecePrintFormat.findChessPieceNotation(chessPiece)).isEqualTo("K");
     }
 }

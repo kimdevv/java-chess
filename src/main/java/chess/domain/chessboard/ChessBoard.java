@@ -5,14 +5,12 @@ import chess.domain.chesspiece.ChessPiece;
 import chess.domain.chesspiece.ChessPieceProperty;
 import chess.domain.chesspiece.ChessPieceType;
 import chess.domain.chesspiece.movestrategy.EmptyMoveStrategy;
-import chess.dto.ChessBoardDto;
-import chess.dto.ChessPieceDto;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ChessBoard {
 
     private static final BoardGenerator BOARD_GENERATOR = BoardGenerator.getInstance();
+    private static final int KING_TYPE_COUNT = 2;
 
     private final Map<Square, ChessPiece> board;
 
@@ -20,8 +18,18 @@ public class ChessBoard {
         this.board = board;
     }
 
-    public ChessBoard() {
-        this(BOARD_GENERATOR.generate());
+    public static ChessBoard initialBoard() {
+        return new ChessBoard(BOARD_GENERATOR.generate());
+    }
+
+    public static ChessBoard from(Map<Square, ChessPiece> chessBoard) {
+        return new ChessBoard(chessBoard);
+    }
+
+    public void move(Square startSquare, Square targetSquare) {
+        ChessPiece chessPiece = findChessPieceOnSquare(startSquare);
+        ChessPieceProperty chessPieceProperty = chessPiece.getChessPieceProperty();
+        chessPieceProperty.executeMoveStrategy(this, startSquare, targetSquare);
     }
 
     public ChessPiece findChessPieceOnSquare(Square findSquare) {
@@ -29,65 +37,85 @@ public class ChessBoard {
     }
 
     public Square findForwardSquare(Square square) {
-        Numbering numbering = Numbering.findNextNumbering(square.getNumbering());
-        return new Square(square.getLettering(), numbering);
+        Numbering numbering = square.getNumbering();
+        Numbering nextNumbering = numbering.findNextNumbering();
+        return new Square(square.getLettering(), nextNumbering);
     }
 
     public Square findBackwardSquare(Square square) {
-        Numbering numbering = Numbering.findPreviousNumbering(square.getNumbering());
-        return new Square(square.getLettering(), numbering);
+        Numbering numbering = square.getNumbering();
+        Numbering previousNumbering = numbering.findPreviousNumbering();
+        return new Square(square.getLettering(), previousNumbering);
     }
 
     public Square findLeftSquare(Square square) {
-        Lettering lettering = Lettering.findPreviousLettering(square.getLettering());
-        return new Square(lettering, square.getNumbering());
+        Lettering lettering = square.getLettering();
+        Lettering leftLettering = lettering.findPreviousLettering();
+        return new Square(leftLettering, square.getNumbering());
     }
 
     public Square findRightSquare(Square square) {
-        Lettering lettering = Lettering.findNextLettering(square.getLettering());
-        return new Square(lettering, square.getNumbering());
+        Lettering lettering = square.getLettering();
+        Lettering rightLettering = lettering.findNextLettering();
+        return new Square(rightLettering, square.getNumbering());
     }
 
     public Square findLeftForwardDiagonalSquare(Square square) {
-        Lettering lettering = Lettering.findPreviousLettering(square.getLettering());
-        Numbering numbering = Numbering.findNextNumbering(square.getNumbering());
-        return new Square(lettering, numbering);
+        Lettering lettering = square.getLettering();
+        Lettering leftLettering = lettering.findPreviousLettering();
+        Numbering numbering = square.getNumbering();
+        Numbering nextNumbering = numbering.findNextNumbering();
+        return new Square(leftLettering, nextNumbering);
     }
 
     public Square findRightForwardDiagonalSquare(Square square) {
-        Lettering lettering = Lettering.findNextLettering(square.getLettering());
-        Numbering numbering = Numbering.findNextNumbering(square.getNumbering());
-        return new Square(lettering, numbering);
+        Lettering lettering = square.getLettering();
+        Lettering rightLettering = lettering.findNextLettering();
+        Numbering numbering = square.getNumbering();
+        Numbering nextNumbering = numbering.findNextNumbering();
+        return new Square(rightLettering, nextNumbering);
     }
 
     public Square findLeftBackwardDiagonalSquare(Square square) {
-        Lettering lettering = Lettering.findPreviousLettering(square.getLettering());
-        Numbering numbering = Numbering.findPreviousNumbering(square.getNumbering());
-        return new Square(lettering, numbering);
+        Lettering lettering = square.getLettering();
+        Lettering leftLettering = lettering.findPreviousLettering();
+        Numbering numbering = square.getNumbering();
+        Numbering previousNumbering = numbering.findPreviousNumbering();
+        return new Square(leftLettering, previousNumbering);
     }
 
     public Square findRightBackwardDiagonalSquare(Square square) {
-        Lettering lettering = Lettering.findNextLettering(square.getLettering());
-        Numbering numbering = Numbering.findPreviousNumbering(square.getNumbering());
-        return new Square(lettering, numbering);
+        Lettering lettering = square.getLettering();
+        Lettering rightLettering = lettering.findNextLettering();
+        Numbering numbering = square.getNumbering();
+        Numbering previousNumbering = numbering.findPreviousNumbering();
+        return new Square(rightLettering, previousNumbering);
     }
 
     public void movePiece(Square moveSource, Square target) {
         ChessPiece moveSourceChessPiece = board.get(moveSource);
-        ChessPiece emptyChessPiece = new ChessPiece(Camp.NONE,
+        ChessPiece emptyChessPiece = ChessPiece.of(Camp.NONE,
                 new ChessPieceProperty(ChessPieceType.NONE, new EmptyMoveStrategy()));
         board.computeIfPresent(moveSource, (k, v) -> emptyChessPiece);
         board.computeIfPresent(target, (k, v) -> moveSourceChessPiece);
     }
 
-    public ChessBoardDto createDto() {
-        Map<Square, ChessPieceDto> chessBoardInfo = new LinkedHashMap<>();
+    public boolean isKingDead() {
+        return board.values()
+                .stream()
+                .filter(ChessPiece::isChessPieceKing).count() < KING_TYPE_COUNT;
+    }
 
-        for (Square square : board.keySet()) {
-            ChessPiece chessPiece = board.get(square);
-            chessBoardInfo.put(square, chessPiece.createDto());
-        }
+    public Camp campKingAlive() {
+        return board.values()
+                .stream()
+                .filter(ChessPiece::isChessPieceKing)
+                .map(ChessPiece::getCamp)
+                .findFirst()
+                .orElseThrow();
+    }
 
-        return new ChessBoardDto(chessBoardInfo);
+    public Map<Square, ChessPiece> getBoard() {
+        return board;
     }
 }

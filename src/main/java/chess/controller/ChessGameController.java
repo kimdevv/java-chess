@@ -3,8 +3,11 @@ package chess.controller;
 import chess.domain.chessboard.ChessBoard;
 import chess.domain.chessboard.Square;
 import chess.domain.chessgame.ChessGame;
-import chess.domain.chessgame.GameCommand;
-import chess.dto.ChessBoardDto;
+import chess.domain.chessgame.gamecommand.EndState;
+import chess.domain.chessgame.gamecommand.GameCommandState;
+import chess.domain.chessgame.gamecommand.GameElements;
+import chess.domain.chesspiece.Camp;
+import chess.service.ChessGameService;
 import chess.view.InputView;
 import chess.view.OutputView;
 import java.util.List;
@@ -12,7 +15,7 @@ import java.util.function.Supplier;
 
 public class ChessGameController {
 
-    private static final Integer GAME_COMMAND_INDEX = 0;
+    private final ChessGameService chessGameService = new ChessGameService();
 
     public void run() {
         OutputView.printStartMessage();
@@ -20,47 +23,51 @@ public class ChessGameController {
     }
 
     private void gameStart() {
-        List<String> input = repeatUntilSuccess(InputView::requestGameCommand);
-        String inputCommand = input.get(GAME_COMMAND_INDEX);
-        GameCommand gameCommand = GameCommand.findGameCommand(inputCommand);
         try {
-            executeGameUntilEnd(gameCommand, input);
+            chessGameService.initialSetting();
+            ChessBoard chessBoard = chessGameService.chessBoardSetting();
+            executeGameCommand(chessBoard);
         } catch (IllegalArgumentException e) {
             OutputView.printErrorMessage(e.getMessage());
             gameStart();
         }
     }
 
-    private void executeGameUntilEnd(GameCommand initialGameCommand, List<String> initialInput) {
-        ChessBoard chessBoard = new ChessBoard();
-        GameCommand gameCommand = initialGameCommand;
-        List<String> input = initialInput;
-        while (GameCommand.isNotFinishedGame(gameCommand)) {
-            executeStartCommand(gameCommand, chessBoard);
-            executeMoveCommand(gameCommand, chessBoard, input);
-            input = repeatUntilSuccess(InputView::requestGameCommand);
-            gameCommand = GameCommand.findGameCommand(input.get(GAME_COMMAND_INDEX));
+    private void executeGameCommand(ChessBoard chessBoard) {
+        ChessGame chessGame = new ChessGame(chessBoard);
+        GameElements gameElements = requestGameCommand();
+        GameCommandState gameCommandState = gameElements.findGameCommandState();
+        while (!isEndState(gameElements)) {
+            chessGame.executeGame(gameCommandState, gameElements);
+            updateGame(chessBoard, gameElements);
+            OutputView.printGameExecute(gameCommandState, chessBoard);
+            if (chessGame.isGameFinished()) {
+                handleKingDead(chessGame);
+                chessGameService.resetChessGame();
+                break;
+            }
+            gameElements = requestGameCommand();
+            gameCommandState = gameElements.findGameCommandState();
         }
     }
 
-    private void executeStartCommand(GameCommand gameCommand, ChessBoard chessBoard) {
-        if (GameCommand.isGameStarted(gameCommand)) {
-            printChessBoard(chessBoard);
-        }
+    private GameElements requestGameCommand() {
+        return repeatUntilSuccess(InputView::requestGameCommand);
     }
 
-    private void executeMoveCommand(GameCommand gameCommand, ChessBoard chessBoard, List<String> input) {
-        if (GameCommand.isMovedChessPiece(gameCommand)) {
-            ChessGame chessGame = new ChessGame(chessBoard);
-            List<Square> moveSquare = chessGame.settingMoveSquare(input);
-            chessGame.executeTurn(moveSquare.get(0), moveSquare.get(1));
-            printChessBoard(chessBoard);
-        }
+    private boolean isEndState(GameElements gameElements) {
+        GameCommandState gameCommandState = gameElements.findGameCommandState();
+        return EndState.getInstance().isEndState(gameCommandState);
     }
 
-    private void printChessBoard(ChessBoard chessBoard) {
-        ChessBoardDto chessBoardDto = chessBoard.createDto();
-        OutputView.printChessBoard(chessBoardDto);
+    private void handleKingDead(ChessGame chessGame) {
+        Camp campKingAlive = chessGame.findCampKingAlive();
+        OutputView.printWhenKingDead(campKingAlive);
+    }
+
+    private void updateGame(ChessBoard chessBoard, GameElements gameElements) {
+        List<Square> moveSquares = gameElements.createMoveSquare();
+        chessGameService.updateChessGame(chessBoard, moveSquares);
     }
 
     private <T> T repeatUntilSuccess(Supplier<T> supplier) {

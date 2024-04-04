@@ -18,7 +18,7 @@ class MoveRangeTest {
 
     @BeforeEach
     void setUp() {
-        chessBoard = new ChessBoard();
+        chessBoard = ChessBoard.initialBoard();
         moveRange = new MoveRange();
     }
 
@@ -31,7 +31,7 @@ class MoveRangeTest {
     }
 
     @Test
-    void 앞_한_칸에_다른_체스_말이_있으면_앞_한_칸을_이동할_수_있는_범위에_추가하지_않는다() {
+    void 앞_한_칸에_같은_진영의_체스_말이_있으면_앞_한_칸을_이동할_수_있는_범위에_추가하지_않는다() {
         Square startSquare = new Square(Lettering.A, Numbering.ONE);
         moveRange.addForward(chessBoard, startSquare);
 
@@ -39,11 +39,10 @@ class MoveRangeTest {
     }
 
     @Test
-    void 앞으로_두_칸_이상_움직일때_이동_할_수_있는_범위는_이동_경로에서_비어있는_체스_칸의_개수이다() {
+    void 앞으로_두_칸_이상_움직일때_이동_할_수_있는_범위를_올바르게_추가한다() {
         Square startSquare = new Square(Lettering.A, Numbering.TWO);
         moveRange.addContinuousForward(chessBoard, startSquare);
-
-        assertThat(moveRange.getMoveRange()).hasSize(4);
+        assertThat(moveRange.getMoveRange()).hasSize(5);
     }
 
     @Test
@@ -63,11 +62,11 @@ class MoveRangeTest {
     }
 
     @Test
-    void 뒤로_두_칸_이상_움직일때_이동_할_수_있는_범위는_이동_경로에서_비어있는_체스_칸의_개수이다() {
+    void 뒤로_두_칸_이상_움직일때_이동_할_수_있는_범위를_올바르게_추가한다() {
         Square startSquare = new Square(Lettering.A, Numbering.SEVEN);
         moveRange.addContinuousBackward(chessBoard, startSquare);
 
-        assertThat(moveRange.getMoveRange()).hasSize(4);
+        assertThat(moveRange.getMoveRange()).hasSize(5);
     }
 
     @Test
@@ -88,7 +87,7 @@ class MoveRangeTest {
     }
 
     @Test
-    void 왼쪽으로_두_칸_이상_움직일때_이동_할_수_있는_범위는_이동_경로에서_비어있는_체스_칸의_개수이다() {
+    void 왼쪽으로_두_칸_이상_움직일때_이동_할_수_있는_범위를_올바르게_추가한다() {
         chessBoard.movePiece(new Square(Lettering.H, Numbering.TWO), new Square(Lettering.H, Numbering.THREE));
         Square startSquare = new Square(Lettering.H, Numbering.THREE);
         moveRange.addContinuousLeft(chessBoard, startSquare);
@@ -114,7 +113,7 @@ class MoveRangeTest {
     }
 
     @Test
-    void 오른쪽으로_두_칸_이상_움직일때_이동_할_수_있는_범위는_이동_경로에서_비어있는_체스_칸의_개수이다() {
+    void 오른쪽으로_두_칸_이상_움직일때_이동_할_수_있는_범위를_올바르게_계산한다() {
         chessBoard.movePiece(new Square(Lettering.A, Numbering.TWO), new Square(Lettering.A, Numbering.THREE));
         Square startSquare = new Square(Lettering.A, Numbering.THREE);
         moveRange.addContinuousRight(chessBoard, startSquare);
@@ -123,8 +122,8 @@ class MoveRangeTest {
     }
 
     @Test
-    void 체스_말이_폰인_경우_왼쪽_대각선_한_칸에_다른_체스_말이_있으면_왼쪽_대각선_한_칸을_이동할_수_있는_범위에_추가한다() {
-        chessBoard.movePiece(new Square(Lettering.G, Numbering.TWO), new Square(Lettering.G, Numbering.THREE));
+    void 체스_말이_폰인_경우_왼쪽_대각선_한_칸에_다른_진영의_체스_말이_있으면_왼쪽_대각선_한_칸을_이동할_수_있는_범위에_추가한다() {
+        chessBoard.movePiece(new Square(Lettering.G, Numbering.SEVEN), new Square(Lettering.G, Numbering.THREE));
         Square startSquare = new Square(Lettering.H, Numbering.TWO);
         moveRange.addLeftForwardDiagonal(chessBoard, startSquare);
 
@@ -141,16 +140,16 @@ class MoveRangeTest {
     }
 
     @Test
-    void 왼쪽_대각선으로_두_칸_이상_움직일때_이동_할_수_있는_범위는_이동_경로에서_비어있는_체스_칸의_개수이다() {
+    void 왼쪽_대각선으로_두_칸_이상_움직일때_이동_할_수_있는_범위를_올바르게_계산한다() {
         Square startSquare = new Square(Lettering.H, Numbering.TWO);
         moveRange.addContinuousLeftForwardDiagonal(chessBoard, startSquare);
 
-        assertThat(moveRange.getMoveRange()).hasSize(4);
+        assertThat(moveRange.getMoveRange()).hasSize(5);
     }
 
     @Test
-    void 체스_말이_폰인_경우_오른쪽_대각선_한_칸에_다른_체스_말이_있으면_오른쪽_대각선_한_칸을_이동할_수_있는_범위에_추가한다() {
-        chessBoard.movePiece(new Square(Lettering.B, Numbering.TWO), new Square(Lettering.B, Numbering.THREE));
+    void 체스_말이_폰인_경우_오른쪽_대각선_한_칸에_다른_진영의_체스_말이_있으면_오른쪽_대각선_한_칸을_이동할_수_있는_범위에_추가한다() {
+        chessBoard.movePiece(new Square(Lettering.B, Numbering.SEVEN), new Square(Lettering.B, Numbering.THREE));
         Square startSquare = new Square(Lettering.A, Numbering.TWO);
         moveRange.addRightForwardDiagonal(chessBoard, startSquare);
 
@@ -167,11 +166,11 @@ class MoveRangeTest {
     }
 
     @Test
-    void 오른쪽_대각선으로_두_칸_이상_움직일때_이동_할_수_있는_범위는_이동_경로에서_비어있는_체스_칸의_개수이다() {
+    void 오른쪽_대각선으로_두_칸_이상_움직일때_이동_할_수_있는_범위를_올바르게_계산한다() {
         Square startSquare = new Square(Lettering.A, Numbering.TWO);
         moveRange.addContinuousRightForwardDiagonal(chessBoard, startSquare);
 
-        assertThat(moveRange.getMoveRange()).hasSize(4);
+        assertThat(moveRange.getMoveRange()).hasSize(5);
     }
 
     @Test
@@ -191,11 +190,11 @@ class MoveRangeTest {
     }
 
     @Test
-    void 왼쪽_대각선_뒤쪽으로_두_칸_이상_움직일때_이동_할_수_있는_범위는_이동_경로에서_비어있는_체스_칸의_개수이다() {
+    void 왼쪽_대각선_뒤쪽으로_두_칸_이상_움직일때_이동_할_수_있는_범위를_올바르게_계산한다() {
         Square startSquare = new Square(Lettering.H, Numbering.SEVEN);
         moveRange.addContinuousLeftBackwardDiagonal(chessBoard, startSquare);
 
-        assertThat(moveRange.getMoveRange()).hasSize(4);
+        assertThat(moveRange.getMoveRange()).hasSize(5);
     }
 
     @Test
@@ -215,11 +214,11 @@ class MoveRangeTest {
     }
 
     @Test
-    void 오른쪽_대각선_뒤쪽으로_두_칸_이상_움직일때_이동_할_수_있는_범위는_이동_경로에서_비어있는_체스_칸의_개수이다() {
+    void 오른쪽_대각선_뒤쪽으로_두_칸_이상_움직일때_이동_할_수_있는_범위를_올바르게_계산한다() {
         Square startSquare = new Square(Lettering.A, Numbering.SEVEN);
         moveRange.addContinuousRightBackwardDiagonal(chessBoard, startSquare);
 
-        assertThat(moveRange.getMoveRange()).hasSize(4);
+        assertThat(moveRange.getMoveRange()).hasSize(5);
     }
 
     @Test

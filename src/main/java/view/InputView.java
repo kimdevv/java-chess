@@ -1,53 +1,50 @@
 package view;
 
-import controller.command.Command;
-import controller.command.EndOnCommand;
-import controller.command.MoveOnCommand;
-import controller.command.StartOnCommand;
-import domain.position.Position;
+import controller.game.command.GameCommand;
+import controller.room.command.RoomCommand;
+import controller.user.command.UserCommand;
+import dto.RoomDto;
+import view.command.CommandInput;
+import view.command.GameCommandType;
+import view.command.RoomCommandType;
+import view.command.UserCommandType;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class InputView {
-    private final Scanner scanner;
+    private static final Scanner SCANNER = new Scanner(System.in);
+    private static final String WRONG_COMMAND_ERROR_MESSAGE = "잘못된 명령어입니다.";
 
-    public InputView() {
-        this.scanner = new Scanner(System.in);
-    }
-
-    public Command readStartCommand() {
-        String[] rawInput = scanner.nextLine().trim().split(" ");
-        if (hasSize(rawInput, 1) && "start".equals(rawInput[0])) {
-            return new StartOnCommand();
-        }
-        throw new IllegalArgumentException("먼저, 게임을 시작해 주세요.");
-    }
-
-    public Command readCommand() {
-        String[] rawInput = scanner.nextLine().trim().split(" ");
-        if (hasSize(rawInput, 1) && "start".equals(rawInput[0])) {
-            return new StartOnCommand();
-        }
-        if (hasSize(rawInput, 3) && "move".equals(rawInput[0])) {
-            return new MoveOnCommand(resolvePosition(rawInput[1]), resolvePosition(rawInput[2]));
-        }
-        if (hasSize(rawInput, 1) && "end".equals(rawInput[0])) {
-            return new EndOnCommand();
-        }
-        throw new IllegalArgumentException("잘못된 형식의 명령어입니다.");
-    }
-
-    private Position resolvePosition(String position) {
-        String file = position.substring(0, 1);
-        String rank = position.substring(1);
+    public static GameCommand readGameCommand() {
         try {
-            return new Position(file, Integer.parseInt(rank));
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("잘못된 형식의 명령어입니다.");
+            CommandInput input = readCommandInput();
+            return GameCommandType.getCommand(input);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(WRONG_COMMAND_ERROR_MESSAGE);
         }
     }
 
-    private boolean hasSize(final String[] rawInput, int size) {
-        return rawInput.length == size;
+    public static RoomCommand readRoomCommand(List<RoomDto> rooms) {
+        try {
+            CommandInput input = readCommandInput();
+            return RoomCommandType.getCommand(input, rooms);
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            throw new IllegalArgumentException(WRONG_COMMAND_ERROR_MESSAGE);
+        }
+    }
+
+    public static UserCommand readUserCommand() {
+        try {
+            CommandInput input = readCommandInput();
+            return UserCommandType.getCommand(input);
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            throw new IllegalArgumentException(WRONG_COMMAND_ERROR_MESSAGE);
+        }
+    }
+
+    private static CommandInput readCommandInput() {
+        return new CommandInput(SCANNER.nextLine().strip());
     }
 }

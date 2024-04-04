@@ -3,24 +3,27 @@ package domain.board;
 import domain.piece.Color;
 import domain.piece.Empty;
 import domain.piece.Piece;
+import domain.piece.Type;
 import domain.position.Position;
 import domain.position.Route;
+import dto.PieceDto;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ChessBoard {
     private final Map<Position, Piece> board;
     private Color turn;
 
-    private ChessBoard(Map<Position, Piece> board, Color color) {
-        this.board = board;
-        this.turn = color;
-    }
-
     public ChessBoard(Map<Position, Piece> board) {
         this(new HashMap<>(board), Color.WHITE);
+    }
+
+    ChessBoard(Map<Position, Piece> board, Color turn) {
+        this.board = new HashMap<>(board);
+        this.turn = turn;
     }
 
     public void move(final Position source, final Position target) {
@@ -41,7 +44,7 @@ public class ChessBoard {
 
     private void validateTurn(final Position source) {
         final Piece piece = findPieceByPosition(source);
-        if (this.turn.isOpposite(piece.color())) {
+        if (this.turn != piece.color()) {
             throw new IllegalArgumentException("상대 턴입니다.");
         }
     }
@@ -64,19 +67,39 @@ public class ChessBoard {
         board.put(target, piece);
     }
 
+    private Piece findPieceByPosition(final Position position) {
+        return board.getOrDefault(position, Empty.getInstance());
+    }
+
     private void changeTurn() {
-        if (this.turn.isBlack()) {
+        if (this.turn == Color.BLACK) {
             this.turn = Color.WHITE;
             return;
         }
         this.turn = Color.BLACK;
     }
 
-    private Piece findPieceByPosition(final Position position) {
-        return board.getOrDefault(position, Empty.getInstance());
+    public boolean isKingNotExist() {
+        return board.values().stream()
+                .filter(piece -> piece.type() == Type.KING)
+                .count() != 2;
+    }
+
+    public Score calculateScore() {
+        return Score.calculate(board);
     }
 
     public Map<Position, Piece> getBoard() {
         return Collections.unmodifiableMap(board);
+    }
+
+    public List<PieceDto> getPieces() {
+        return board.entrySet().stream()
+                .map(entry -> PieceDto.of(entry.getKey(), entry.getValue()))
+                .toList();
+    }
+
+    public Color getTurn() {
+        return this.turn;
     }
 }

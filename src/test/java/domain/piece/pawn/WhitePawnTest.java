@@ -5,11 +5,15 @@ import domain.piece.Piece;
 import domain.position.File;
 import domain.position.Position;
 import domain.position.Rank;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@SuppressWarnings("NonAsciiCharacters")
 class WhitePawnTest {
     private final Piece whitePawn = new WhitePawn();
 
@@ -31,7 +35,7 @@ class WhitePawnTest {
 
         assertThatThrownBy(() -> whitePawn.validateMovement(source, target, other))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("잘못된 방향으로 이동하고 있습니다.");
+                .hasMessage("잘못된 위치로 이동하고 있습니다.");
     }
 
     @Test
@@ -52,7 +56,7 @@ class WhitePawnTest {
 
         assertThatThrownBy(() -> whitePawn.validateMovement(source, target, other))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("잘못된 방향으로 이동하고 있습니다.");
+                .hasMessage("잘못된 위치로 이동하고 있습니다.");
     }
 
     @Test
@@ -73,7 +77,7 @@ class WhitePawnTest {
 
         assertThatThrownBy(() -> whitePawn.validateMovement(source, target, other))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("잘못된 방향으로 이동하고 있습니다.");
+                .hasMessage("잘못된 위치로 이동하고 있습니다.");
     }
 
     @Test
@@ -84,7 +88,7 @@ class WhitePawnTest {
 
         assertThatThrownBy(() -> whitePawn.validateMovement(source, target, other))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("잘못된 방향으로 이동하고 있습니다.");
+                .hasMessage("잘못된 위치로 이동하고 있습니다.");
     }
 
     @Test
@@ -106,7 +110,7 @@ class WhitePawnTest {
 
         assertThatThrownBy(() -> whitePawn.validateMovement(source, target, other))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("잘못된 방향으로 이동하고 있습니다.");
+                .hasMessageContaining("잘못된 위치로 이동하고 있습니다.");
     }
 
     @Test
@@ -117,7 +121,7 @@ class WhitePawnTest {
 
         assertThatThrownBy(() -> whitePawn.validateMovement(source, target, other))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("잘못된 방향으로 이동하고 있습니다.");
+                .hasMessageContaining("잘못된 위치로 이동하고 있습니다.");
     }
 
     @Test

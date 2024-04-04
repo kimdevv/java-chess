@@ -6,13 +6,16 @@ public class Position {
     private final File file;
     private final Rank rank;
 
+    public Position(final String fileAndRank) {
+        this(
+                File.fromName(fileAndRank.substring(0, 1)),
+                Rank.fromNumber(Integer.parseInt(fileAndRank.substring(1)))
+        );
+    }
+
     public Position(final File file, final Rank rank) {
         this.file = file;
         this.rank = rank;
-    }
-
-    public Position(final String file, final int rank) {
-        this(File.fromName(file), Rank.fromNumber(rank));
     }
 
     public boolean isStraightAt(final Position target) {

@@ -12,10 +12,12 @@ import domain.piece.pawn.WhitePawn;
 import domain.position.File;
 import domain.position.Position;
 import domain.position.Rank;
+import dto.PieceDto;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ChessBoardFactory {
     private static final int SPECIAL_PIECE_SIZE = 8;
@@ -28,9 +30,6 @@ public class ChessBoardFactory {
             new King(Color.BLACK), new Bishop(Color.BLACK), new Knight(Color.BLACK), new Rook(Color.BLACK)
     );
 
-    private ChessBoardFactory() {
-    }
-
     public static ChessBoard createInitialChessBoard() {
         final Map<Position, Piece> pieceMap = new HashMap<>();
         for (int order = 0; order < SPECIAL_PIECE_SIZE; order++) {
@@ -40,5 +39,15 @@ public class ChessBoardFactory {
             pieceMap.put(new Position(File.fromOrder(order), Rank.ONE), whiteSpecialPieces.get(order));
         }
         return new ChessBoard(pieceMap);
+    }
+
+    public static ChessBoard loadPreviousChessBoard(final List<PieceDto> pieces, final Color turn) {
+        return pieces.stream()
+                .collect(
+                        Collectors.collectingAndThen(
+                                Collectors.toMap(PieceDto::getPosition, PieceDto::getPiece),
+                                board -> new ChessBoard(board, turn)
+                        )
+                );
     }
 }

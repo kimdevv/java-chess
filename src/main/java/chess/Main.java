@@ -8,7 +8,7 @@ public class Main {
             ChessController chessController = new ChessController();
             chessController.play();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println(e);
         }
     }
 }

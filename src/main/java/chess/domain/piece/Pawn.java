@@ -1,10 +1,10 @@
 package chess.domain.piece;
 
 import chess.domain.Calculator;
-import chess.domain.Position;
-import chess.domain.Positions;
 import chess.domain.piece.character.Kind;
 import chess.domain.piece.character.Team;
+import chess.domain.position.Position;
+import chess.domain.position.Positions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class Pawn extends Piece {
         this(team, false);
     }
 
-    private Pawn(Team team, boolean isMoved) {
+    public Pawn(Team team, boolean isMoved) {
         super(team, isMoved);
     }
 
@@ -31,34 +31,35 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public boolean checkKind(Kind kind) {
-        return Kind.PAWN == kind;
-    }
-
-    @Override
     public boolean isAttackable(Positions positions) {
-        return positions.calculateRowDifference() == NORMAL_MOVEMENT * team.attackDirection()
-                && Math.abs(positions.calculateColumnDifference()) == ATTACK_COLUMN_MOVEMENT;
+        return isPossibleOneStepMovement(positions.calculateRankDifference())
+                && Math.abs(positions.calculateFileDifference()) == ATTACK_COLUMN_MOVEMENT;
     }
 
     @Override
     public boolean isMovable(Positions positions) {
-        if (positions.calculateColumnDifference() != 0) {
+        if (positions.calculateFileDifference() != 0) {
             return false;
         }
+        int rankDifference = positions.calculateRankDifference();
+        return isPossibleOneStepMovement(rankDifference) || isPossibleTowStepMovement(rankDifference);
+    }
 
-        int rowDifference = positions.calculateRowDifference();
-        return rowDifference == NORMAL_MOVEMENT * team.attackDirection()
-                || (!isMoved && rowDifference == START_MOVEMENT * team.attackDirection());
+    private boolean isPossibleOneStepMovement(int rankDifference) {
+        return rankDifference == NORMAL_MOVEMENT * team.attackDirection();
+    }
+
+    private boolean isPossibleTowStepMovement(int rankDifference) {
+        return !isMoved && rankDifference == START_MOVEMENT * team.attackDirection();
     }
 
     @Override
     public List<Position> findBetweenPositionsWhenAttack(Positions positions) {
-        int rowDifference = positions.calculateRowDifference();
-        int columnDifference = positions.calculateColumnDifference();
+        int rankDifference = positions.calculateRankDifference();
+        int fileDifference = positions.calculateFileDifference();
 
         validateAttackable(positions);
-        return findBetweenPositions(positions.source(), rowDifference, columnDifference);
+        return findBetweenPositions(positions.source(), rankDifference, fileDifference);
     }
 
     private void validateAttackable(Positions positions) {
@@ -69,12 +70,17 @@ public class Pawn extends Piece {
     }
 
     @Override
-    protected List<Position> findBetweenPositions(Position position, int rowDifference, int columnDifference) {
+    protected List<Position> findBetweenPositions(Position position, int fileDifference, int rankDifference) {
         List<Position> positions = new ArrayList<>();
-        if (Math.abs(rowDifference) == START_MOVEMENT) {
-            positions.add(position.move(Calculator.calculateMinMovement(rowDifference), 0));
+        if (Math.abs(rankDifference) == START_MOVEMENT) {
+            positions.add(position.move(0, Calculator.calculateMinMovement(rankDifference)));
             return positions;
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public Kind findKind() {
+        return Kind.PAWN;
     }
 }

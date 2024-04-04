@@ -1,9 +1,10 @@
 package chess.domain.piece;
 
-import chess.domain.Position;
-import chess.domain.Positions;
+import chess.domain.Calculator;
 import chess.domain.piece.character.Kind;
 import chess.domain.piece.character.Team;
+import chess.domain.position.Position;
+import chess.domain.position.Positions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ public class Bishop extends Piece {
         this(team, false);
     }
 
-    private Bishop(Team team, boolean isMoved) {
+    public Bishop(Team team, boolean isMoved) {
         super(team, isMoved);
     }
 
@@ -26,18 +27,13 @@ public class Bishop extends Piece {
     }
 
     @Override
-    public boolean checkKind(Kind kind) {
-        return Kind.BISHOP == kind;
-    }
-
-    @Override
     public boolean isAttackable(Positions positions) {
         return isMovable(positions);
     }
 
     @Override
     public boolean isMovable(Positions positions) {
-        return Math.abs(positions.calculateRowDifference()) == Math.abs(positions.calculateColumnDifference());
+        return Math.abs(positions.calculateRankDifference()) == Math.abs(positions.calculateFileDifference());
     }
 
     @Override
@@ -46,15 +42,20 @@ public class Bishop extends Piece {
     }
 
     @Override
-    protected List<Position> findBetweenPositions(Position position, int rowDifference, int columnDifference) {
-        int absoluteDifference = Math.abs(rowDifference);
-        int rowSign = rowDifference / absoluteDifference;
-        int columnSign = columnDifference / absoluteDifference;
+    protected List<Position> findBetweenPositions(Position position, int fileDifference, int rankDifference) {
+        int absoluteDifference = Math.abs(rankDifference);
+        int rankSign = Calculator.calculateMinMovement(rankDifference);
+        int fileSign = Calculator.calculateMinMovement(fileDifference);
 
         List<Position> positions = new ArrayList<>();
         for (int i = MIN_MOVEMENT; i < absoluteDifference; i++) {
-            positions.add(position.move(rowSign * i, columnSign * i));
+            positions.add(position.move(fileSign * i, rankSign * i));
         }
         return positions;
+    }
+
+    @Override
+    public Kind findKind() {
+        return Kind.BISHOP;
     }
 }

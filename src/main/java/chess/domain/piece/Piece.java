@@ -1,9 +1,9 @@
 package chess.domain.piece;
 
-import chess.domain.Position;
-import chess.domain.Positions;
 import chess.domain.piece.character.Kind;
 import chess.domain.piece.character.Team;
+import chess.domain.position.Position;
+import chess.domain.position.Positions;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,14 +14,12 @@ public abstract class Piece {
     protected final Team team;
     protected final boolean isMoved;
 
-    protected Piece(Team team, boolean isMoved) {
+    public Piece(Team team, boolean isMoved) {
         this.team = team;
         this.isMoved = isMoved;
     }
 
     public abstract Piece move();
-
-    public abstract boolean checkKind(Kind kind);
 
     public abstract boolean isAttackable(Positions positions);
 
@@ -29,14 +27,16 @@ public abstract class Piece {
 
     public abstract List<Position> findBetweenPositionsWhenAttack(Positions positions);
 
-    protected abstract List<Position> findBetweenPositions(Position position, int rowDifference, int columnDifference);
+    protected abstract List<Position> findBetweenPositions(Position position, int fileDifference, int rankDifference);
+
+    public abstract Kind findKind();
 
     public List<Position> findBetweenPositions(Positions positions) {
         validateMovable(positions);
-        int rowDifference = positions.calculateRowDifference();
-        int columnDifference = positions.calculateColumnDifference();
+        int rankDifference = positions.calculateRankDifference();
+        int fileDifference = positions.calculateFileDifference();
 
-        return findBetweenPositions(positions.source(), rowDifference, columnDifference);
+        return findBetweenPositions(positions.source(), fileDifference, rankDifference);
     }
 
     private void validateMovable(Positions positions) {
@@ -56,6 +56,26 @@ public abstract class Piece {
 
     public boolean isSameTeamWith(Team team) {
         return this.team == team;
+    }
+
+    public boolean checkKind(Kind kind) {
+        return findKind() == kind;
+    }
+
+    public double findMinScore() {
+        return findKind().minScore();
+    }
+
+    public double findMaxScore() {
+        return findKind().maxScore();
+    }
+
+    public Team team() {
+        return team;
+    }
+
+    public boolean isMoved() {
+        return isMoved;
     }
 
     @Override

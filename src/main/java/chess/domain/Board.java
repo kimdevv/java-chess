@@ -4,7 +4,11 @@ import chess.domain.piece.King;
 import chess.domain.piece.Piece;
 import chess.domain.piece.character.Kind;
 import chess.domain.piece.character.Team;
+import chess.domain.position.File;
+import chess.domain.position.Position;
+import chess.domain.position.Positions;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +16,6 @@ import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 public record Board(Map<Position, Piece> pieces) {
-
     public void validateSameTeamByPosition(Position position, Team team) {
         if (pieces.get(position).isOppositeTeamWith(team)) {
             throw new IllegalArgumentException("%s 팀이 움직일 차례입니다".formatted(team.name()));
@@ -177,6 +180,51 @@ public record Board(Map<Position, Piece> pieces) {
             return piece.findBetweenPositionsWhenAttack(positions);
         }
         return piece.findBetweenPositions(positions);
+    }
+
+
+    public double calculateScore(Team team) {
+        return calculateNotPawnScore(team) + calculatePawnScore(team);
+    }
+
+    private double calculateNotPawnScore(Team team) {
+        return pieces.values()
+                .stream()
+                .filter(piece -> piece.isSameTeamWith(team) && !piece.checkKind(Kind.PAWN))
+                .mapToDouble(Piece::findMaxScore)
+                .sum();
+    }
+
+    private double calculatePawnScore(Team team) {
+        List<Position> pawnPositions = pieces.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().isSameTeamWith(team) && entry.getValue().checkKind(Kind.PAWN))
+                .map(Entry::getKey)
+                .toList();
+
+        return Arrays.stream(File.values())
+                .mapToDouble(file -> calculateSamePieceScoreByFile(pawnPositions, file))
+                .sum();
+    }
+
+    private double calculateSamePieceScoreByFile(List<Position> positions, File file) {
+        long count = positions.stream()
+                .filter(position -> position.checkFile(file))
+                .count();
+
+        if(count == 0) {
+            return 0;
+        }
+        if (count > 1) {
+            return findAnyPiece(positions).findMinScore() * count;
+        }
+        return findAnyPiece(positions).findMaxScore() * count;
+    }
+
+    private Piece findAnyPiece(List<Position> pawnPositions) {
+        return pieces.get(pawnPositions.stream()
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("기물이 존재하지 않습니다.")));
     }
 
     @Override

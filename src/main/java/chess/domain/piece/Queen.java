@@ -1,21 +1,20 @@
 package chess.domain.piece;
 
 import chess.domain.Calculator;
-import chess.domain.Position;
-import chess.domain.Positions;
 import chess.domain.piece.character.Kind;
 import chess.domain.piece.character.Team;
+import chess.domain.position.Position;
+import chess.domain.position.Positions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Queen extends Piece {
-
     public Queen(Team team) {
         this(team, false);
     }
 
-    private Queen(Team team, boolean isMoved) {
+    public Queen(Team team, boolean isMoved) {
         super(team, isMoved);
     }
 
@@ -28,19 +27,14 @@ public class Queen extends Piece {
     }
 
     @Override
-    public boolean checkKind(Kind kind) {
-        return Kind.QUEEN == kind;
-    }
-
-    @Override
     public boolean isAttackable(Positions positions) {
         return isMovable(positions);
     }
 
     @Override
     public boolean isMovable(Positions positions) {
-        int rowDifference = positions.calculateRowDifference();
-        int columnDifference = positions.calculateColumnDifference();
+        int rowDifference = positions.calculateRankDifference();
+        int columnDifference = positions.calculateFileDifference();
         return (rowDifference == 0 || columnDifference == 0)
                 || Math.abs(rowDifference) == Math.abs(columnDifference);
     }
@@ -51,15 +45,20 @@ public class Queen extends Piece {
     }
 
     @Override
-    public List<Position> findBetweenPositions(Position position, int rowDifference, int columnDifference) {
-        int absoluteDifference = Math.max(Math.abs(rowDifference), Math.abs(columnDifference));
-        int rowSign = Calculator.calculateMinMovement(rowDifference);
-        int columnSign = Calculator.calculateMinMovement(columnDifference);
+    public List<Position> findBetweenPositions(Position position, int fileDifference, int rankDifference) {
+        int absoluteDifference = Math.max(Math.abs(rankDifference), Math.abs(fileDifference));
+        int rankSign = Calculator.calculateMinMovement(rankDifference);
+        int fileSign = Calculator.calculateMinMovement(fileDifference);
 
         List<Position> positions = new ArrayList<>();
         for (int i = MIN_MOVEMENT; i < absoluteDifference; i++) {
-            positions.add(position.move(rowSign * i, columnSign * i));
+            positions.add(position.move(fileSign * i, rankSign * i));
         }
         return positions;
+    }
+
+    @Override
+    public Kind findKind() {
+        return Kind.QUEEN;
     }
 }

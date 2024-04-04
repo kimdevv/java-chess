@@ -1,4 +1,4 @@
-package chess.domain;
+package chess.domain.position;
 
 public class Positions {
     private final Position sourcePosition;
@@ -16,12 +16,12 @@ public class Positions {
         }
     }
 
-    public int calculateRowDifference() {
-        return sourcePosition.calculateRowDifference(targetPosition);
+    public int calculateRankDifference() {
+        return sourcePosition.calculateRankDifference(targetPosition);
     }
 
-    public int calculateColumnDifference() {
-        return sourcePosition.calculateColumnDifference(targetPosition);
+    public int calculateFileDifference() {
+        return sourcePosition.calculateFileDifference(targetPosition);
     }
 
     public Position source() {

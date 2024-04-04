@@ -1,9 +1,9 @@
 package chess.domain.piece;
 
-import chess.domain.Position;
-import chess.domain.Positions;
 import chess.domain.piece.character.Kind;
 import chess.domain.piece.character.Team;
+import chess.domain.position.Position;
+import chess.domain.position.Positions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class Knight extends Piece {
         this(team, false);
     }
 
-    private Knight(Team team, boolean isMoved) {
+    public Knight(Team team, boolean isMoved) {
         super(team, isMoved);
     }
 
@@ -29,11 +29,6 @@ public class Knight extends Piece {
     }
 
     @Override
-    public boolean checkKind(Kind kind) {
-        return Kind.KNIGHT == kind;
-    }
-
-    @Override
     public boolean isAttackable(Positions positions) {
         return isMovable(positions);
     }
@@ -41,8 +36,8 @@ public class Knight extends Piece {
     @Override
     public boolean isMovable(Positions positions) {
         List<Integer> differenceList = List.of(
-                Math.abs(positions.calculateRowDifference()),
-                Math.abs(positions.calculateColumnDifference()));
+                Math.abs(positions.calculateRankDifference()),
+                Math.abs(positions.calculateFileDifference()));
         return differenceList.containsAll(MOVE_DIFFERENCES);
     }
 
@@ -52,7 +47,12 @@ public class Knight extends Piece {
     }
 
     @Override
-    protected List<Position> findBetweenPositions(Position position, int rowDifference, int columnDifference) {
+    protected List<Position> findBetweenPositions(Position position, int fileDifference, int rankDifference) {
         return new ArrayList<>();
+    }
+
+    @Override
+    public Kind findKind() {
+        return Kind.KNIGHT;
     }
 }

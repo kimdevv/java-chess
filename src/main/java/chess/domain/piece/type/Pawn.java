@@ -1,62 +1,57 @@
 package chess.domain.piece.type;
 
+import static chess.domain.Direction.LEFT_UP;
+import static chess.domain.Direction.RIGHT_UP;
+import static chess.domain.Direction.UP;
+import static chess.domain.Direction.UP_UP;
+
 import chess.domain.Direction;
-import chess.util.RouteCalculator;
 import chess.domain.piece.Color;
 import chess.domain.piece.Piece;
+import chess.domain.piece.PieceType;
 import chess.domain.piece.Position;
-import chess.domain.piece.Rank;
+import java.util.Map;
 import java.util.Set;
 
-public class Pawn extends Piece {
-
-    public static final int DEFAULT_STEP = 1;
-    private static final int INIT_AVAILABLE_STEP = 2;
-    private static final Rank INIT_WHITE_RANK = Rank.TWO;
-    private static final Rank INIT_BLACK_RANK = Rank.SEVEN;
+public abstract class Pawn extends Piece {
 
     public Pawn(final Color color) {
         super(color);
     }
 
-    private boolean canWhiteMoveTo(final Position source, final Position target) {
-        boolean isDownThanTarget = Direction.of(source, target).contains(Direction.DOWN);
+    public abstract Set<Position> getPositions(final Position sourcePosition, final Map<Position, Piece> pieces);
 
-        if (isInitPosition(source)) {
-            return (isDownThanTarget && source.getRankDistance(target) == INIT_AVAILABLE_STEP)
-                    || (isDownThanTarget && source.getRankDistance(target) == DEFAULT_STEP);
-        }
-
-        return isDownThanTarget && source.getRankDistance(target) == DEFAULT_STEP;
-    }
-
-    private boolean canBlackMoveTo(final Position source, final Position target) {
-        boolean isDownThanTarget = Direction.of(source, target).contains(Direction.DOWN);
-
-        if (isInitPosition(source)) {
-            return (!isDownThanTarget && source.getRankDistance(target) == INIT_AVAILABLE_STEP)
-                    || (!isDownThanTarget && source.getRankDistance(target) == DEFAULT_STEP);
-        }
-        return !isDownThanTarget && source.getRankDistance(target) == DEFAULT_STEP;
-    }
-
-    private boolean isInitPosition(final Position source) {
-        if (color.equals(Color.WHITE)) {
-            return source.isSameRank(INIT_WHITE_RANK);
-        }
-        return source.isSameRank(INIT_BLACK_RANK);
+    @Override
+    protected Set<Position> getPositionsByDirection(final Direction direction, final Position sourcePosition,
+                                                    final Map<Position, Piece> pieces) {
+        return getPositions(sourcePosition, pieces);
     }
 
     @Override
-    public boolean canMoveTo(final Position source, final Position target) {
-        if (color.equals(Color.WHITE)) {
-            return canWhiteMoveTo(source, target);
-        }
-        return canBlackMoveTo(source, target);
+    protected Set<Direction> directions() {
+        return Set.of(UP, UP_UP, RIGHT_UP, LEFT_UP);
     }
 
     @Override
-    public Set<Position> getRoute(final Position source, final Position target) {
-        return RouteCalculator.getVerticalMiddlePositions(source, target);
+    public double getScore() {
+        return 1;
+    }
+
+    @Override
+    public double getPawnScore(final boolean hasSameFilePawn) {
+        if (hasSameFilePawn) {
+            return 0.5;
+        }
+        return 1;
+    }
+
+    @Override
+    public PieceType getPieceType() {
+        return PieceType.PAWN;
+    }
+
+    @Override
+    public boolean isType(final PieceType pieceType) {
+        return pieceType == PieceType.PAWN;
     }
 }

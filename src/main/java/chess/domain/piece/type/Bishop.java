@@ -1,35 +1,38 @@
 package chess.domain.piece.type;
 
-import chess.domain.MultiDirection;
+import static chess.domain.Direction.LEFT_DOWN;
+import static chess.domain.Direction.LEFT_UP;
+import static chess.domain.Direction.RIGHT_DOWN;
+import static chess.domain.Direction.RIGHT_UP;
+
+import chess.domain.Direction;
 import chess.domain.piece.Color;
-import chess.domain.piece.Piece;
-import chess.domain.piece.Position;
-import chess.util.RouteCalculator;
-import java.util.HashSet;
+import chess.domain.piece.PieceType;
 import java.util.Set;
 
-public class Bishop extends Piece {
+public class Bishop extends SlidingPiece {
+
     public Bishop(final Color color) {
         super(color);
     }
 
     @Override
-    public boolean canMoveTo(final Position source, final Position target) {
-        MultiDirection multiDirection = MultiDirection.of(source, target);
-        return multiDirection == MultiDirection.RIGHT_DIAGONAL || multiDirection == MultiDirection.LEFT_DIAGONAL;
+    protected Set<Direction> directions() {
+        return Set.of(RIGHT_UP, RIGHT_DOWN, LEFT_UP, LEFT_DOWN);
     }
 
     @Override
-    public Set<Position> getRoute(final Position source, final Position target) {
-        MultiDirection multiDirection = MultiDirection.of(source, target);
+    public double getScore() {
+        return 3;
+    }
 
-        if (multiDirection == MultiDirection.RIGHT_DIAGONAL) {
-            return RouteCalculator.getRightDiagonalMiddlePositions(source, target);
-        }
-        if (multiDirection == MultiDirection.LEFT_DIAGONAL) {
-            return RouteCalculator.getLeftDiagonalMiddlePositions(source, target);
-        }
+    @Override
+    public PieceType getPieceType() {
+        return PieceType.BISHOP;
+    }
 
-        return new HashSet<>();
+    @Override
+    public boolean isType(final PieceType pieceType) {
+        return pieceType == PieceType.BISHOP;
     }
 }

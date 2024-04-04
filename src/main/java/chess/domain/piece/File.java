@@ -35,6 +35,10 @@ public enum File {
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] 유효한 파일 입력이 아닙니다."));
     }
 
+    public File move(final int x) {
+        return fromIndex(index + x);
+    }
+
     public File right() {
         return fromIndex(this.index + 1);
     }
@@ -47,12 +51,16 @@ public enum File {
         return Math.abs(this.index - other.index);
     }
 
+    public boolean canMove(final int x) {
+        return index + x <= 8 && index + x > 0;
+    }
+
     public boolean isBigger(final File other) {
         return this.index > other.index;
     }
 
-    public int getIndex() {
-        return index;
+    public String getSymbol() {
+        return symbol;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package chess.domain.piece;
 
-import chess.domain.piece.type.Pawn;
-import chess.domain.piece.type.Rook;
+import chess.domain.piece.type.WhitePawn;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,10 +11,10 @@ class PieceTest {
     @Test
     void isPosition() {
         // given
-        final Piece pawn = new Pawn(Color.WHITE);
+        final Piece pawn = new WhitePawn();
 
         // when
-        final boolean isMySide = pawn.isMySide(new Rook(Color.WHITE));
+        final boolean isMySide = pawn.isMyColor(Color.WHITE);
 
         // then
         Assertions.assertThat(isMySide).isTrue();
@@ -25,10 +24,10 @@ class PieceTest {
     @Test
     void isNotPosition() {
         // given
-        final Piece pawn = new Pawn(Color.WHITE);
+        final Piece pawn = new WhitePawn();
 
         // when
-        final boolean isMySide = pawn.isMySide(new Rook(Color.BLACK));
+        final boolean isMySide =  pawn.isMyColor(Color.BLACK);
 
         // then
         Assertions.assertThat(isMySide).isFalse();

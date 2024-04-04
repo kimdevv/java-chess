@@ -1,67 +1,88 @@
 package chess.domain;
 
+import chess.domain.piece.Color;
 import chess.domain.piece.Piece;
+import chess.domain.piece.PieceType;
 import chess.domain.piece.Position;
 import chess.domain.piece.type.Empty;
-import chess.domain.piece.type.Pawn;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ChessBoard {
 
-    private Map<Position, Piece> pieces;
+    private final Map<Position, Piece> pieces;
 
     public ChessBoard(final Map<Position, Piece> pieces) {
         this.pieces = pieces;
     }
 
-    public void move(final List<String> positions) {
-        final String sourcePosition = positions.get(0);
-        final String targetPosition = positions.get(1);
-
-        move(Position.from(sourcePosition), Position.from(targetPosition));
+    public void tryMove(final String sourcePosition, final String targetPosition) {
+        tryMove(Position.from(sourcePosition), Position.from(targetPosition));
     }
 
-    void move(final Position sourcePosition, final Position targetPosition) {
+    public void tryMove(final Position sourcePosition, final Position targetPosition) {
         final Piece sourcePiece = findPieceBy(sourcePosition);
 
-        if (sourcePiece.isClass(Pawn.class) && canPawnCatch(sourcePosition, targetPosition)) {
+        Set<Position> positions = sourcePiece.getPositions(sourcePosition, pieces);
+
+        if (positions.contains(targetPosition)) {
             movePiece(sourcePosition, targetPosition);
             return;
         }
 
-        validateStrategy(sourcePosition, targetPosition);
-        validateJumpOver(sourcePosition, targetPosition);
-
-        if (isPieceExist(targetPosition)) {
-            validateNotMySide(sourcePiece, targetPosition);
-        }
-
-        movePiece(sourcePosition, targetPosition);
+        throw new IllegalArgumentException("[ERROR] 이동할 수 없는 위치입니다.");
     }
 
-    Piece findPieceBy(final Position input) {
+    public Piece findPieceBy(final Position input) {
         if (isPieceExist(input)) {
             return pieces.get(input);
         }
         throw new IllegalArgumentException("[ERROR] 해당 위치에 기물이 존재하지 않습니다.");
     }
 
-    private boolean isPieceExist(final Position input) {
-        return !pieces.get(input).isClass(Empty.class);
+    public boolean isPieceColor(final String sourcePosition, final Color color) {
+        final Piece sourcePiece = findPieceBy(Position.from(sourcePosition));
+        return sourcePiece.isMyColor(color);
     }
 
-    private boolean canPawnCatch(final Position sourcePosition, final Position targetPosition) {
-        Piece sourcePiece = pieces.get(sourcePosition);
-        Piece targetPiece = pieces.get(targetPosition);
-        MultiDirection multiDirection = MultiDirection.of(sourcePosition, targetPosition);
+    public boolean doesKingDead() {
+        int kingCount = (int) pieces.values().stream()
+                .filter(piece -> piece.isType(PieceType.KING))
+                .count();
+        return kingCount != 2;
+    }
 
-        if (!isPieceExist(targetPosition)) {
-            return false;
+    public Map<Color, Double> getScores() {
+        Map<Color, Double> scores = new EnumMap<>(Color.class);
+        scores.put(Color.WHITE, calculateScore(Color.WHITE));
+        scores.put(Color.BLACK, calculateScore(Color.BLACK));
+        return scores;
+    }
+
+    private double calculateScore(final Color color) {
+        return pieces.entrySet().stream()
+                .filter(positionPiece -> positionPiece.getValue().isMyColor(color))
+                .mapToDouble(positionPiece -> positionPiece.getValue()
+                        .getScore(hasSameFilePawn(positionPiece.getKey(), positionPiece.getValue())))
+                .sum();
+    }
+
+    public List<Color> getWinners() {
+        List<Color> winners = new ArrayList<>();
+
+        Double blackScore = getScores().get(Color.BLACK);
+        Double whiteScore = getScores().get(Color.WHITE);
+
+        if (blackScore >= whiteScore) {
+            winners.add(Color.BLACK);
         }
-        return ((multiDirection == MultiDirection.LEFT_DIAGONAL || multiDirection == MultiDirection.RIGHT_DIAGONAL)
-                && (sourcePosition.getRankDistance(targetPosition) == Pawn.DEFAULT_STEP))
-                && !sourcePiece.isMySide(targetPiece);
+        if (blackScore <= whiteScore) {
+            winners.add(Color.WHITE);
+        }
+        return winners;
     }
 
     private void movePiece(final Position sourcePosition, final Position targetPosition) {
@@ -71,33 +92,54 @@ public class ChessBoard {
         pieces.put(sourcePosition, new Empty());
     }
 
-    private void validateStrategy(final Position sourcePosition, final Position targetPosition) {
-        Piece sourcePiece = findPieceBy(sourcePosition);
-
-        if (!sourcePiece.canMoveTo(sourcePosition, targetPosition)) {
-            throw new IllegalArgumentException("[ERROR] 전략상 이동할 수 없는 위치입니다.");
-        }
+    private boolean isPieceExist(final Position input) {
+        return !pieces.get(input).isClass(Empty.class);
     }
 
-    private void validateJumpOver(final Position sourcePosition, final Position targetPosition) {
-        if (existPieceInWay(sourcePosition, targetPosition)) {
-            throw new IllegalArgumentException("[ERROR] 경로상 기물이 존재합니다.");
-        }
-    }
+//    private double calculateScore(final Color color) {
+//        double score = pieces.values().stream()
+//                .filter(piece -> piece.isMyColor(color) && !piece.isType(PieceType.PAWN))
+//                .mapToDouble(Piece::getScore)
+//                .sum();
+//
+//        double pawnsScore = calculatePawnsScore(color);
+//        return score + pawnsScore;
+//    }
+//
+//    private double calculatePawnsScore(final Color color) {
+//        return pieces.entrySet().stream()
+//                .filter(positionPiece -> positionPiece.getValue().isMyColor(color))
+//                .filter(positionPiece -> positionPiece.getValue().isType(PieceType.PAWN))
+//                .filter(positionPiece -> positionPiece.getKey().isSameFile(positionPiece.getKey()))
+//                .mapToDouble(positionPiece -> positionPiece.getValue().getPanwnScore(hasSameFilePawn(positionPiece)))
+//                .sum();
+//    }
 
-    private boolean existPieceInWay(final Position sourcePosition, final Position targetPosition) {
-        Piece sourcePiece = pieces.get(sourcePosition);
+//    private double calculateScore(final Color color) {
+//        double score = pieces.entrySet().stream()
+//                .filter(positionPiece -> positionPiece.getValue().isMyColor(color))
+//                .mapToDouble(positionPiece -> positionPiece.getValue().getScore(hasSameFilePawn(positionPiece.getKey(), positionPiece.getValue())))
+//                .sum();
+//
+//        double pawnScore = calculatePawnScore(color);
+//        return score + pawnScore;
+//    }
+//
+//    private double calculatePawnScore(final Color color) {
+//        pieces.values().stream()
+//                .filter(piece -> piece.isType(PieceType.PAWN))
+//                .mapToDouble(piece -> piece.getScore(hasSameFilePawn(piece)))
+//                .sum()
+//    }
 
-        return sourcePiece.getRoute(sourcePosition, targetPosition).stream()
-                .anyMatch(this::isPieceExist);
-    }
+    private boolean hasSameFilePawn(final Position position, final Piece piece) {
+        long count = pieces.entrySet().stream()
+                .filter(positionPiece -> positionPiece.getKey().isSameFile(position)
+                        && positionPiece.getValue().isType(PieceType.PAWN)
+                        && positionPiece.getValue().isMyColor(piece))
+                .count();
+        return count > 1;
 
-    private void validateNotMySide(final Piece sourcePiece, final Position targetPosition) {
-        final Piece targetPiece = findPieceBy(targetPosition);
-
-        if (sourcePiece.isMySide(targetPiece)) {
-            throw new IllegalArgumentException("[ERROR] 잡을 수 없는 기물입니다.");
-        }
     }
 
     public Map<Position, Piece> getPieces() {

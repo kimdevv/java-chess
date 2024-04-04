@@ -1,43 +1,42 @@
 package chess.domain.piece.type;
 
-import chess.domain.MultiDirection;
-import chess.util.RouteCalculator;
+import static chess.domain.Direction.DOWN;
+import static chess.domain.Direction.LEFT;
+import static chess.domain.Direction.LEFT_DOWN;
+import static chess.domain.Direction.LEFT_UP;
+import static chess.domain.Direction.RIGHT;
+import static chess.domain.Direction.RIGHT_DOWN;
+import static chess.domain.Direction.RIGHT_UP;
+import static chess.domain.Direction.UP;
+
+import chess.domain.Direction;
 import chess.domain.piece.Color;
-import chess.domain.piece.Piece;
-import chess.domain.piece.Position;
-import java.util.HashSet;
+import chess.domain.piece.PieceType;
 import java.util.Set;
 
-public class Queen extends Piece {
+public class Queen extends SlidingPiece {
+
     public Queen(final Color color) {
         super(color);
     }
 
     @Override
-    public boolean canMoveTo(final Position source, final Position target) {
-        MultiDirection multiDirection = MultiDirection.of(source, target);
-
-        return multiDirection == MultiDirection.VERTICAL || multiDirection == MultiDirection.HORIZONTAL
-                || multiDirection == MultiDirection.LEFT_DIAGONAL || multiDirection == MultiDirection.RIGHT_DIAGONAL;
-
+    protected Set<Direction> directions() {
+        return Set.of(RIGHT_UP, RIGHT_DOWN, LEFT_UP, LEFT_DOWN, UP, DOWN, RIGHT, LEFT);
     }
 
     @Override
-    public Set<Position> getRoute(final Position source, final Position target) {
-        MultiDirection multiDirection = MultiDirection.of(source, target);
+    public double getScore() {
+        return 9;
+    }
 
-        if (multiDirection == MultiDirection.RIGHT_DIAGONAL) {
-            return RouteCalculator.getRightDiagonalMiddlePositions(source, target);
-        }
-        if (multiDirection == MultiDirection.LEFT_DIAGONAL) {
-            return RouteCalculator.getLeftDiagonalMiddlePositions(source, target);
-        }
-        if (multiDirection == MultiDirection.VERTICAL) {
-            return RouteCalculator.getVerticalMiddlePositions(source, target);
-        }
-        if (multiDirection == MultiDirection.HORIZONTAL) {
-            return RouteCalculator.getHorizontalMiddlePositions(source, target);
-        }
-        return new HashSet<>();
+    @Override
+    public PieceType getPieceType() {
+        return PieceType.QUEEN;
+    }
+
+    @Override
+    public boolean isType(final PieceType pieceType) {
+        return pieceType == PieceType.QUEEN;
     }
 }

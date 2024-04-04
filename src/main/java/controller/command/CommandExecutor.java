@@ -1,7 +1,8 @@
 package controller.command;
 
-import domain.game.ChessGame;
+import service.ChessGameService;
+import view.OutputView;
 
 public interface CommandExecutor {
-    void execute(ChessGame chessGame);
+    void execute(ChessGameService chessGameService, OutputView outputView);
 }

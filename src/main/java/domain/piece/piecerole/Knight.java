@@ -18,6 +18,7 @@ import java.util.Objects;
 
 public class Knight extends PieceRole {
     private static final int MAX_MOVEMENT = 1;
+    private static final double SCORE = 2.5;
 
     private Knight(final List<Movable> routes) {
         super(routes);
@@ -44,6 +45,11 @@ public class Knight extends PieceRole {
             final Map<Position, Piece> chessBoard
     ) {
         validateCorrectRouteForPiece(source, target);
+    }
+
+    @Override
+    public double calculateScore(final Position current, final Map<Position, Piece> piecePosition) {
+        return SCORE;
     }
 
     @Override

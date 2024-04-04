@@ -1,5 +1,7 @@
 package domain.piece;
 
+import static domain.piece.Color.WHITE;
+
 import domain.piece.piecerole.PieceRole;
 import domain.position.Position;
 import java.util.Map;
@@ -23,7 +25,7 @@ public class Piece {
     }
 
     public boolean isWhite() {
-        return isEqualColor(Color.WHITE);
+        return isEqualColor(WHITE);
     }
 
     public boolean isEqualColor(final Color target) {
@@ -32,6 +34,22 @@ public class Piece {
 
     public boolean equalPieceRole(final PieceRole pieceRole) {
         return this.pieceRole.equals(pieceRole);
+    }
+
+    public boolean doesGameEndsWhenCaptured() {
+        return pieceRole.doesGameEndWhenCaptured();
+    }
+
+    public double calculateScore(final Position current, final Map<Position, Piece> piecePosition) {
+        return pieceRole.calculateScore(current, piecePosition);
+    }
+
+    public String getPieceRoleName() {
+        return pieceRole.getClass().getSimpleName();
+    }
+
+    public String getColorName() {
+        return this.color.name();
     }
 
     public Color getColor() {
@@ -54,5 +72,4 @@ public class Piece {
     public int hashCode() {
         return Objects.hash(pieceRole, color);
     }
-
 }

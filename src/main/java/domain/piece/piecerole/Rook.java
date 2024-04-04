@@ -14,6 +14,7 @@ import java.util.Objects;
 
 public class Rook extends PieceRole {
     private static final int MAX_MOVEMENT = 7;
+    private static final double SCORE = 5;
 
     private Rook(final List<Movable> routes) {
         super(routes);
@@ -37,6 +38,11 @@ public class Rook extends PieceRole {
     ) {
         validateCorrectRouteForPiece(source, target);
         validateBlockedRoute(source, target, chessBoard);
+    }
+
+    @Override
+    public double calculateScore(final Position current, final Map<Position, Piece> piecePosition) {
+        return SCORE;
     }
 
     @Override

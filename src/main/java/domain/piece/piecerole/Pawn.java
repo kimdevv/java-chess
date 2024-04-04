@@ -11,6 +11,8 @@ import java.util.Objects;
 public abstract class Pawn extends PieceRole {
     protected static final int INITIAL_MAX_MOVEMENT = 2;
     protected static final int ORIGINAL_MAX_MOVEMENT = 1;
+    private static final int ORIGINAL_SCORE = 1;
+    private static final double DECLINED_SCORE = 0.5;
 
     protected Pawn(final List<Movable> routes) {
         super(routes);
@@ -33,7 +35,7 @@ public abstract class Pawn extends PieceRole {
         boolean cannotMove = movables.stream()
                 .noneMatch(movable -> movable.canMove(source, target));
         if (cannotMove) {
-            throw new IllegalArgumentException("[ERROR]이동할 수 없는 경로입니다. 다시 입력해주세요.");
+            throw new IllegalArgumentException("[ERROR] 이동할 수 없는 경로입니다.");
         }
     }
 
@@ -57,7 +59,7 @@ public abstract class Pawn extends PieceRole {
             final Map<Position, Piece> chessBoard
     ) {
         if (chessBoard.containsKey(new Position(target))) {
-            throw new IllegalArgumentException("[ERROR]전진하려는 곳에 다른 기물이 있어서 이동할 수 없습니다.");
+            throw new IllegalArgumentException("[ERROR] 전진하려는 곳에 다른 기물이 있어서 이동할 수 없습니다.");
         }
     }
 
@@ -66,11 +68,29 @@ public abstract class Pawn extends PieceRole {
             final Map<Position, Piece> chessBoard
     ) {
         if (!chessBoard.containsKey(new Position(target))) {
-            throw new IllegalArgumentException("[ERROR]다른 진영의 기물이 있을 때만 대각선으로 이동할 수 있습니다.");
+            throw new IllegalArgumentException("[ERROR] 다른 진영의 기물이 있을 때만 대각선으로 이동할 수 있습니다.");
         }
     }
 
     protected abstract boolean isStartPosition(final Position source);
+
+    @Override
+    public double calculateScore(final Position current, final Map<Position, Piece> piecePosition) {
+        for (Map.Entry<Position, Piece> entry : piecePosition.entrySet()) {
+            Position position = entry.getKey();
+            Piece piece = entry.getValue();
+            if (hasSameColorPawnOnCurrentFile(current, position, piece)) {
+                return DECLINED_SCORE;
+            }
+        }
+        return ORIGINAL_SCORE;
+    }
+
+    protected abstract boolean hasSameColorPawnOnCurrentFile(
+            final Position current,
+            final Position position,
+            final Piece piece
+    );
 
     @Override
     public boolean equals(final Object o) {

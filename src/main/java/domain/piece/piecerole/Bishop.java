@@ -14,6 +14,7 @@ import java.util.Objects;
 
 public class Bishop extends PieceRole {
     private static final int MAX_MOVEMENT = 7;
+    private static final double SCORE = 3;
 
     private Bishop(final List<Movable> routes) {
         super(routes);
@@ -34,6 +35,11 @@ public class Bishop extends PieceRole {
                                      final Map<Position, Piece> chessBoard) {
         validateCorrectRouteForPiece(source, target);
         validateBlockedRoute(source, target, chessBoard);
+    }
+
+    @Override
+    public double calculateScore(final Position current, final Map<Position, Piece> piecePosition) {
+        return SCORE;
     }
 
     @Override

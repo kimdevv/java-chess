@@ -1,30 +1,43 @@
 package controller.command;
 
-import domain.game.ChessGame;
 import java.util.Arrays;
 import java.util.function.Function;
+import service.ChessGameService;
+import view.OutputView;
+import view.command.CommandDto;
 import view.command.CommandType;
 
 public enum Command {
-    START(StartCommandExecutor::new),
-    END(EndCommandExecutor::new),
-    MOVE(MoveCommandExecutor::new),
+    START(CommandType.START, StartCommandExecutor::new),
+    END(CommandType.END, EndCommandExecutor::new),
+    MOVE(CommandType.MOVE, MoveCommandExecutor::new),
+    STATUS(CommandType.STATUS, StatusCommandExecutor::new),
+    CONTINUE(CommandType.CONTINUE, ContinueCommandExecutor::new),
     ;
 
-    private final Function<CommandType, CommandExecutor> executorFunction;
+    private final CommandType commandType;
+    private final Function<CommandDto, CommandExecutor> executorFunction;
 
-    Command(final Function<CommandType, CommandExecutor> executorFunction) {
+    Command(
+            final CommandType commandType,
+            final Function<CommandDto, CommandExecutor> executorFunction
+    ) {
+        this.commandType = commandType;
         this.executorFunction = executorFunction;
     }
 
-    public static Command from(final CommandType commandType) {
+    public static Command from(final CommandDto commandDto) {
         return Arrays.stream(Command.values())
-                .filter(command -> command.name().equals(commandType.name()))
+                .filter(command -> command.commandType == commandDto.getCommandType())
                 .findAny()
-                .orElseThrow(IllegalStateException::new);
+                .orElseThrow(IllegalArgumentException::new);
     }
 
-    public void execute(final CommandType commandType, final ChessGame chessGame) {
-        executorFunction.apply(commandType).execute(chessGame);
+    public void execute(
+            final CommandDto commandDto,
+            final ChessGameService chessGameService,
+            final OutputView outputView
+    ) {
+        executorFunction.apply(commandDto).execute(chessGameService, outputView);
     }
 }

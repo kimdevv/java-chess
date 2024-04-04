@@ -30,6 +30,10 @@ public class File {
         return letter - target.letter;
     }
 
+    public String getName() {
+        return String.valueOf(letter);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

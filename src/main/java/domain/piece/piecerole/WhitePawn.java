@@ -2,7 +2,9 @@ package domain.piece.piecerole;
 
 import domain.game.Direction;
 import domain.game.Movable;
+import domain.piece.Piece;
 import domain.position.Position;
+import domain.position.Rank;
 import java.util.List;
 
 public class WhitePawn extends Pawn {
@@ -33,6 +35,18 @@ public class WhitePawn extends Pawn {
 
     @Override
     public boolean isStartPosition(final Position source) {
-        return source.isRank2();
+        return source.isEqualRank(new Rank(2));
+    }
+
+    @Override
+    protected boolean hasSameColorPawnOnCurrentFile(
+            final Position current,
+            final Position position,
+            final Piece piece
+    ) {
+        if (position.equals(current)) {
+            return false;
+        }
+        return position.hasEqualFilePosition(current) && piece.equalPieceRole(this);
     }
 }

@@ -1,33 +1,37 @@
 package controller;
 
 import controller.command.Command;
-import domain.game.ChessGame;
+import service.ChessGameService;
 import view.InputView;
 import view.OutputView;
-import view.command.CommandType;
+import view.command.CommandDto;
 
 public class ChessController {
-    private final InputView inputView = new InputView();
-    private final OutputView outputView = new OutputView();
+    private final InputView inputView;
+    private final OutputView outputView;
+    private final ChessGameService chessGameService;
+
+    public ChessController() {
+        this.inputView = new InputView();
+        this.outputView = new OutputView();
+        this.chessGameService = new ChessGameService();
+    }
 
     public void runChessGame() {
-        ChessGame chessGame = new ChessGame();
         outputView.printStartMessage();
-        while (chessGame.isRunning()) {
-            inputCommandAndExecute(chessGame);
+        while (chessGameService.isContinuing()) {
+            inputCommandAndExecute();
         }
     }
 
-    public void inputCommandAndExecute(final ChessGame chessGame) {
+    public void inputCommandAndExecute() {
         try {
-            CommandType commandType = inputView.inputCommand();
-            Command command = Command.from(commandType);
-            command.execute(commandType, chessGame);
-
-            outputView.printChessBoard(chessGame.getChessBoard());
+            CommandDto commandDto = inputView.inputCommand();
+            Command command = Command.from(commandDto);
+            command.execute(commandDto, chessGameService, outputView);
         } catch (final Exception exception) {
-            OutputView.printErrorMessage(exception.getMessage());
-            chessGame.end();
+            outputView.printErrorMessage(exception.getMessage());
+            chessGameService.endGame();
         }
     }
 }

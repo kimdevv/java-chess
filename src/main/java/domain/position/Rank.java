@@ -30,6 +30,10 @@ public class Rank {
         return new Rank(number + movement);
     }
 
+    public String getName() {
+        return String.valueOf(number);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

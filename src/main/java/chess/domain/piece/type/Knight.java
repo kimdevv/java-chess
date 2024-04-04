@@ -1,5 +1,6 @@
 package chess.domain.piece.type;
 
+import chess.domain.piece.PieceType;
 import chess.domain.position.Movement;
 import chess.domain.piece.Color;
 import chess.domain.piece.Piece;
@@ -10,9 +11,10 @@ public class Knight extends Piece {
 
     private static final int DEFAULT_STEP_ONE = 1;
     private static final int DEFAULT_STEP_TWO = 2;
+    private static final double KNIGHT_SCORE = 2.5;
 
     public Knight(final Color color) {
-        super(color);
+        super(color, PieceType.KNIGHT);
     }
 
     @Override
@@ -22,7 +24,22 @@ public class Knight extends Piece {
     }
 
     @Override
+    public double getScore() {
+        return KNIGHT_SCORE;
+    }
+
+    @Override
     public Set<Position> getRoute(final Movement movement) {
         return Set.of();
+    }
+
+    @Override
+    public boolean isPawn() {
+        return false;
+    }
+
+    @Override
+    public boolean isKing() {
+        return false;
     }
 }

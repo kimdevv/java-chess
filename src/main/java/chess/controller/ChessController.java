@@ -1,56 +1,74 @@
 package chess.controller;
 
-import static chess.domain.piece.Color.WHITE;
+import static chess.exception.RetryHandler.retryOnException;
 
-import chess.domain.ChessBoard;
-import chess.domain.Turn;
-import chess.util.ChessBoardInitializer;
-import chess.domain.Command;
-import chess.domain.position.Position;
+import chess.domain.Scores;
+import chess.dto.ChessBoardDto;
+import chess.dto.CommandDto;
+import chess.domain.board.ChessBoard;
+import chess.service.ChessService;
 import chess.view.InputView;
 import chess.view.OutputView;
-import java.util.List;
 
 public class ChessController {
 
     private final InputView inputView;
     private final OutputView outputView;
+    private final ChessService chessService;
 
-    public ChessController(final InputView inputView, final OutputView outputView) {
+    public ChessController(final InputView inputView, final OutputView outputView, final ChessService chessService) {
         this.inputView = inputView;
         this.outputView = outputView;
+        this.chessService = chessService;
     }
 
-    public void runChess() {
-        final Turn turn = new Turn(WHITE);
-        final Command initCommand = Command.from(inputView.readInitCommand());
+    public void run() {
+        outputView.printCommandMenu();
+        retryOnException(this::startGame);
+    }
 
-        if (!initCommand.isStart()) {
-            return;
+    private void startGame() {
+        final CommandDto commandDto = CommandDto.fromStart(inputView.readCommand());
+
+        if (commandDto.isReload()) {
+            startGame(chessService.findRecentBoard());
         }
 
-        final ChessBoard chessBoard = ChessBoardInitializer.init();
-        outputView.printChessBoard(chessBoard.getPieces());
-
-        List<String> command = inputView.readMoveCommand();
-
-        while (isNotEndCommand(command)) {
-            playTurn(command, turn, chessBoard);
-
-            command = inputView.readMoveCommand();
+        if (commandDto.isStart()) {
+            startGame(chessService.createBoard());
         }
     }
 
-    private boolean isNotEndCommand(final List<String> command) {
-        return !command.isEmpty();
+    private void startGame(final ChessBoard chessBoard) {
+        outputView.printChessBoard(ChessBoardDto.from(chessBoard.getPieces()));
+        retryOnException(() -> playTurn(chessBoard));
     }
 
-    private void playTurn(final List<String> command, final Turn turn, final ChessBoard chessBoard) {
-        final Position current = new Position(command.get(0));
-        final Position destination = new Position(command.get(1));
+    private void playTurn(final ChessBoard chessBoard) {
+        while (true) {
+            final CommandDto commandDto = CommandDto.fromPlay(inputView.readCommand());
 
-        chessBoard.move(turn, current, destination);
-        turn.change();
-        outputView.printChessBoard(chessBoard.getPieces());
+            if (commandDto.isMove()) {
+                chessService.move(commandDto, chessBoard);
+            }
+
+            printResult(commandDto, chessBoard);
+
+            if (commandDto.isEnd() || chessBoard.isKingCaught()) {
+                break;
+            }
+        }
+    }
+
+    private void printResult(final CommandDto commandDto, final ChessBoard chessBoard) {
+        if (commandDto.isMove()) {
+            outputView.printChessBoard(ChessBoardDto.from(chessBoard.getPieces()));
+        }
+        if (commandDto.isStatus()) {
+            outputView.printScores(Scores.from(chessBoard));
+        }
+        if (chessBoard.isKingCaught()) {
+            outputView.printWinner(chessBoard.getTurn());
+        }
     }
 }

@@ -26,7 +26,7 @@ public enum Rank{
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] 유효한 랭크 입력이 아닙니다."));
     }
 
-    public static Rank fromSymbol(final int index) {
+    public static Rank fromIndex(final int index) {
         return Arrays.stream(values())
                 .filter(rank -> rank.index == index)
                 .findFirst()
@@ -34,7 +34,7 @@ public enum Rank{
     }
 
     public Rank addIndex(final int index) {
-        return fromSymbol(this.index + index);
+        return fromIndex(this.index + index);
     }
 
     public int getDistance(final Rank other) {

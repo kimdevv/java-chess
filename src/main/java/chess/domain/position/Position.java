@@ -48,6 +48,10 @@ public class Position {
         return this.rank.equals(rank);
     }
 
+    public boolean isFile(final File file) {
+        return this.file.equals(file);
+    }
+
     public int getFileIndex() {
         return this.file.getIndex();
     }

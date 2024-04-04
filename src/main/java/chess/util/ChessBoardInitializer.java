@@ -1,7 +1,10 @@
 package chess.util;
 
-import chess.domain.ChessBoard;
+import chess.domain.board.ChessBoard;
+import chess.domain.board.Turn;
 import chess.domain.piece.Color;
+import chess.domain.piece.type.BlackPawn;
+import chess.domain.piece.type.WhitePawn;
 import chess.domain.position.File;
 import chess.domain.piece.Piece;
 import chess.domain.position.Position;
@@ -24,22 +27,22 @@ public class ChessBoardInitializer {
         final Map<Position, Piece> pieces = new HashMap<>();
 
         createPieceWithoutPawn(pieces, Color.BLACK, Rank.EIGHT);
-        createPawn(pieces, Color.BLACK, Rank.SEVEN);
-        createPawn(pieces, Color.WHITE, Rank.TWO);
+        createPawn(pieces, new BlackPawn(), Rank.SEVEN);
+        createPawn(pieces, new WhitePawn(), Rank.TWO);
         createPieceWithoutPawn(pieces, Color.WHITE, Rank.ONE);
 
-        return new ChessBoard(pieces);
+        return new ChessBoard(0, new Turn(Color.WHITE), pieces);
     }
 
-    private static void createPawn(final Map<Position, Piece> pieces, final Color color, final Rank rank) {
-        pieces.put(new Position(File.A, rank), new Pawn(color));
-        pieces.put(new Position(File.B, rank), new Pawn(color));
-        pieces.put(new Position(File.C, rank), new Pawn(color));
-        pieces.put(new Position(File.D, rank), new Pawn(color));
-        pieces.put(new Position(File.E, rank), new Pawn(color));
-        pieces.put(new Position(File.F, rank), new Pawn(color));
-        pieces.put(new Position(File.G, rank), new Pawn(color));
-        pieces.put(new Position(File.H, rank), new Pawn(color));
+    private static void createPawn(final Map<Position, Piece> pieces, final Pawn pawn, final Rank rank) {
+        pieces.put(new Position(File.A, rank), pawn);
+        pieces.put(new Position(File.B, rank), pawn);
+        pieces.put(new Position(File.C, rank), pawn);
+        pieces.put(new Position(File.D, rank), pawn);
+        pieces.put(new Position(File.E, rank), pawn);
+        pieces.put(new Position(File.F, rank), pawn);
+        pieces.put(new Position(File.G, rank), pawn);
+        pieces.put(new Position(File.H, rank), pawn);
     }
 
     private static void createPieceWithoutPawn(final Map<Position, Piece> pieces, final Color color, final Rank rank) {

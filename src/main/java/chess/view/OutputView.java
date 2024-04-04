@@ -1,39 +1,38 @@
 package chess.view;
 
-import chess.domain.piece.Piece;
-import chess.domain.position.Position;
-import chess.domain.position.Rank;
-import java.util.ArrayList;
+import chess.domain.Scores;
+import chess.domain.piece.Color;
+import chess.dto.ChessBoardDto;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class OutputView {
 
-    public void printChessBoard(final Map<Position, Piece> pieces) {
-        final List<List<Character>> board = sortByBoardOrder(pieces);
-        board.forEach(this::printChessRow);
+    public void printCommandMenu() {
+        System.out.println("""
+                > 체스 게임을 시작합니다.
+                > 게임 이어하기 : reload
+                > 게임 시작 : start
+                > 게임 종료 : end
+                > 게임 이동 : move source위치 target위치 - 예. move b2 b3""");
+    }
+
+    public void printChessBoard(final ChessBoardDto chessBoardDto) {
+        chessBoardDto.chessBoard().forEach(this::printChessRow);
+    }
+
+    public void printScores(final Scores scores) {
+        final double blackScore = scores.getBlackScore();
+        final double whiteScore = scores.getWhiteScore();
+
+        System.out.println(String.format("BLACK 점수 : %.2f, WHITE 점수 : %.2f", blackScore, whiteScore));
+    }
+
+    public void printWinner(final Color winner) {
+        System.out.println(String.format("축하합니다🎉 우승자는 %s입니다.", winner));
     }
 
     private void printChessRow(final List<Character> row) {
         row.forEach(System.out::print);
         System.out.println();
-    }
-
-    private List<List<Character>> sortByBoardOrder(final Map<Position, Piece> pieces) {
-        final List<List<Character>> board = new ArrayList<>();
-        for (int i = 0; i < Rank.values().length; i++) {
-            board.add(new ArrayList<>(List.of('.', '.', '.', '.', '.', '.', '.', '.')));
-        }
-
-        for (Entry<Position, Piece> entry : pieces.entrySet()) {
-            final int fileIndex = entry.getKey().getFileIndex() - 1;
-            final int rankIndex = 7 - (entry.getKey().getRankIndex() - 1);
-
-            final List<Character> marks = board.get(rankIndex);
-            marks.set(fileIndex, ChessBoardMarker.getSymbol(entry.getValue()));
-        }
-
-        return board;
     }
 }

@@ -9,14 +9,12 @@ import java.util.Set;
 
 public abstract class Piece {
 
+    protected final PieceType pieceType;
     protected final Color color;
 
-    protected Piece(final Color color) {
+    protected Piece(final Color color, final PieceType pieceType) {
         this.color = color;
-    }
-
-    public Set<Position> getCatchRoute(final Movement movement) {
-        return getRoute(movement);
+        this.pieceType = pieceType;
     }
 
     public Set<Position> getRoute(final Movement movement) {
@@ -35,18 +33,31 @@ public abstract class Piece {
         return positions;
     }
 
+    public boolean isOpponent(final Piece otherPiece) {
+        return !color.equals(otherPiece.color);
+    }
+
+    public boolean isColor(final Color otherColor) {
+        return color.equals(otherColor);
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public PieceType getPieceType() { return pieceType; }
+
     private int distance(final Movement movement) {
         return Math.max(movement.getRankDistance(), movement.getFileDistance());
     }
-    public boolean isOpponent(final Piece other) {
-        return this.color != other.color;
-    }
 
-    public boolean isBlack() {
-        return this.color.equals(Color.BLACK);
-    }
+    public abstract boolean isPawn();
+
+    public abstract boolean isKing();
 
     public abstract boolean canMove(final Movement movement);
+
+    public abstract double getScore();
 
     @Override
     public boolean equals(Object o) {
@@ -63,9 +74,5 @@ public abstract class Piece {
     @Override
     public int hashCode() {
         return Objects.hash(color);
-    }
-
-    public Color getColor() {
-        return color;
     }
 }

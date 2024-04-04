@@ -17,7 +17,7 @@ class PawnTest {
     @Test
     void canWhiteMoveTwoAtFirst() {
         // given
-        final Pawn pawn = new Pawn(Color.WHITE);
+        final Pawn pawn = new WhitePawn();
         final Movement movement = new Movement(new Position(File.D, Rank.TWO), new Position(File.D, Rank.FOUR));
 
         // when
@@ -31,7 +31,7 @@ class PawnTest {
     @Test
     void canBlackMoveTwoAtFirst() {
         // given
-        final Pawn pawn = new Pawn(Color.BLACK);
+        final Pawn pawn = new BlackPawn();
         final Movement movement = new Movement(new Position(File.D, Rank.SEVEN), new Position(File.D, Rank.FIVE));
 
         // when
@@ -45,7 +45,7 @@ class PawnTest {
     @Test
     void canNotMoveTwo() {
         // given
-        final Pawn pawn = new Pawn(Color.WHITE);
+        final Pawn pawn = new WhitePawn();
         final Movement movement = new Movement(new Position(File.D, Rank.FOUR), new Position(File.D, Rank.SIX));
 
         // when
@@ -59,7 +59,7 @@ class PawnTest {
     @Test
     void canMoveForwardOneStep() {
         // given
-        final Pawn pawn = new Pawn(Color.WHITE);
+        final Pawn pawn = new WhitePawn();
         final Movement movement = new Movement(new Position(File.D, Rank.FIVE), new Position(File.D, Rank.SIX));
 
         // when
@@ -73,7 +73,7 @@ class PawnTest {
     @Test
     void canNotMoveForwardOverOneStep() { // TODO: 한칸인데 뒤로가는 경우 추가
         // given
-        final Pawn pawn = new Pawn(Color.WHITE);
+        final Pawn pawn = new WhitePawn();
         final Movement movement = new Movement(new Position(File.D, Rank.FIVE), new Position(File.D, Rank.EIGHT));
 
         // when
@@ -87,7 +87,7 @@ class PawnTest {
     @Test
     void getRouteForward() {
         // given
-        final Pawn pawn = new Pawn(Color.WHITE);
+        final Pawn pawn = new WhitePawn();
         final Movement movement = new Movement(new Position(File.A, Rank.TWO), new Position(File.A, Rank.FOUR));
 
         // when

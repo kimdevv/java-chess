@@ -24,6 +24,10 @@ public enum Row {
         return find(value.charAt(0) - 'a');
     }
 
+    public static Row from(int index) {
+        return find(index);
+    }
+
     private static void validate(String value) {
         validateAlphabet(value);
         validateSize(value);
@@ -38,7 +42,7 @@ public enum Row {
 
     private static void validateSize(String value) {
         if (value.length() != 1) {
-            throw new IllegalArgumentException("a~h까지 가능합니다.");
+            throw new IllegalArgumentException("한 글자의 알파벳만 가능합니다.");
         }
     }
 

@@ -9,6 +9,7 @@ import java.util.List;
 import static chess.domain.chesspiece.Role.*;
 
 public class Knight extends Piece {
+    private static final double SCORE = 2.5;
 
     public Knight(Team team) {
         super(team);
@@ -36,5 +37,10 @@ public class Knight extends Piece {
             return WHITE_KNIGHT;
         }
         return BLACK_KNIGHT;
+    }
+
+    @Override
+    public double getScore() {
+        return SCORE;
     }
 }

@@ -1,25 +1,32 @@
 package chess.view;
 
-import chess.domain.chessboard.Line;
-import chess.domain.position.Column;
+import chess.domain.chessboard.State;
 import chess.domain.chesspiece.Role;
 import chess.domain.chesspiece.Piece;
+import chess.domain.chesspiece.Team;
+import chess.domain.position.Position;
 
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
+
+import static chess.domain.chessboard.State.*;
+import static chess.domain.chesspiece.Team.*;
 
 public class OutputView {
     private static final EnumMap<Role, String> pieceBoard = initializePiece();
 
-    public static void printChessBoard(Map<Column, Line> chessBoard) {
-        chessBoard.values()
-                .forEach(line -> printOneLine(line.getLine()));
+    public static void printChessBoard(Map<Position, Piece> chessBoard, Position position) {
+        for (int i = 0; i < 8; i++) {
+            printLine(chessBoard, position.move(0, -i));
+            System.out.println();
+        }
     }
 
-    private static void printOneLine(List<Piece> line) {
-        line.forEach(chessPiece -> System.out.print(pieceBoard.get(chessPiece.getRole())));
-        System.out.println();
+    private static void printLine(Map<Position, Piece> chessBoard, Position position) {
+        for (int i = 0; i < 7; i++) {
+            Piece piece = chessBoard.get(position.move(i, 0));
+            System.out.print(pieceBoard.get(piece.getRole()));
+        }
     }
 
     public static void printStartMessage() {
@@ -43,5 +50,25 @@ public class OutputView {
         pieceBoard.put(Role.WHITE_PAWN, "p");
         pieceBoard.put(Role.EMPTY, ".");
         return pieceBoard;
+    }
+
+    public static void printScore(Team team, double score) {
+        System.out.println(team + " 점수: " + score);
+    }
+
+    public static void printSuperiority(Team team) {
+        if (team == NOTHING) {
+            System.out.println("동점\n");
+            return;
+        }
+        System.out.println(team + " 우세\n");
+    }
+
+    public static void printWinner(State state) {
+        if (state == BLACK_WIN) {
+            System.out.println("BLACK 승리");
+            return;
+        }
+        System.out.println("WHITE 승리");
     }
 }

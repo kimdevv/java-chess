@@ -1,7 +1,5 @@
 package chess.domain.position;
 
-import chess.domain.chesspiece.Team;
-
 import java.util.Arrays;
 
 public enum Column {
@@ -23,6 +21,10 @@ public enum Column {
     public static Column from(String value) {
         validate(value);
         return find(Integer.parseInt(value) - 1);
+    }
+
+    public static Column from(int index) {
+        return find(index);
     }
 
     private static void validate(String value) {
@@ -47,6 +49,10 @@ public enum Column {
                 .orElseThrow(() -> new IllegalArgumentException("1~8까지 가능합니다."));
     }
 
+    public static int getMaxSize() {
+        return values().length;
+    }
+
     public Column update(int direction) {
         return Arrays.stream(values())
                 .filter(column -> column.index == this.index + direction)
@@ -54,22 +60,15 @@ public enum Column {
                 .orElseThrow(() -> new IllegalArgumentException("1~8까지 가능합니다."));
     }
 
-    public boolean isPawnStartPosition(Team team) {
-        if (team.isWhite()) {
-            return index == 1;
-        }
-        return index == 6;
-    }
-
     public int subtractColumn(Column column) {
         return this.index - column.index;
     }
 
-    public int getIndex() {
-        return index;
-    }
-
     public int compare(Column column) {
         return Integer.compare(column.index, index);
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

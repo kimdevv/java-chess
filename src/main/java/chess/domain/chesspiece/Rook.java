@@ -5,6 +5,7 @@ import chess.domain.position.Position;
 import static chess.domain.chesspiece.Role.*;
 
 public class Rook extends Piece {
+    private static final double SCORE = 5;
 
     public Rook(Team team) {
         super(team);
@@ -23,5 +24,10 @@ public class Rook extends Piece {
             return WHITE_ROOK;
         }
         return BLACK_ROOK;
+    }
+
+    @Override
+    public double getScore() {
+        return SCORE;
     }
 }

@@ -6,6 +6,7 @@ import static chess.domain.chesspiece.Role.BLACK_BISHOP;
 import static chess.domain.chesspiece.Role.WHITE_BISHOP;
 
 public class Bishop extends Piece {
+    private static final double SCORE = 3;
 
     public Bishop(Team team) {
         super(team);
@@ -26,5 +27,10 @@ public class Bishop extends Piece {
             return WHITE_BISHOP;
         }
         return BLACK_BISHOP;
+    }
+
+    @Override
+    public double getScore() {
+        return SCORE;
     }
 }

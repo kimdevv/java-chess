@@ -1,7 +1,5 @@
 package chess.domain.position;
 
-import chess.domain.chesspiece.Team;
-
 import java.util.Objects;
 
 public class Position {
@@ -20,8 +18,11 @@ public class Position {
         return new Position(row, column);
     }
 
-    public Row getRow() {
-        return row;
+    public static Position of(int rowIndex, int columnIndex) {
+        Row row = Row.from(rowIndex);
+        Column column = Column.from(columnIndex);
+
+        return new Position(row, column);
     }
 
     public Column getColumn() {
@@ -32,19 +33,6 @@ public class Position {
         return new Position(row.update(rowDirection), column.update(columnDirection));
     }
 
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Position position = (Position) object;
-        return row == position.row && column == position.column;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(row, column);
-    }
-
     public int calculateRowDistance(Position target) {
         return Math.abs(row.getIndex() - target.row.getIndex());
     }
@@ -53,11 +41,8 @@ public class Position {
         return Math.abs(column.getIndex() - target.getColumn().getIndex());
     }
 
-    public int calculatePawnColumnDistance(Position target, Team team) {
-        if (team.isWhite()) {
-            return target.column.subtractColumn(column);
-        }
-        return column.subtractColumn(target.column);
+    public int subtractColumn(Position target) {
+        return column.subtractColumn(target.getColumn());
     }
 
     public boolean isSameRow(Position target) {
@@ -76,15 +61,28 @@ public class Position {
         return !isSameColumn(target);
     }
 
-    public boolean isPawnStartPosition(Team team) {
-        return column.isPawnStartPosition(team);
-    }
-
     public int compareRow(Position target) {
         return row.compare(target.row);
     }
 
     public int compareColumn(Position target) {
         return column.compare(target.column);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Position position = (Position) object;
+        return row == position.row && column == position.column;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, column);
+    }
+
+    public String getName() {
+        return row.name().toLowerCase() + (column.getIndex() + 1);
     }
 }

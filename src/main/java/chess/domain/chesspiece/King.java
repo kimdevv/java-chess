@@ -5,12 +5,12 @@ import chess.domain.position.Position;
 import static chess.domain.chesspiece.Role.*;
 
 public class King extends Piece {
+    private static final double SCORE = 0;
 
     public King(Team team) {
         super(team);
     }
 
-    //TODO : 리팩토링
     @Override
     protected void validateMovingRule(Position source, Position target) {
         int rowDistance = source.calculateRowDistance(target);
@@ -27,4 +27,10 @@ public class King extends Piece {
         }
         return BLACK_KING;
     }
+
+    @Override
+    public double getScore() {
+        return SCORE;
+    }
+
 }

@@ -1,0 +1,13 @@
+USE chess;
+
+CREATE TABLE chess_game (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    turn_color VARCHAR(5) NOT NULL
+);
+
+CREATE TABLE pieces (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    color VARCHAR(5) NOT NULL,
+    type VARCHAR(6) NOT NULL,
+    position VARCHAR(2) NOT NULL
+);

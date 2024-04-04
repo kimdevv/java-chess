@@ -16,18 +16,45 @@ public abstract class Piece {
         this.color = color;
     }
 
-    abstract public List<Position> findPath(final Position source, final Position target);
+    public abstract String getOwnPieceTypeName();
 
-    abstract public String getOwnPieceTypeName();
+    public abstract double getPieceScore();
 
-    abstract public boolean isEmpty();
+    public abstract List<Position> findPath(final Position source, final Position target, final Direction direction);
 
-    final protected List<Position> findPathOfSingleMovePiece(final Position source, final Position target) {
-        List<Position> positions = new ArrayList<>();
+    public final boolean canMoveInTargetDirection(final Direction targetDirection) {
+        return directions.contains(targetDirection);
+    }
 
-        Direction direction = source.calculateDirection(target);
+    public final boolean isAlly(final Piece piece) {
+        if (piece.isEmpty()) {
+            return false;
+        }
+
+        return this.color == piece.color;
+    }
+
+    public boolean isSameColorWith(final Color color) {
+        return this.color == color;
+    }
+
+    public final boolean isEmpty() {
+        return PieceType.EMPTY.name().equals(getOwnPieceTypeName());
+    }
+
+    public final boolean isPawn() {
+        return PieceType.PAWN.name().equals(getOwnPieceTypeName());
+    }
+
+    public final boolean isKing() {
+        return PieceType.KING.name().equals(getOwnPieceTypeName());
+    }
+
+    protected final List<Position> findPathOfSingleMovePiece(final Position source, final Position target,
+                                                             final Direction direction) {
         validateDirection(direction);
 
+        List<Position> positions = new ArrayList<>();
         Position currentPosition = source;
         currentPosition = currentPosition.moveTowardDirection(direction);
         positions.add(currentPosition);
@@ -37,12 +64,11 @@ public abstract class Piece {
         return positions;
     }
 
-    final protected List<Position> findPathOfMultipleMovePiece(final Position source, final Position target) {
-        List<Position> positions = new ArrayList<>();
-
-        Direction direction = source.calculateDirection(target);
+    protected final List<Position> findPathOfMultipleMovePiece(final Position source, final Position target,
+                                                               final Direction direction) {
         validateDirection(direction);
 
+        List<Position> positions = new ArrayList<>();
         Position currentPosition = source;
         while (currentPosition != target) {
             currentPosition = currentPosition.moveTowardDirection(direction);
@@ -52,35 +78,19 @@ public abstract class Piece {
         return positions;
     }
 
-    final protected void validateDirection(final Direction direction) {
+    protected final void validateDirection(final Direction direction) {
         if (!directions.contains(direction)) {
             throw new IllegalArgumentException("[ERROR] 선택한 기물이 이동할 수 없는 방향입니다.");
         }
     }
 
-    final protected void validateReachability(final Position target, final Position currentPosition) {
+    protected final void validateReachability(final Position target, final Position currentPosition) {
         if (!currentPosition.equals(target)) {
             throw new IllegalArgumentException("[ERROR] 선택한 기물은 해당 위치에 도달할 수 없습니다.");
         }
     }
 
-    final public boolean canMoveInTargetDirection(final Direction targetDirection) {
-        return directions.contains(targetDirection);
-    }
-
-    final public boolean isPawn() {
-        return getOwnPieceTypeName().equals(PieceType.PAWN.name());
-    }
-
-    final public boolean isAlly(final Piece piece) {
-        if (piece.isEmpty()) {
-            return false;
-        }
-
-        return this.color == piece.color;
-    }
-
-    final public boolean isBlack() {
-        return this.color == Color.BLACK;
+    public Color getColor() {
+        return color;
     }
 }

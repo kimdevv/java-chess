@@ -65,4 +65,12 @@ public class Position {
     public boolean isSameRank(final int targetRank) {
         return this.rank == targetRank;
     }
+
+    public char getFile() {
+        return file;
+    }
+
+    public String getValue() {
+        return "" + file + rank;
+    }
 }

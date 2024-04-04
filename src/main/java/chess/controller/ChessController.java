@@ -1,96 +1,87 @@
 package chess.controller;
 
-import chess.domain.ChessBoard;
-import chess.domain.ChessBoardFactory;
-import chess.domain.Position;
+import chess.domain.piece.Color;
+import chess.service.ChessGameService;
+import chess.view.CommandArguments;
 import chess.view.GameCommand;
 import chess.view.InputView;
 import chess.view.OutputView;
-import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class ChessController {
 
-    private static final int COMMAND_INDEX = 0;
-    private static final int SOURCE_POSITION_INDEX = 1;
-    private static final int TARGET_POSITION_INDEX = 2;
+    private final ChessGameService chessGameService;
 
-    private final InputView inputView;
-    private final OutputView outputView;
-
-    public ChessController(final InputView inputView, final OutputView outputView) {
-        this.inputView = inputView;
-        this.outputView = outputView;
+    public ChessController(final ChessGameService chessGameService) {
+        this.chessGameService = chessGameService;
     }
 
     public void run() {
-        final ChessBoard chessBoard = ChessBoardFactory.makeChessBoard();
-        outputView.printCommandInformation();
+        OutputView.printCommandInformation();
+        CommandArguments commandArguments = repeatUntilSuccess(() -> readCommandBeforeGame());
+        GameCommand gameCommand = commandArguments.parseCommand();
 
-        List<String> commandArguments = repeat(this::readInitialCommand);
-        String gameCommand = commandArguments.get(COMMAND_INDEX);
+        while (gameCommand != GameCommand.END && !chessGameService.isGameOver()) {
+            OutputView.printChessBoard(chessGameService.findAllPieces());
+            commandArguments = repeatUntilSuccess(() -> readAndExecuteCommandDuringGame());
+            gameCommand = commandArguments.parseCommand();
+        }
 
-        repeat(() -> playTurn(chessBoard, gameCommand, commandArguments));
-    }
-
-    private void playTurn(ChessBoard chessBoard, String gameCommand, List<String> commandArguments) {
-        while (!GameCommand.isEndCommand(gameCommand)) {
-            playMoveCommand(chessBoard, gameCommand, commandArguments);
-            outputView.printChessBoard(chessBoard);
-
-            commandArguments = readInGameCommand();
-            gameCommand = commandArguments.get(COMMAND_INDEX);
+        if (chessGameService.isGameOver()) {
+            OutputView.printWinner(chessGameService.getCurrentTurnColor());
+            chessGameService.resetGame();
         }
     }
 
-    private void playMoveCommand(final ChessBoard chessBoard,
-                                 final String gameCommand,
-                                 final List<String> commandArguments) {
-        if (GameCommand.isMoveCommand(gameCommand)) {
-            Position source = Position.from(commandArguments.get(SOURCE_POSITION_INDEX));
-            Position target = Position.from(commandArguments.get(TARGET_POSITION_INDEX));
-            chessBoard.move(source, target);
-            outputView.printChessBoard(chessBoard);
+    private CommandArguments readCommandBeforeGame() {
+        CommandArguments commandArguments = InputView.readGameCommand();
+        GameCommand gameCommand = commandArguments.parseCommand();
+        validateCommandBeforeGame(gameCommand);
+
+        return commandArguments;
+    }
+
+    private CommandArguments readAndExecuteCommandDuringGame() {
+        CommandArguments commandArguments = InputView.readGameCommand();
+        GameCommand gameCommand = commandArguments.parseCommand();
+        validateCommandDuringGame(gameCommand);
+        executeCommand(gameCommand, commandArguments);
+
+        return commandArguments;
+    }
+
+    private void executeCommand(final GameCommand gameCommand, final CommandArguments commandArguments) {
+        if (GameCommand.MOVE == gameCommand) {
+            chessGameService.executeMoveCommand(commandArguments);
+        }
+        if (GameCommand.STATUS == gameCommand) {
+            Map<Color, Double> scoreByColor = chessGameService.executeStatusCommand();
+            OutputView.printScoreStatus(scoreByColor);
+        }
+        if (GameCommand.END == gameCommand) {
+            chessGameService.saveCurrentGame();
         }
     }
 
-    private List<String> readInitialCommand() {
-        List<String> commandArguments = inputView.readGameCommand();
-        String gameCommand = commandArguments.get(COMMAND_INDEX);
-
-        if (GameCommand.isMoveCommand(gameCommand)) {
+    private void validateCommandBeforeGame(final GameCommand gameCommand) {
+        if (!gameCommand.canExecuteBeforeGame()) {
             throw new IllegalArgumentException("[ERROR] 먼저 게임을 시작해야 합니다.");
         }
-
-        return commandArguments;
     }
 
-    private List<String> readInGameCommand() {
-        List<String> commandArguments = inputView.readGameCommand();
-        String gameCommand = commandArguments.get(COMMAND_INDEX);
-
-        if (GameCommand.isStartCommand(gameCommand)) {
-            throw new IllegalArgumentException("[ERROR] 이미 게임이 시작된 상태입니다.");
-        }
-
-        return commandArguments;
-    }
-
-    private <T> T repeat(final Supplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (IllegalArgumentException e) {
-            outputView.printErrorMessage(e.getMessage());
-            return repeat(supplier);
+    private void validateCommandDuringGame(final GameCommand gameCommand) {
+        if (!gameCommand.canExecuteDuringGame()) {
+            throw new IllegalArgumentException("[ERROR] 이미 게임이 실행중입니다.");
         }
     }
 
-    private void repeat(final Runnable runnable) {
+    private CommandArguments repeatUntilSuccess(final Supplier<CommandArguments> reader) {
         try {
-            runnable.run();
-        } catch (IllegalArgumentException e) {
-            outputView.printErrorMessage(e.getMessage());
-            repeat(runnable);
+            return reader.get();
+        } catch (Exception e) {
+            OutputView.printErrorMessage(e.getMessage());
+            return repeatUntilSuccess(reader);
         }
     }
 }

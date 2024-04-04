@@ -5,18 +5,14 @@ import java.util.List;
 
 public class Empty extends Piece {
 
-    private static final Empty empty = new Empty();
+    public static final Empty EMPTY = new Empty();
 
     private Empty() {
         super(null);
     }
 
-    public static Empty of() {
-        return empty;
-    }
-
     @Override
-    public List<Position> findPath(final Position source, final Position target) {
+    public List<Position> findPath(final Position source, final Position target, final Direction direction) {
         throw new IllegalArgumentException("[ERROR] 빈 기물은 이동할 수 없습니다.");
     }
 
@@ -26,7 +22,7 @@ public class Empty extends Piece {
     }
 
     @Override
-    public boolean isEmpty() {
-        return true;
+    public double getPieceScore() {
+        throw new IllegalArgumentException("[ERROR] 빈 기물은 점수를 계산할 수 없습니다.");
     }
 }

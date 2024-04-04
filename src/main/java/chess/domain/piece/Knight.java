@@ -34,8 +34,8 @@ public class Knight extends Piece {
     }
 
     @Override
-    public List<Position> findPath(final Position source, final Position target) {
-        return findPathOfSingleMovePiece(source, target);
+    public List<Position> findPath(final Position source, final Position target, final Direction direction) {
+        return findPathOfSingleMovePiece(source, target, direction);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    public boolean isEmpty() {
-        return false;
+    public double getPieceScore() {
+        return 2.5;
     }
 }

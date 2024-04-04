@@ -1,5 +1,6 @@
 package chess.view;
 
+import chess.domain.piece.Color;
 import chess.domain.piece.Piece;
 import java.util.Arrays;
 
@@ -23,7 +24,7 @@ public enum PieceExpression {
     public static String mapToExpression(final Piece piece) {
         String foundExpression = findMatchedExpression(piece);
 
-        if (piece.isBlack()) {
+        if (piece.isSameColorWith(Color.BLACK)) {
             return foundExpression.toUpperCase();
         }
 
@@ -32,8 +33,7 @@ public enum PieceExpression {
 
     private static String findMatchedExpression(final Piece piece) {
         return Arrays.stream(values())
-                .filter(expression -> expression.name()
-                        .equals(piece.getOwnPieceTypeName()))
+                .filter(expression -> expression.name().equals(piece.getOwnPieceTypeName()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] 존재하지 않는 유형의 기물입니다."))
                 .expression;

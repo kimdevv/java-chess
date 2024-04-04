@@ -3,6 +3,7 @@ package chess.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import chess.domain.piece.Bishop;
 import chess.domain.piece.Color;
 import chess.domain.piece.Empty;
 import chess.domain.piece.King;
@@ -22,7 +23,7 @@ class ChessBoardTest {
     @Test
     @DisplayName("생성 테스트")
     void create() {
-        assertThatCode(ChessBoardFactory::makeChessBoard)
+        assertThatCode(ChessBoardFactory::makeDefaultChessBoard)
                 .doesNotThrowAnyException();
     }
 
@@ -42,7 +43,7 @@ class ChessBoardTest {
     @Test
     @DisplayName("대상 위치에 존재하는 기물을 타켓 위치로 옮긴다.")
     void movePiece() {
-        ChessBoard chessBoard = ChessBoardFactory.makeChessBoard();
+        ChessBoard chessBoard = ChessBoardFactory.makeDefaultChessBoard();
         Position source = Position.of('b', 2);
         Position target = Position.of('b', 3);
         Piece pieceBeforeMove = chessBoard.findPieceByPosition(source);
@@ -56,7 +57,7 @@ class ChessBoardTest {
     @Test
     @DisplayName("기물이 이동하면 기존 위치에는 기물이 존재하지 않게 된다.")
     void noPieceOnSourcePositionWhenPieceMoves() {
-        ChessBoard chessBoard = ChessBoardFactory.makeChessBoard();
+        ChessBoard chessBoard = ChessBoardFactory.makeDefaultChessBoard();
         Position source = Position.of('b', 2);
         Position target = Position.of('b', 3);
 
@@ -87,9 +88,9 @@ class ChessBoardTest {
     void cannotReachTarget() {
         Map<Position, Piece> positionPiece = new LinkedHashMap<>();
         Position sourcePosition = Position.of('a', 1);
-        positionPiece.put(sourcePosition, King.colorOf(Color.BLACK));
+        positionPiece.put(sourcePosition, King.colorOf(Color.WHITE));
         Position targetPosition = Position.of('a', 3);
-        positionPiece.put(targetPosition, Empty.of());
+        positionPiece.put(targetPosition, Empty.EMPTY);
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
 
@@ -103,11 +104,11 @@ class ChessBoardTest {
     void knightCanJumpOverPiece() {
         Map<Position, Piece> positionPiece = new LinkedHashMap<>();
         Position sourcePosition = Position.of('a', 1);
-        positionPiece.put(sourcePosition, Knight.colorOf(Color.BLACK));
+        positionPiece.put(sourcePosition, Knight.colorOf(Color.WHITE));
         Position obstaclePosition = Position.of('a', 2);
         positionPiece.put(obstaclePosition, Pawn.colorOf(Color.BLACK));
         Position targetPosition = Position.of('b', 3);
-        positionPiece.put(targetPosition, Empty.of());
+        positionPiece.put(targetPosition, Empty.EMPTY);
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
 
@@ -120,9 +121,9 @@ class ChessBoardTest {
     void invalidDirection() {
         Map<Position, Piece> positionPiece = new LinkedHashMap<>();
         Position sourcePosition = Position.of('a', 1);
-        positionPiece.put(sourcePosition, Rook.colorOf(Color.BLACK));
+        positionPiece.put(sourcePosition, Rook.colorOf(Color.WHITE));
         Position targetPosition = Position.of('c', 3);
-        positionPiece.put(targetPosition, Empty.of());
+        positionPiece.put(targetPosition, Empty.EMPTY);
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
 
@@ -136,13 +137,13 @@ class ChessBoardTest {
     void kill() {
         Map<Position, Piece> positionPiece = new LinkedHashMap<>();
         Position sourcePosition = Position.of('a', 1);
-        Rook sourcePiece = Rook.colorOf(Color.BLACK);
+        Rook sourcePiece = Rook.colorOf(Color.WHITE);
         positionPiece.put(sourcePosition, sourcePiece);
         Position targetPosition = Position.of('a', 3);
-        Rook targetPiece = Rook.colorOf(Color.WHITE);
+        Rook targetPiece = Rook.colorOf(Color.BLACK);
         positionPiece.put(targetPosition, targetPiece);
 
-        positionPiece.put(Position.of('a', 2), Empty.of());
+        positionPiece.put(Position.of('a', 2), Empty.EMPTY);
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
         chessBoard.move(sourcePosition, targetPosition);
@@ -156,11 +157,11 @@ class ChessBoardTest {
     void fromEdgeToEdge() {
         Map<Position, Piece> positionPiece = new LinkedHashMap<>();
         Position sourcePosition = Position.of('a', 1);
-        positionPiece.put(sourcePosition, Queen.colorOf(Color.BLACK));
+        positionPiece.put(sourcePosition, Queen.colorOf(Color.WHITE));
 
         for (int i = 2; i <= 8; i++) {
-            Position emptyPosition = Position.of('a', i);
-            positionPiece.put(emptyPosition, Empty.of());
+            Position passThroughPosition = Position.of('a', i);
+            positionPiece.put(passThroughPosition, Empty.EMPTY);
         }
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
@@ -176,11 +177,11 @@ class ChessBoardTest {
     void pawnInitialMove() {
         Map<Position, Piece> positionPiece = new LinkedHashMap<>();
         Position sourcePosition = Position.of('a', 2);
-        Position emptyPosition = Position.of('a', 3);
+        Position passThroughPosition = Position.of('a', 3);
         Position targetPosition = Position.of('a', 4);
         positionPiece.put(sourcePosition, Pawn.colorOf(Color.WHITE));
-        positionPiece.put(emptyPosition, Empty.of());
-        positionPiece.put(targetPosition, Empty.of());
+        positionPiece.put(passThroughPosition, Empty.EMPTY);
+        positionPiece.put(targetPosition, Empty.EMPTY);
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
 
@@ -193,11 +194,11 @@ class ChessBoardTest {
     void pawnInitialMoveWithObstacleOnRoute() {
         Map<Position, Piece> positionPiece = new LinkedHashMap<>();
         Position sourcePosition = Position.of('a', 2);
-        Position emptyPosition = Position.of('a', 3);
+        Position passThroughPosition = Position.of('a', 3);
         Position targetPosition = Position.of('a', 4);
         positionPiece.put(sourcePosition, Pawn.colorOf(Color.WHITE));
-        positionPiece.put(emptyPosition, Pawn.colorOf(Color.BLACK));
-        positionPiece.put(targetPosition, Empty.of());
+        positionPiece.put(passThroughPosition, Pawn.colorOf(Color.BLACK));
+        positionPiece.put(targetPosition, Empty.EMPTY);
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
 
@@ -210,10 +211,10 @@ class ChessBoardTest {
     void pawnInitialMoveWithObstacleOnTargetPosition() {
         Map<Position, Piece> positionPiece = new LinkedHashMap<>();
         Position sourcePosition = Position.of('a', 2);
-        Position emptyPosition = Position.of('a', 3);
+        Position passThroughPosition = Position.of('a', 3);
         Position targetPosition = Position.of('a', 4);
         positionPiece.put(sourcePosition, Pawn.colorOf(Color.WHITE));
-        positionPiece.put(emptyPosition, Empty.of());
+        positionPiece.put(passThroughPosition, Empty.EMPTY);
         positionPiece.put(targetPosition, Pawn.colorOf(Color.BLACK));
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
@@ -229,7 +230,7 @@ class ChessBoardTest {
         Position sourcePosition = Position.of('a', 2);
         Position targetPosition = Position.of('b', 3);
         positionPiece.put(sourcePosition, Pawn.colorOf(Color.WHITE));
-        positionPiece.put(targetPosition, Empty.of());
+        positionPiece.put(targetPosition, Empty.EMPTY);
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
 
@@ -257,15 +258,30 @@ class ChessBoardTest {
     void pawnCantMoveInitialDiagonal() {
         Map<Position, Piece> positionPiece = new LinkedHashMap<>();
         Position sourcePosition = Position.of('a', 2);
-        Position emptyPosition = Position.of('b', 3);
+        Position passThroughPosition = Position.of('b', 3);
         Position targetPosition = Position.of('c', 4);
         positionPiece.put(sourcePosition, Pawn.colorOf(Color.WHITE));
-        positionPiece.put(emptyPosition, Empty.of());
+        positionPiece.put(passThroughPosition, Empty.EMPTY);
         positionPiece.put(targetPosition, Pawn.colorOf(Color.BLACK));
 
         ChessBoard chessBoard = new ChessBoard(positionPiece);
 
         assertThatCode(() -> chessBoard.move(sourcePosition, targetPosition))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("King이 잡혔는지 여부를 확인할 수 있다.")
+    void isKingDead() {
+        Map<Position, Piece> positionPiece = new LinkedHashMap<>();
+        Position sourcePosition = Position.of('a', 2);
+        Position targetPosition = Position.of('b', 3);
+        positionPiece.put(sourcePosition, Bishop.colorOf(Color.WHITE));
+        positionPiece.put(targetPosition, King.colorOf(Color.BLACK));
+
+        ChessBoard chessBoard = new ChessBoard(positionPiece);
+        chessBoard.move(sourcePosition, targetPosition);
+
+        assertThat(chessBoard.isKingDead()).isTrue();
     }
 }

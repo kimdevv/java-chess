@@ -1,12 +1,15 @@
 package chess.domain;
 
+import chess.GameStatus;
 import chess.domain.piece.Piece;
 import chess.domain.piece.Team;
 import chess.domain.position.Position;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class Board {
 
@@ -14,8 +17,12 @@ public class Board {
     private Team turn;
 
     public Board(Map<Position, Piece> board) {
+        this(board, Team.WHITE);
+    }
+
+    public Board(Map<Position, Piece> board, Team turn) {
         this.board = new HashMap<>(board);
-        this.turn = Team.WHITE;
+        this.turn = turn;
     }
 
     public Optional<Piece> find(Position position) {
@@ -23,7 +30,7 @@ public class Board {
         return Optional.ofNullable(piece);
     }
 
-    public void tryMove(Position start, Position end) {
+    public GameStatus tryMove(Position start, Position end) {
         Piece movingPiece = findMovingPiece(start);
         validateTeamRule(movingPiece, end);
 
@@ -31,17 +38,7 @@ public class Board {
         List<Position> path = movingPiece.findPath(start, end, hasEnemy);
         validatePath(path);
 
-        move(start, end, movingPiece);
-    }
-
-    private void validatePath(List<Position> path) {
-        if (isBlocked(path)) {
-            throw new IllegalArgumentException("다른 말이 있어 이동 불가능합니다.");
-        }
-    }
-
-    private boolean hasEnemy(Position end) {
-        return find(end).isPresent();
+        return move(start, end, movingPiece);
     }
 
     private Piece findMovingPiece(Position start) {
@@ -63,14 +60,53 @@ public class Board {
                 .orElse(false);
     }
 
+    private boolean hasEnemy(Position end) {
+        return find(end).map(piece -> !piece.isSameTeam(turn))
+                .orElse(false);
+    }
+
+    private void validatePath(List<Position> path) {
+        if (isBlocked(path)) {
+            throw new IllegalArgumentException("다른 말이 있어 이동 불가능합니다.");
+        }
+    }
+
     private boolean isBlocked(List<Position> path) {
         return path.stream()
                 .anyMatch(board::containsKey);
     }
 
-    private void move(Position start, Position end, Piece movingPiece) {
+    private GameStatus move(Position start, Position end, Piece movingPiece) {
         board.remove(start);
+        if (isOtherTeamKing(end)) {
+            return GameStatus.winBy(turn);
+        }
         board.put(end, movingPiece);
         turn = turn.next();
+        return GameStatus.PLAYING;
+    }
+
+    private boolean isOtherTeamKing(Position end) {
+        return find(end).map(this::isOtherTeamKing).orElse(false);
+    }
+
+    private boolean isOtherTeamKing(Piece piece) {
+        return !piece.isSameTeam(turn) && piece.isKing();
+    }
+
+    public Stream<Piece> getPiecesOf(Team team) {
+        return board.values().stream()
+                .filter(piece -> piece.isSameTeam(team));
+    }
+
+    public Stream<Position> getPawnPositionsOf(Team team) {
+        return board.entrySet().stream()
+                .filter(entry -> entry.getValue().isSameTeam(team))
+                .filter(entry -> entry.getValue().isPawn())
+                .map(Entry::getKey);
+    }
+
+    public Team getTurn() {
+        return turn;
     }
 }

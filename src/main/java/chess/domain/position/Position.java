@@ -19,8 +19,12 @@ public class Position {
         this.rank = Objects.requireNonNull(rank);
     }
 
-    public boolean isSameRank(Rank rank) {
+    public boolean isOnSameRank(Rank rank) {
         return this.rank == rank;
+    }
+
+    public boolean isOnSameFile(Position other) {
+        return this.file == other.file;
     }
 
     public int calculateFileDifference(Position other) {
@@ -45,6 +49,14 @@ public class Position {
 
     public Position moveToSouth() {
         return new Position(file, rank.toSouth());
+    }
+
+    public String getFile() {
+        return file.toString();
+    }
+
+    public String getRank() {
+        return rank.toString();
     }
 
     @Override

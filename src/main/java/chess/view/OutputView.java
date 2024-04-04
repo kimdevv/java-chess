@@ -1,11 +1,13 @@
 package chess.view;
 
+import chess.GameStatus;
+import chess.domain.piece.PieceType;
+import chess.domain.piece.Team;
 import chess.domain.position.File;
 import chess.domain.position.Position;
 import chess.domain.position.Rank;
 import chess.dto.BoardDto;
 import chess.dto.PieceDto;
-import chess.dto.PieceType;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +21,8 @@ public class OutputView {
     private static final Map<PieceType, String> PIECE_DISPLAY = Map.of(
             PieceType.KING, "K", PieceType.QUEEN, "Q", PieceType.KNIGHT, "N",
             PieceType.BISHOP, "B", PieceType.ROOK, "R", PieceType.PAWN, "P");
+    private static final Map<Team, String> WINNER_DISPLAY = Map.of(
+            Team.BLACK, "검은색 승리", Team.WHITE, "흰색 승리");
     private static final String EMPTY_SPACE = ".";
     private static final String ERROR_PREFIX = "[ERROR] ";
 
@@ -67,7 +71,27 @@ public class OutputView {
         System.out.print(EMPTY_SPACE);
     }
 
+    public void printStatus(double blackScore, double whiteScore, Team winner) {
+        System.out.println("검은색: " + blackScore + ", 흰색: " + whiteScore);
+        System.out.println(getWinnerDisplay(winner));
+    }
+
     public void printExceptionMessage(Exception exception) {
         System.out.println(ERROR_PREFIX + exception.getMessage());
+    }
+
+    public void printWinner(GameStatus gameStatus) {
+        if (gameStatus == GameStatus.BLACK_WIN) {
+            System.out.println(getWinnerDisplay(Team.BLACK));
+            return;
+        }
+        System.out.println(getWinnerDisplay(Team.WHITE));
+    }
+
+    private static String getWinnerDisplay(Team winner) {
+        if (winner == null) {
+            return "무승부";
+        }
+        return WINNER_DISPLAY.get(winner);
     }
 }

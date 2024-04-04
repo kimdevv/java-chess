@@ -5,7 +5,13 @@ import model.command.CommandLine;
 
 public interface GameStatus {
 
-    GameStatus play(CommandLine commandLine, ChessGame chessGame);
+    GameStatus play(final CommandLine commandLine, final ChessGame chessGame);
 
     boolean isRunning();
+
+    boolean isCheck();
+
+    default boolean isQuit() {
+        return false;
+    }
 }

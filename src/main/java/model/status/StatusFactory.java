@@ -9,12 +9,15 @@ public class StatusFactory {
     private StatusFactory() {
     }
 
-    public static GameStatus create(CommandLine commandLine) {
+    public static GameStatus create(final CommandLine commandLine) {
         if (commandLine.isStart()) {
             return new Running();
         }
         if (commandLine.isEnd()) {
             return new End();
+        }
+        if (commandLine.isQuit()) {
+            return new Quit();
         }
         throw new InvalidStatusException(ErrorCode.INVALID_STATUS);
     }

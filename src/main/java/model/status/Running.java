@@ -2,6 +2,7 @@ package model.status;
 
 import constant.ErrorCode;
 import exception.InvalidStatusException;
+import exception.KingDeadException;
 import java.util.List;
 import model.ChessGame;
 import model.command.CommandLine;
@@ -16,11 +17,25 @@ public class Running implements GameStatus {
             return new End();
         }
         if (commandLine.isMove()) {
-            final Moving moving = convert(commandLine.getBody());
-            chessGame.move(moving);
+            return status(commandLine, chessGame);
+        }
+        if (commandLine.isStatus()) {
             return new Running();
         }
+        if (commandLine.isQuit()) {
+            return new Quit();
+        }
         throw new InvalidStatusException(ErrorCode.INVALID_STATUS);
+    }
+
+    private GameStatus status(final CommandLine commandLine, final ChessGame chessGame) {
+        final Moving moving = convert(commandLine.getBody());
+        try {
+            chessGame.move(moving);
+            return new Running();
+        } catch (final KingDeadException exception) {
+            return new Checkmate();
+        }
     }
 
     private Moving convert(final List<String> command) {
@@ -33,5 +48,10 @@ public class Running implements GameStatus {
     @Override
     public boolean isRunning() {
         return true;
+    }
+
+    @Override
+    public boolean isCheck() {
+        return false;
     }
 }

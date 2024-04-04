@@ -1,7 +1,6 @@
 package constant;
 
 public enum ErrorCode {
-
     INVALID_INPUT,
     INVALID_STATUS,
     INVALID_COMMAND,
@@ -16,6 +15,10 @@ public enum ErrorCode {
     OWN_PIECE_EXIST_POSITION,
     PIECE_DOES_NOT_EXIST_POSITION,
     INVALID_CAMP_PIECE,
+    KING_DEAD,
+    CONNECTION,
+    FAIL_SAVE,
+    FAIL_FIND,
+    FAIL_DELETE,
     NO_MESSAGE
-
 }

@@ -16,4 +16,9 @@ public class End implements GameStatus {
     public boolean isRunning() {
         return false;
     }
+
+    @Override
+    public boolean isCheck() {
+        return false;
+    }
 }

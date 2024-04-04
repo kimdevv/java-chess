@@ -1,12 +1,7 @@
 package view;
 
-import domain.Command;
-import domain.board.File;
-import domain.position.Position;
-import domain.board.Rank;
+import command.Command;
 import view.mapper.CommandMapper;
-import view.mapper.FileMapper;
-import view.mapper.RankMapper;
 
 import java.util.Scanner;
 
@@ -20,29 +15,17 @@ public class InputView {
         System.out.println(String.join(LINE_SEPARATOR, "> 체스 게임을 시작합니다.",
                 "> 게임 시작 : start",
                 "> 게임 종료 : end",
-                "> 게임 이동 : move source위치 target위치 - 예. move b2 b3"));
-        return CommandMapper.toInitCommand(scanner.nextLine());
+                "> 게임 이동 : move source위치 target위치 - 예. move b2 b3",
+                "> 점수 현황 : status"));
+        return CommandMapper.makeCommand(scanner.nextLine());
     }
 
-    public Command readMoveCommand() {
-        return CommandMapper.toMoveCommand(scanner.next());
+    public String readRoomName() {
+        System.out.println("방 이름을 입력해주세요.");
+        return scanner.nextLine();
     }
 
-    public Position readPosition() {
-        if (scanner.hasNext()) {
-            String position = scanner.next();
-            if (position.length() != 2) {
-                throw new IllegalArgumentException();
-            }
-            File file = FileMapper.from(position.substring(0, 1));
-            Rank rank = RankMapper.from(position.substring(1, 2));
-
-            return Position.valueOf(file, rank);
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public void readNextLine() {
-        scanner.nextLine();
+    public Command readCommand() {
+        return CommandMapper.makeCommand(scanner.nextLine());
     }
 }

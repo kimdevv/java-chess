@@ -4,6 +4,7 @@ public enum Side {
 
     BLACK,
     WHITE,
+    NONE,
     ;
 
     public boolean isBlack() {
@@ -15,5 +16,9 @@ public enum Side {
             return WHITE;
         }
         return BLACK;
+    }
+
+    public boolean isNotNone() {
+        return this != NONE;
     }
 }

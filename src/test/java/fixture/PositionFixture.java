@@ -1,8 +1,8 @@
 package fixture;
 
 import domain.board.File;
-import domain.position.Position;
 import domain.board.Rank;
+import domain.position.Position;
 
 public class PositionFixture {
 
@@ -23,7 +23,11 @@ public class PositionFixture {
     }
 
     public static Position a5() {
-        return Position.valueOf(File.C, Rank.FIVE);
+        return Position.valueOf(File.A, Rank.FIVE);
+    }
+
+    public static Position a6() {
+        return Position.valueOf(File.A, Rank.SIX);
     }
 
     public static Position a7() {
@@ -80,6 +84,10 @@ public class PositionFixture {
 
     public static Position c5() {
         return Position.valueOf(File.C, Rank.FIVE);
+    }
+
+    public static Position c6() {
+        return Position.valueOf(File.C, Rank.SIX);
     }
 
     public static Position c7() {

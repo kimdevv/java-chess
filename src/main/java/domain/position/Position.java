@@ -42,7 +42,7 @@ public class Position {
         return isSameRank(other.rank);
     }
 
-    public boolean isSameRank(Rank otherRank) {
+    private boolean isSameRank(Rank otherRank) {
         return rank == otherRank;
     }
 

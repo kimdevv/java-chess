@@ -1,6 +1,7 @@
 package domain;
 
 import domain.board.ChessBoard;
+import domain.board.ChessBoardInitializer;
 import fixture.PositionFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,7 @@ public class TurnTest {
     @DisplayName("주어진 진영의 턴이 아니면 예외가 발생한다.")
     @Test
     void invalidTurnTest() {
-        ChessBoard chessBoard = new ChessBoard();
-        chessBoard.init();
+        ChessBoard chessBoard = new ChessBoard(ChessBoardInitializer.init());
 
         Turn turn = new Turn();
 
@@ -25,8 +25,7 @@ public class TurnTest {
     @DisplayName("주어진 진영의 턴이면 예외가 발생하지 않는다.")
     @Test
     void validTurnTest() {
-        ChessBoard chessBoard = new ChessBoard();
-        chessBoard.init();
+        ChessBoard chessBoard = new ChessBoard(ChessBoardInitializer.init());
 
         Turn turn = new Turn();
 
@@ -37,8 +36,7 @@ public class TurnTest {
     @DisplayName("턴을 넘긴다.")
     @Test
     void turnSwitchTest() {
-        ChessBoard chessBoard = new ChessBoard();
-        chessBoard.init();
+        ChessBoard chessBoard = new ChessBoard(ChessBoardInitializer.init());
 
         Turn turn = new Turn();
 

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class PawnTest {
 
@@ -61,9 +62,8 @@ public class PawnTest {
             put(target, PieceFixture.blackPawn());
         }};
 
-        boolean actual = pawn.canMove(current, target, pieces);
-
-        assertThat(actual).isFalse();
+        assertThatThrownBy(() -> pawn.canMove(current, target, pieces))
+                .isInstanceOf(IllegalArgumentException.class).hasMessage("폰은 같은 선상의 적을 공격할 수 없습니다.");
     }
 
     @DisplayName("폰은 두 칸 전진으로 공격할 수 없다.")
@@ -77,9 +77,8 @@ public class PawnTest {
             put(target, PieceFixture.blackPawn());
         }};
 
-        boolean actual = pawn.canMove(current, target, pieces);
-
-        assertThat(actual).isFalse();
+        assertThatThrownBy(() -> pawn.canMove(current, target, pieces))
+                .isInstanceOf(IllegalArgumentException.class).hasMessage("폰은 같은 선상의 적을 공격할 수 없습니다.");
     }
 
     @DisplayName("폰은 초기화 위치 외에서는 한 칸 전진한다.")
@@ -153,9 +152,8 @@ public class PawnTest {
             Position current = PositionFixture.a2();
             Position target = PositionFixture.b2();
 
-            boolean actual = pawn.canMove(current, target, new LinkedHashMap<>());
-
-            assertThat(actual).isFalse();
+            assertThatThrownBy(() -> pawn.canMove(current, target, new LinkedHashMap<>()))
+                    .isInstanceOf(IllegalArgumentException.class).hasMessage("폰은 수평 혹은 뒤로 이동할 수 없습니다.");
         }
 
         @DisplayName("폰은 후진할 수 없다.")
@@ -163,9 +161,8 @@ public class PawnTest {
         @MethodSource("NonReversiblePosition")
         void cantReverseMoveTest(Pawn pawn, Position current, Position target) {
 
-            boolean actual = pawn.canMove(current, target, new LinkedHashMap<>());
-
-            assertThat(actual).isFalse();
+            assertThatThrownBy(() -> pawn.canMove(current, target, new LinkedHashMap<>()))
+                    .isInstanceOf(IllegalArgumentException.class).hasMessage("폰은 수평 혹은 뒤로 이동할 수 없습니다.");
         }
 
         @DisplayName("폰은 공격할 때가 아니면 대각선 방향으로 움직일 수 없다.")

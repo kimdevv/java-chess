@@ -1,24 +1,18 @@
 package domain.piece;
 
-import domain.position.Position;
 import domain.Side;
+import domain.position.Position;
 
 import java.util.Map;
 
 public class King extends Piece {
 
     public King(Side side) {
-        super(side);
-    }
-
-    @Override
-    public boolean isKing() {
-        return true;
+        super(side, PieceScore.KING);
     }
 
     @Override
     public boolean canMove(Position current, Position target, Map<Position, Piece> pieces) {
-        checkBlockingPiece(target, pieces);
         return hasOnlyOneFileGap(current, target) ||
                 hasOnlyOneRankGap(current, target) ||
                 hasOnlyOneDiagonalGap(current, target);
@@ -37,5 +31,10 @@ public class King extends Piece {
     private boolean hasOnlyOneDiagonalGap(Position current, Position target) {
         return current.isDiagonal(target) &&
                 current.hasOneFileGap(target);
+    }
+
+    @Override
+    public boolean isKing() {
+        return true;
     }
 }

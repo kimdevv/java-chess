@@ -29,6 +29,6 @@ public enum FileMapper {
                 .filter(file -> file.symbol.equals(input))
                 .findFirst()
                 .map(it -> it.file)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("a ~ h 사이의 file을 입력해주세요."));
     }
 }

@@ -1,6 +1,5 @@
 package domain.board;
 
-import domain.board.Rank;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,12 +9,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RankTest {
-
-    @DisplayName("가장 높은 순서 값을 찾는다.")
-    @Test
-    void maxTest() {
-        assertThat(Rank.max()).isEqualTo(8);
-    }
 
     @DisplayName("순서를 받아 열을 찾는다.")
     @Test

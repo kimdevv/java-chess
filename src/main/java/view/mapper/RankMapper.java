@@ -29,6 +29,6 @@ public enum RankMapper {
                 .filter(rank -> rank.symbol.equals(input))
                 .findFirst()
                 .map(it -> it.rank)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("1 ~ 8 사이의 rank를 입력해주세요."));
     }
 }

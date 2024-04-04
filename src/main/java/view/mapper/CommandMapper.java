@@ -1,45 +1,53 @@
 package view.mapper;
 
-import domain.Command;
+import command.*;
+import domain.position.Position;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 
 public enum CommandMapper {
 
-    START("start", Command.START),
-    END("end", Command.END),
-    MOVE("move", Command.MOVE),
+    START("start", input -> new Start()),
+    MOVE("move", CommandMapper::makeMove),
+    STATUS("status", input -> new Status()),
+    END("end", input -> new End()),
     ;
 
-    private final String input;
-    private final Command command;
+    private final String command;
+    private final Function<String, Command> function;
 
-    CommandMapper(String input, Command command) {
-        this.input = input;
+    CommandMapper(String command, Function<String, Command> function) {
         this.command = command;
+        this.function = function;
     }
 
-    public static Command toInitCommand(String input) {
-        Command command = from(input);
-        if (command.isMove()) {
-            throw new IllegalArgumentException("시작 명령은 start 혹은 end 만 입력 가능합니다.");
-        }
-        return command;
-    }
-
-    public static Command from(String input) {
+    public static Command makeCommand(String input) {
         return Arrays.stream(values())
-                .filter(command -> command.input.equals(input))
+                .filter(commandMapper -> commandMapper.isMatched(input))
+                .map(commandMapper -> commandMapper.function.apply(input))
                 .findFirst()
-                .map(it -> it.command)
-                .orElseThrow(() -> new IllegalArgumentException("입력값이 명령어 목록에 없습니다."));
+                .orElseThrow();
     }
 
-    public static Command toMoveCommand(String input) {
-        Command command = from(input);
-        if (!command.isMove()) {
-            throw new IllegalArgumentException("move 명령어를 입력해야 합니다.");
-        }
-        return command;
+    private boolean isMatched(String input) {
+        return input.startsWith(command);
+    }
+
+    private static Command makeMove(String input) {
+        List<String> moveCommand = List.of(input.split(" "));
+        String currentInput = moveCommand.get(1);
+        String targetInput = moveCommand.get(2);
+
+        Position current = makePosition(currentInput);
+        Position target = makePosition(targetInput);
+        return new Move(current, target);
+    }
+
+    private static Position makePosition(String Input) {
+        String file = Input.substring(0, 1);
+        String rank = Input.substring(1, 2);
+        return Position.valueOf(FileMapper.from(file), RankMapper.from(rank));
     }
 }

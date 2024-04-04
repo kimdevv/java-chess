@@ -1,33 +1,32 @@
 package view.mapper;
 
-import domain.piece.Piece;
+import domain.piece.*;
 
 import java.util.Arrays;
-import java.util.function.Function;
 
 public enum PieceMapper {
 
-    ROOK(Piece::isRook, "R"),
-    KNIGHT(Piece::isKnight, "N"),
-    BISHOP(Piece::isBishop, "B"),
-    QUEEN(Piece::isQueen, "Q"),
-    KING(Piece::isKing, "K"),
-    PAWN(Piece::isPawn, "P"),
+    ROOK(Rook.class, "R"),
+    KNIGHT(Knight.class, "N"),
+    BISHOP(Bishop.class, "B"),
+    QUEEN(Queen.class, "Q"),
+    KING(King.class, "K"),
+    PAWN(Pawn.class, "P"),
     ;
 
-    private final Function<Piece, Boolean> function;
+    private final Class<? extends Piece> pieceType;
     private final String symbol;
 
-    PieceMapper(Function<Piece, Boolean> function, String symbol) {
-        this.function = function;
+    PieceMapper(Class<? extends Piece> pieceType, String symbol) {
+        this.pieceType = pieceType;
         this.symbol = symbol;
     }
 
     public static String toSymbol(Piece piece) {
         String symbol = Arrays.stream(values())
-                .filter(it -> it.function.apply(piece))
+                .filter(value -> value.pieceType == piece.getClass())
                 .findFirst()
-                .map(it -> it.symbol)
+                .map(value -> value.symbol)
                 .orElseThrow();
 
         if (piece.isBlack()) {

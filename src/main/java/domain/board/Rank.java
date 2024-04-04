@@ -24,13 +24,6 @@ public enum Rank {
         this.order = order;
     }
 
-    public static int max() {
-        return Arrays.stream(values())
-                .mapToInt(it -> it.order)
-                .max()
-                .orElseThrow();
-    }
-
     public static Rank find(int order) {
         return Arrays.stream(values())
                 .filter(it -> it.order == order)

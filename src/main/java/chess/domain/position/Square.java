@@ -31,7 +31,7 @@ public class Square {
         return POOL.get(toKey(file, rank));
     }
 
-    public static Square findByName(String name) {
+    public static Square from(String name) {
         validateInPool(name);
         return POOL.get(name);
     }
@@ -60,5 +60,13 @@ public class Square {
 
     public boolean isPawnStartSquare() {
         return rank.equals(Rank.TWO) || rank.equals(Rank.SEVEN);
+    }
+
+    public File file() {
+        return file;
+    }
+
+    public Rank rank() {
+        return rank;
     }
 }

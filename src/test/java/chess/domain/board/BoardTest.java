@@ -18,14 +18,14 @@ public class BoardTest {
     @Test
     void createBoard() {
         // when & then
-        assertThatCode(Board::new).doesNotThrowAnyException();
+        assertThatCode(() -> new BoardFactory().create()).doesNotThrowAnyException();
     }
 
     @DisplayName("체스판은 목적지에 같은 색의 말이 있으면 예외를 반환한다.")
     @Test
     void checkPieceSameColor() {
         // given
-        Board board = new Board();
+        Board board = new BoardFactory().create();
         Square source = Square.of(File.A, Rank.EIGHT);
         Square destination = Square.of(File.A, Rank.SEVEN);
 
@@ -37,7 +37,7 @@ public class BoardTest {
     @Test
     void move() {
         // given
-        Board board = new Board();
+        Board board = new BoardFactory().create();
         Square source = Square.of(File.A, Rank.TWO);
         Square destination = Square.of(File.A, Rank.THREE);
 
@@ -49,7 +49,7 @@ public class BoardTest {
     @Test
     void checkPathBlocked() {
         // given
-        Board board = new Board();
+        Board board = new BoardFactory().create();
         Square source = Square.of(File.A, Rank.EIGHT);
         Square destination = Square.of(File.A, Rank.FIVE);
 
@@ -61,7 +61,7 @@ public class BoardTest {
     @Test
     void checkPathNotBlocked() {
         // given
-        Board board = new Board();
+        Board board = new BoardFactory().create();
         Square source = Square.of(File.A, Rank.TWO);
         Square destination = Square.of(File.A, Rank.FOUR);
 
@@ -73,7 +73,7 @@ public class BoardTest {
     @Test
     void checkCannotMove() {
         // given
-        Board board = new Board();
+        Board board = new BoardFactory().create();
         Square source = Square.of(File.B, Rank.EIGHT);
         Square destination = Square.of(File.C, Rank.THREE);
 
@@ -85,7 +85,7 @@ public class BoardTest {
     @Test
     void checkCanMove() {
         // given
-        Board board = new Board();
+        Board board = new BoardFactory().create();
         Square source = Square.of(File.B, Rank.ONE);
         Square destination = Square.of(File.C, Rank.THREE);
 
@@ -97,7 +97,7 @@ public class BoardTest {
     @Test
     void checkTurn() {
         // given
-        Board board = new Board();
+        Board board = new BoardFactory().create();
         Square source = Square.of(File.B, Rank.SEVEN);
         Square destination = Square.of(File.C, Rank.SIX);
 
@@ -109,7 +109,7 @@ public class BoardTest {
     @Test
     void catchOpponent() {
         // given
-        Board board = new Board();
+        Board board = new BoardFactory().create();
         board.move(Square.of(File.G, Rank.TWO), Square.of(File.G, Rank.FOUR));
         board.move(Square.of(File.H, Rank.SEVEN), Square.of(File.H, Rank.FIVE));
 
@@ -128,12 +128,74 @@ public class BoardTest {
     @Test
     void pawnStraightCatch() {
         // given
-        Board board = new Board();
+        Board board = new BoardFactory().create();
         board.move(Square.of(File.G, Rank.TWO), Square.of(File.G, Rank.FOUR));
         board.move(Square.of(File.G, Rank.SEVEN), Square.of(File.G, Rank.FIVE));
 
         // when & then
         assertThatThrownBy(() -> board.move(Square.of(File.G, Rank.FOUR), Square.of(File.G, Rank.FIVE)))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("체스판은 King 존재 여부를 반환한다.")
+    void kingDead() {
+        // given
+        Board board = new BoardFactory().create();
+
+        // when & then
+        assertThat(board.isKingDead()).isFalse();
+    }
+
+    @Test
+    @DisplayName("체스판 초기 점수는 38이다.")
+    void initScore() {
+        // given
+        Board board = new BoardFactory().create();
+
+        // when
+        double blackScore = board.calculateScore(Piece::isBlack);
+        double whiteScore = board.calculateScore(Piece::isWhite);
+
+        // then
+        assertThat(blackScore).isEqualTo(38);
+        assertThat(whiteScore).isEqualTo(38);
+    }
+
+    @Test
+    @DisplayName("체스판은 보드 결과를 바탕으로 검은 말 점수를 계산한 결과를 반환한다.")
+    void blackScore() {
+        // given
+        Board board = new BoardFactory().create();
+        board.move(Square.of(File.G, Rank.TWO), Square.of(File.G, Rank.FOUR));
+        board.move(Square.of(File.H, Rank.SEVEN), Square.of(File.H, Rank.FIVE));
+
+        board.move(Square.of(File.G, Rank.FOUR), Square.of(File.H, Rank.FIVE));
+        board.move(Square.of(File.H, Rank.EIGHT), Square.of(File.H, Rank.FIVE));
+
+        // when
+        double score = board.calculateScore(Piece::isBlack);
+
+        // then
+        assertThat(score).isEqualTo(37);
+    }
+
+    @Test
+    @DisplayName("체스판은 보드 결과를 바탕으로 흰 말 점수를 계산한 결과를 반환한다.")
+    void whiteScore() {
+        // given
+        Board board = new BoardFactory().create();
+        board.move(Square.of(File.G, Rank.TWO), Square.of(File.G, Rank.FOUR));
+        board.move(Square.of(File.H, Rank.SEVEN), Square.of(File.H, Rank.FIVE));
+
+        board.move(Square.of(File.G, Rank.FOUR), Square.of(File.H, Rank.FIVE));
+
+        // when
+        double blackScore = board.calculateScore(Piece::isBlack);
+        double whiteScore = board.calculateScore(Piece::isWhite);
+
+        // then
+        assertThat(whiteScore).isEqualTo(37);
+        assertThat(blackScore).isEqualTo(37);
     }
 }

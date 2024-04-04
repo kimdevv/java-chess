@@ -10,7 +10,14 @@ import java.util.Map;
 
 public class BlackTurn implements Turn {
 
-    public Turn checkMovable(Map<Square, Piece> board, Square source, Square destination, Piece sourcePiece, Piece destinationPiece) {
+    public TurnState turnState() {
+        return TurnState.BLACK;
+    }
+
+    public Turn checkMovable(Map<Square, Piece> board, Square source, Square destination) {
+        Piece sourcePiece = board.get(source);
+        Piece destinationPiece = board.get(destination);
+
         if (sourcePiece.isWhite()) {
             throw new IllegalArgumentException(WhiteTurn.NOT_YOUR_TURN_ERROR);
         }

@@ -1,11 +1,13 @@
 package chess.model.piece;
 
+import java.util.Arrays;
+
 public enum Color {
     WHITE,
     BLACK,
     NONE;
 
-    public static Color findColorByName(String pieceName) {
+    public static Color findColorByPieceName(String pieceName) {
         if (pieceName.equals(".")) {
             return NONE;
         }
@@ -15,7 +17,17 @@ public enum Color {
         return WHITE;
     }
 
-    public Color changeColor() {
+    public static Color convertToColor(String colorName) {
+        return Arrays.stream(Color.values())
+                .filter(color -> color.name().equals(colorName))
+                .findFirst()
+                .orElse(Color.NONE);
+    }
+
+    public Color changeColor(Piece piece) {
+        if (piece.lostGoal()) {
+            return NONE;
+        }
         if (this == WHITE) {
             return BLACK;
         }
@@ -35,5 +47,9 @@ public enum Color {
 
     public boolean isWhite() {
         return this == WHITE;
+    }
+
+    public boolean isNone() {
+        return this == NONE;
     }
 }

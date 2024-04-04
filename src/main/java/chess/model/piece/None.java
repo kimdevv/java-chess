@@ -1,8 +1,11 @@
 package chess.model.piece;
 
-import chess.model.Position;
+import chess.model.position.Position;
+import java.util.List;
 
 public class None extends Piece {
+
+    private static final double SCORE = 0;
 
     protected None(PieceType pieceType) {
         super(pieceType, Color.NONE);
@@ -21,5 +24,15 @@ public class None extends Piece {
     @Override
     public boolean canJump() {
         return false;
+    }
+
+    @Override
+    public boolean lostGoal() {
+        return false;
+    }
+
+    @Override
+    public double getScore(List<Piece> pieces) {
+        return SCORE;
     }
 }

@@ -1,13 +1,15 @@
-package chess.model;
+package chess.model.board;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import chess.dto.BoardDto;
 import chess.model.piece.Color;
 import chess.model.piece.Piece;
+import chess.model.piece.PieceType;
+import chess.model.position.Position;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +19,7 @@ class BoardTest {
     @Test
     void createPiecesOnBoard() {
         Board board = Board.createInitialBoard();
-        BoardDto boardDto = BoardDto.from(board);
+        BoardFormatter boardFormatter = BoardFormatter.from(board);
 
         String expected = """
                 RNBQKBNR
@@ -29,7 +31,7 @@ class BoardTest {
                 pppppppp
                 rnbqkbnr""";
 
-        assertThat(boardDto).hasToString(expected);
+        assertThat(boardFormatter).hasToString(expected);
     }
 
     @DisplayName("White 차례에 Black 기물 이동 시 예외가 발생한다.")
@@ -113,5 +115,65 @@ class BoardTest {
                 () -> assertThat(targetPiece).isEqualTo(sourcePiece),
                 () -> assertThat(emptyPiece.isAlly(Color.NONE)).isTrue()
         );
+    }
+
+    @DisplayName("같은 Column에 존재하는 Piece들을 가져온다")
+    @Test
+    void findPiecesInSameColumn() {
+        Board board = Board.createInitialBoard();
+        List<Piece> expectedPieces = List.of(
+                Piece.from(PieceType.ROOK, Color.BLACK),
+                Piece.from(PieceType.PAWN, Color.BLACK),
+                Piece.from(PieceType.NONE, Color.NONE),
+                Piece.from(PieceType.NONE, Color.NONE),
+                Piece.from(PieceType.NONE, Color.NONE),
+                Piece.from(PieceType.NONE, Color.NONE),
+                Piece.from(PieceType.PAWN, Color.WHITE),
+                Piece.from(PieceType.ROOK, Color.WHITE)
+        );
+
+        List<Piece> actualPieces = board.findPiecesInColumn(0);
+
+        assertThat(actualPieces).isEqualTo(expectedPieces);
+    }
+
+    @DisplayName("같은 Column에 존재하는 Piece들을 가져온다")
+    @Test
+    void findPiecesInSameRow() {
+        Board board = Board.createInitialBoard();
+        List<Piece> expectedPieces = List.of(
+                Piece.from(PieceType.ROOK, Color.BLACK),
+                Piece.from(PieceType.KNIGHT, Color.BLACK),
+                Piece.from(PieceType.BISHOP, Color.BLACK),
+                Piece.from(PieceType.QUEEN, Color.BLACK),
+                Piece.from(PieceType.KING, Color.BLACK),
+                Piece.from(PieceType.BISHOP, Color.BLACK),
+                Piece.from(PieceType.KNIGHT, Color.BLACK),
+                Piece.from(PieceType.ROOK, Color.BLACK)
+        );
+
+        List<Piece> actualPieces = board.findPiecesInRow(0);
+
+        assertThat(actualPieces).isEqualTo(expectedPieces);
+    }
+
+    @DisplayName("King을 잡으면 게임이 종료된다")
+    @Test
+    void endGameByKillKing() {
+        List<String> customBoard = List.of(
+                "....K...",
+                "........",
+                "........",
+                "........",
+                "........",
+                "........",
+                "....r...",
+                "rnbqkbn."
+        );
+        Board board = Board.createCustomBoard(customBoard, Color.WHITE);
+
+        board.move("e2", "e8");
+
+        assertThat(board.canContinue()).isFalse();
     }
 }

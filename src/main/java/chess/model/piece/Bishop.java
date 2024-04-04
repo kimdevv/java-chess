@@ -1,14 +1,17 @@
 package chess.model.piece;
 
-import static chess.model.Direction.DOWN_LEFT;
-import static chess.model.Direction.DOWN_RIGHT;
-import static chess.model.Direction.UP_LEFT;
-import static chess.model.Direction.UP_RIGHT;
+import static chess.model.position.Direction.DOWN_LEFT;
+import static chess.model.position.Direction.DOWN_RIGHT;
+import static chess.model.position.Direction.UP_LEFT;
+import static chess.model.position.Direction.UP_RIGHT;
 
-import chess.model.Direction;
-import chess.model.Position;
+import chess.model.position.Direction;
+import chess.model.position.Position;
+import java.util.List;
 
 public class Bishop extends Piece {
+
+    private static final double SCORE = 3;
 
     public Bishop(PieceType pieceType, Color color) {
         super(pieceType, color);
@@ -28,5 +31,15 @@ public class Bishop extends Piece {
     @Override
     public boolean canJump() {
         return false;
+    }
+
+    @Override
+    public boolean lostGoal() {
+        return false;
+    }
+
+    @Override
+    public double getScore(List<Piece> pieces) {
+        return SCORE;
     }
 }

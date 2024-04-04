@@ -1,8 +1,10 @@
-package chess.model;
+package chess.model.board;
 
 import chess.model.piece.Color;
 import chess.model.piece.Piece;
 import chess.model.piece.PieceType;
+import chess.model.position.Position;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,9 @@ public class Board {
             "pppppppp",
             "rnbqkbnr"
     );
-    private static final Piece EMPTY_PIECE =  Piece.from(PieceType.NONE, Color.NONE);
+    private static final Piece EMPTY_PIECE = Piece.from(PieceType.NONE, Color.NONE);
+    private static final int MAX_ROW_COUNT = 8;
+    private static final int MAX_COLUMN_COUNT = 8;
 
     private final Map<Position, Piece> board;
     private Color turn;
@@ -51,7 +55,7 @@ public class Board {
             Position position = new Position(rowIndex, j);
             char pieceName = row.charAt(j);
             PieceType pieceType = PieceType.findPieceTypeByName(String.valueOf(pieceName));
-            Color pieceColor = Color.findColorByName(String.valueOf(pieceName));
+            Color pieceColor = Color.findColorByPieceName(String.valueOf(pieceName));
             Piece piece = putPieceByType(pieceType, pieceColor);
             board.put(position, piece);
         }
@@ -74,7 +78,7 @@ public class Board {
 
         board.put(target, sourcePiece);
         board.put(source, EMPTY_PIECE);
-        turn = turn.changeColor();
+        turn = turn.changeColor(targetPiece);
     }
 
     private void validate(Piece sourcePiece, Piece targetPiece, Position source, Position target) {
@@ -154,7 +158,53 @@ public class Board {
         }
     }
 
+    public List<Piece> findPiecesInRow(int rowIndex) {
+        List<Piece> pieces = new ArrayList<>();
+        List<Position> positions = getPositionsInRow(rowIndex);
+        for (int i = 0; i < MAX_COLUMN_COUNT; i++) {
+            pieces.add(board.get(positions.get(i)));
+        }
+        return pieces;
+    }
+
+    private List<Position> getPositionsInRow(int rowIndex) {
+        List<Position> positions = new ArrayList<>();
+        for (int i = 0; i < MAX_COLUMN_COUNT; i++) {
+            positions.add(new Position(rowIndex, i));
+        }
+        return positions;
+    }
+
+    public List<Piece> findPiecesInColumn(int columnIndex) {
+        List<Piece> pieces = new ArrayList<>();
+        List<Position> positions = getPositionsInColumn(columnIndex);
+        for (int i = 0; i < MAX_ROW_COUNT; i++) {
+            pieces.add(board.get(positions.get(i)));
+        }
+        return pieces;
+    }
+
+    private List<Position> getPositionsInColumn(int columnIndex) {
+        List<Position> positions = new ArrayList<>();
+        for (int i = 0; i < MAX_ROW_COUNT; i++) {
+            positions.add(new Position(i, columnIndex));
+        }
+        return positions;
+    }
+
+    public void stopGame() {
+        turn = Color.NONE;
+    }
+
+    public boolean canContinue() {
+        return !turn.isNone();
+    }
+
     public Piece findPiece(Position position) {
         return board.get(position);
+    }
+
+    public Color getTurn() {
+        return turn;
     }
 }

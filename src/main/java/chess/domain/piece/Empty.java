@@ -9,7 +9,11 @@ import static chess.domain.piece.Type.EMPTY;
 
 public class Empty extends Piece {
     public Empty() {
-        super(Color.NONE);
+        super(Team.NONE);
+    }
+
+    public Empty(Team team) {
+        super(team);
     }
 
     @Override

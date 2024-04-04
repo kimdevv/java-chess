@@ -1,5 +1,6 @@
 package chess.view;
 
+import chess.domain.piece.Team;
 import chess.domain.piece.Piece;
 import chess.domain.position.File;
 import chess.domain.position.Position;
@@ -29,6 +30,26 @@ public class OutputView {
             System.out.println();
         }
         System.out.println();
+    }
+
+    public void printChessStatus(double blackScore, double whiteScore, Team winner) {
+        System.out.println("BLACK 팀의 점수 :" + blackScore);
+        System.out.println("WHITE 팀의 점수 :" + whiteScore);
+
+        if (winner == Team.NONE) {
+            System.out.println("두 팀의 점수가 같습니다." + NEW_LINE);
+            return;
+        }
+
+        System.out.println(winner.name() + "팀이 이기고 있습니다." + NEW_LINE);
+    }
+
+    public void printResultMessage(Team winnerTeam) {
+        if (winnerTeam == Team.NONE) {
+            System.out.println("두 팀의 점수가 같습니다." + NEW_LINE);
+            return;
+        }
+        System.out.println(winnerTeam.name() + "팀의 승리입니다.");
     }
 
     public void printErrorMessage(String message) {

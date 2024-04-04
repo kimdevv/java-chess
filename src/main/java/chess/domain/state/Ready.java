@@ -1,6 +1,11 @@
 package chess.domain.state;
 
+import chess.dao.PiecesDao;
+import chess.dao.TurnsDao;
+import chess.db.DBConnector;
 import chess.domain.board.ChessBoard;
+import chess.domain.piece.Team;
+import chess.service.ChessService;
 
 import java.util.List;
 
@@ -9,17 +14,26 @@ public class Ready implements GameState {
     private static final String MOVE_COMMAND = "move";
     private static final String END_COMMAND = "end";
 
-    private final ChessBoard chessBoard;
+    private ChessBoard chessBoard = new ChessBoard();
+    private final ChessService chessService = new ChessService(
+            new PiecesDao(DBConnector.getProductionDB()), new TurnsDao(DBConnector.getProductionDB()));
 
-    public Ready(ChessBoard chessBoard) {
-        this.chessBoard = chessBoard;
+    private Team team = Team.WHITE;
+
+    public Ready() {
+        initializeGameSetting();
+    }
+
+    @Override
+    public Team findWinner() {
+        return Team.NONE;
     }
 
     @Override
     public GameState play(List<String> inputCommand) {
         String command = inputCommand.get(0);
         if (command.equals(START_COMMAND)) {
-            return new Progress(chessBoard);
+            return new Progress(chessBoard, chessService, team);
         }
         if (command.equals(MOVE_COMMAND)) {
             throw new UnsupportedOperationException("게임이 시작되지 않았습니다.");
@@ -33,5 +47,21 @@ public class Ready implements GameState {
     @Override
     public boolean isEnd() {
         return false;
+    }
+
+    @Override
+    public ChessBoard getChessBoard() {
+        return chessBoard;
+    }
+
+    private void initializeGameSetting() {
+        if (chessService.hasNoLastGame()) {
+            chessBoard.initialBoard();
+            chessService.saveChessBoard(chessBoard);
+            chessService.saveTurn(Team.WHITE);
+            return;
+        }
+        chessBoard = chessService.loadChessBoard();
+        team = chessService.loadTurn();
     }
 }

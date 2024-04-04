@@ -1,5 +1,8 @@
 package chess.domain.state;
 
+import chess.domain.board.ChessBoard;
+import chess.domain.piece.Team;
+
 import java.util.List;
 
 public class End implements GameState {
@@ -7,7 +10,19 @@ public class End implements GameState {
     private static final String MOVE_COMMAND = "move";
     private static final String END_COMMAND = "end";
 
+    private final Team team;
+
+    public End(Team team) {
+        this.team = team;
+    }
+
     public End() {
+        team = Team.NONE;
+    }
+
+    @Override
+    public Team findWinner() {
+        return team;
     }
 
     @Override
@@ -28,5 +43,10 @@ public class End implements GameState {
     @Override
     public boolean isEnd() {
         return true;
+    }
+
+    @Override
+    public ChessBoard getChessBoard() {
+        throw new UnsupportedOperationException("종료한 게임의 체스판은 초기화됩니다.");
     }
 }

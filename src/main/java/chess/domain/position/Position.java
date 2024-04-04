@@ -60,6 +60,18 @@ public class Position {
         return this.rank.equals(rank);
     }
 
+    public boolean isFile(File file) {
+        return this.file.equals(file);
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public Rank getRank() {
+        return rank;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

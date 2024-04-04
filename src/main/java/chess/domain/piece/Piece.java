@@ -9,10 +9,10 @@ public abstract class Piece {
     private static final int STAY = 0;
     private static final int ONE_SQUARE = 1;
 
-    protected Color color;
+    protected Team team;
 
-    protected Piece(Color color) {
-        this.color = color;
+    protected Piece(Team team) {
+        this.team = team;
     }
 
     public abstract Type identifyType();
@@ -22,11 +22,11 @@ public abstract class Piece {
     public abstract List<Position> searchPath(Position source, Position target);
 
     public final boolean isBlack() {
-        return color == Color.BLACK;
+        return team == Team.BLACK;
     }
 
-    public final boolean isSameColor(Color color) {
-        return this.color == color;
+    public final boolean isSameTeam(Team team) {
+        return this.team == team;
     }
 
     public final boolean isHorizontalMove(Position source, Position target) {
@@ -50,25 +50,25 @@ public abstract class Piece {
         return Math.abs(rankDiff) == Math.abs(fileDiff);
     }
 
-    public final List<Position> slidingMove(Position source, Position target, boolean isVertical) {
+    public final List<Position> slidingMove(Position source, Position target) {
         int rankDiff = source.calculateRankDifference(target);
         int fileDiff = source.calculateFileDifference(target);
-
+        int movingDistance = Math.max(Math.abs(rankDiff), Math.abs(fileDiff));
         int rankUnit = calculateUnit(rankDiff);
         int fileUnit = calculateUnit(fileDiff);
-        int movingDistance = Math.abs(rankDiff);
 
         List<Position> path = new ArrayList<>();
-
-        if (isVertical) {
-            movingDistance = Math.abs(fileDiff);
-        }
+        Position current = source;
 
         for (int i = movingDistance; i != ONE_SQUARE; i--) {
-            source = source.move(fileUnit, rankUnit);
-            path.add(source);
+            current = current.move(fileUnit, rankUnit);
+            path.add(current);
         }
         return path;
+    }
+
+    public Team getTeam() {
+        return team;
     }
 
     private int calculateUnit(int difference) {

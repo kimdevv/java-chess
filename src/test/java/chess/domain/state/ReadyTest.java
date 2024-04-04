@@ -3,8 +3,6 @@ package chess.domain.state;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import chess.domain.board.ChessBoard;
-
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +13,7 @@ class ReadyTest {
     @Test
     void playWithCommandStart() {
         // given
-        Ready ready = new Ready(new ChessBoard());
+        Ready ready = new Ready();
 
         // when
         GameState result = ready.play(List.of("start"));
@@ -28,7 +26,7 @@ class ReadyTest {
     @Test
     void playWithCommandMove() {
         // given
-        Ready ready = new Ready(new ChessBoard());
+        Ready ready = new Ready();
 
         // when, then
         assertThatThrownBy(() -> ready.play(List.of("move", "b1", "b2")))
@@ -39,7 +37,7 @@ class ReadyTest {
     @Test
     void playWithCommandEnd() {
         // given
-        Ready ready = new Ready(new ChessBoard());
+        Ready ready = new Ready();
 
         // when, then
         assertThatThrownBy(() -> ready.play(List.of("end")))
@@ -50,7 +48,7 @@ class ReadyTest {
     @Test
     void playWithCommandInvalidValue() {
         // given
-        Ready ready = new Ready(new ChessBoard());
+        Ready ready = new Ready();
 
         // when, then
         assertThatThrownBy(() -> ready.play(List.of("ash", "ella")))
@@ -61,7 +59,7 @@ class ReadyTest {
     @Test
     void isEnd() {
         // given
-        Ready ready = new Ready(new ChessBoard());
+        Ready ready = new Ready();
 
         // when
         boolean result = ready.isEnd();

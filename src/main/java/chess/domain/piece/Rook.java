@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Rook extends Piece {
 
-    public Rook(Color color) {
-        super(color);
+    public Rook(Team team) {
+        super(team);
     }
 
     @Override
@@ -19,7 +19,7 @@ public class Rook extends Piece {
 
     @Override
     public boolean canMove(Position source, Position target, Piece piece) {
-        if (piece.isSameColor(color)) {
+        if (piece.isSameTeam(team)) {
             return false;
         }
         return isVerticalMove(source, target) || isHorizontalMove(source, target);
@@ -27,6 +27,6 @@ public class Rook extends Piece {
 
     @Override
     public List<Position> searchPath(Position source, Position target) {
-        return slidingMove(source, target, isVerticalMove(source, target));
+        return slidingMove(source, target);
     }
 }

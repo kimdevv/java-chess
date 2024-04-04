@@ -8,12 +8,18 @@ import chess.dto.ChessBoardDto;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ChessBoard {
     private static final Piece EMPTY = new Empty();
-    private final Map<Position, Piece> chessBoard = new LinkedHashMap<>();
+    private final Map<Position, Piece> chessBoard;
+
+    public ChessBoard(Map<Position, Piece> defaultChessBoard) {
+        chessBoard = defaultChessBoard;
+    }
 
     public ChessBoard() {
+        chessBoard = new LinkedHashMap<>();
     }
 
     public void initialBoard() {
@@ -25,13 +31,32 @@ public class ChessBoard {
         return new ChessBoardDto(chessBoard);
     }
 
-    public void move(Position source, Position target) {
+    public Map<Position, Type> findRemainingPieces(Team team) {
+        return chessBoard.entrySet().stream()
+                .filter(entry -> entry.getValue().isSameTeam(team))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().identifyType()));
+    }
+
+    public boolean winByAttackingKing(Position target) {
+        return chessBoard.containsKey(target) && chessBoard.get(target).identifyType() == Type.KING;
+    }
+
+    public void move(Position source, Position target, Team team) {
         if (!canMove(source, target)) {
             throw new IllegalArgumentException("올바르지 않은 이동입니다.");
         }
+
+        if (!chessBoard.get(source).isSameTeam(team)) {
+            throw new IllegalArgumentException(team.toggleTeam().name() + "의 턴이 아닙니다.");
+        }
+
         Piece sourcePiece = chessBoard.get(source);
         chessBoard.put(target, sourcePiece);
         chessBoard.remove(source);
+    }
+
+    public Map<Position, Piece> getChessBoard() {
+        return chessBoard;
     }
 
     private boolean canMove(Position source, Position target) {
@@ -53,29 +78,29 @@ public class ChessBoard {
     }
 
     private void initializeBlackPieces() {
-        initializeEdgeRank(Rank.EIGHT, Color.BLACK);
-        initializePawnRank(Rank.SEVEN, Color.BLACK);
+        initializeEdgeRank(Rank.EIGHT, Team.BLACK);
+        initializePawnRank(Rank.SEVEN, Team.BLACK);
     }
 
     private void initializeWhitePieces() {
-        initializePawnRank(Rank.TWO, Color.WHITE);
-        initializeEdgeRank(Rank.ONE, Color.WHITE);
+        initializePawnRank(Rank.TWO, Team.WHITE);
+        initializeEdgeRank(Rank.ONE, Team.WHITE);
     }
 
-    private void initializePawnRank(Rank rank, Color color) {
+    private void initializePawnRank(Rank rank, Team team) {
         for (File file : File.values()) {
-            chessBoard.put(Position.of(file, rank), new Pawn(color));
+            chessBoard.put(Position.of(file, rank), new Pawn(team));
         }
     }
 
-    private void initializeEdgeRank(Rank rank, Color color) {
-        chessBoard.put(Position.of(File.A, rank), new Rook(color));
-        chessBoard.put(Position.of(File.B, rank), new Knight(color));
-        chessBoard.put(Position.of(File.C, rank), new Bishop(color));
-        chessBoard.put(Position.of(File.D, rank), new Queen(color));
-        chessBoard.put(Position.of(File.E, rank), new King(color));
-        chessBoard.put(Position.of(File.F, rank), new Bishop(color));
-        chessBoard.put(Position.of(File.G, rank), new Knight(color));
-        chessBoard.put(Position.of(File.H, rank), new Rook(color));
+    private void initializeEdgeRank(Rank rank, Team team) {
+        chessBoard.put(Position.of(File.A, rank), new Rook(team));
+        chessBoard.put(Position.of(File.B, rank), new Knight(team));
+        chessBoard.put(Position.of(File.C, rank), new Bishop(team));
+        chessBoard.put(Position.of(File.D, rank), new Queen(team));
+        chessBoard.put(Position.of(File.E, rank), new King(team));
+        chessBoard.put(Position.of(File.F, rank), new Bishop(team));
+        chessBoard.put(Position.of(File.G, rank), new Knight(team));
+        chessBoard.put(Position.of(File.H, rank), new Rook(team));
     }
 }

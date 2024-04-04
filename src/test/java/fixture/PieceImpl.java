@@ -1,9 +1,9 @@
 package fixture;
 
-import domain.chess.Color;
+import domain.chess.piece.Color;
 import domain.chess.piece.Piece;
 import domain.chess.piece.PieceStatus;
-import domain.chess.Point;
+import domain.chess.piece.Point;
 
 import java.util.List;
 
@@ -19,6 +19,11 @@ public class PieceImpl extends Piece {
 
     @Override
     public boolean canMove(final Point point, final List<Piece> pieceList) {
+        throw new UnsupportedOperationException("사용할 수 없습니다.");
+    }
+
+    @Override
+    public double getScore(final List<Piece> pieces) {
         throw new UnsupportedOperationException("사용할 수 없습니다.");
     }
 }

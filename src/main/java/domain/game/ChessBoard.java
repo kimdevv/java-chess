@@ -3,17 +3,16 @@ package domain.game;
 import domain.movement.Direction;
 import domain.piece.Color;
 import domain.piece.Piece;
-import domain.piece.PieceGenerator;
 import domain.position.Position;
+import domain.score.ScoreBoard;
 import java.util.Collections;
 import java.util.Map;
 
 public class ChessBoard {
-
     private final Map<Position, Piece> piecesPosition;
 
-    public ChessBoard() {
-        this.piecesPosition = PieceGenerator.generate();
+    public ChessBoard(Map<Position, Piece> piecesPosition) {
+        this.piecesPosition = piecesPosition;
     }
 
     public void checkRoute(Position source, Position target, Color color) {
@@ -44,7 +43,7 @@ public class ChessBoard {
         if (hasSameColorPiece(sourcePosition, targetPosition)) {
             throw new IllegalArgumentException("같은 진영의 기물이 있는 곳으로 옮길 수 없습니다.");
         }
-        if (isSamePosition(sourcePosition, targetPosition)) {
+        if (sourcePosition.equals(targetPosition)) {
             throw new IllegalArgumentException("같은 위치로의 이동입니다. 다시 입력해주세요.");
         }
     }
@@ -57,10 +56,6 @@ public class ChessBoard {
             return sourcePiece.isSameColor(targetPiece);
         }
         return false;
-    }
-
-    private boolean isSamePosition(Position sourcePosition, Position targetPosition) {
-        return sourcePosition.equals(targetPosition);
     }
 
     private void validatePieceMove(Position source, Position target) {
@@ -117,9 +112,19 @@ public class ChessBoard {
     public void move(Position source, Position target) {
         Piece findPiece = piecesPosition.get(source);
 
-        piecesPosition.remove(target);
         piecesPosition.put(target, findPiece);
         piecesPosition.remove(source);
+    }
+
+    public boolean isKingDeath() {
+        return piecesPosition.values()
+                .stream()
+                .filter(Piece::isKing)
+                .count() == 1;
+    }
+
+    public ScoreBoard calculateScore() {
+        return ScoreBoard.of(piecesPosition);
     }
 
     public boolean isNotEmptyAt(Position position) {
@@ -128,10 +133,6 @@ public class ChessBoard {
 
     private boolean isEmptyAt(Position position) {
         return !isNotEmptyAt(position);
-    }
-
-    public Piece findPieceByPosition(Position targetPosition) {
-        return piecesPosition.get(targetPosition);
     }
 
     public Map<Position, Piece> getPiecesPosition() {

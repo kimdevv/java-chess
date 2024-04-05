@@ -1,12 +1,30 @@
 package domain.piece.piecerole;
 
 import domain.position.Position;
+import domain.score.Score;
 
-public interface PieceRole {
+public abstract class PieceRole {
+    private final PieceType pieceType;
+    private final Score score;
 
-    boolean canMove(Position sourcePosition, Position targetPosition);
+    protected PieceRole(PieceType pieceType, Score score) {
+        this.pieceType = pieceType;
+        this.score = score;
+    }
 
-    boolean isPawn();
+    public abstract boolean canMove(Position sourcePosition, Position targetPosition);
 
-    boolean isSlidingPiece();
+    public abstract boolean isPawn();
+
+    public abstract boolean isKing();
+
+    public abstract boolean isSlidingPiece();
+
+    public Score getScore() {
+        return score;
+    }
+
+    public String getPieceType() {
+        return pieceType.name();
+    }
 }

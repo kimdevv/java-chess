@@ -1,4 +1,4 @@
-package domain.command;
+package controller.command;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,13 +6,10 @@ import java.util.Map;
 
 public enum CommandType {
     START("start"),
+    CONTINUE("continue"),
     END("end"),
-    MOVE("move");
-    private final String command;
-
-    CommandType(final String command) {
-        this.command = command;
-    }
+    MOVE("move"),
+    STATUS("status");
 
     public static final int COMMAND_INDEX = 0;
     public static final Map<CommandType, CommandConstructor> commandByChessCommand;
@@ -21,8 +18,16 @@ public enum CommandType {
         commandByChessCommand = Map.of(
                 CommandType.START, StartCommand::new,
                 CommandType.END, EndCommand::new,
-                CommandType.MOVE, MoveCommand::new
+                CommandType.MOVE, MoveCommand::new,
+                CommandType.STATUS, StautsCommand::new,
+                CommandType.CONTINUE, ContinueCommand::new
         );
+    }
+
+    private final String command;
+
+    CommandType(final String command) {
+        this.command = command;
     }
 
     public static Command parse(List<String> arguments) {

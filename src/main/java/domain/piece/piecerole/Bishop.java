@@ -7,10 +7,12 @@ import static domain.movement.Direction.SW;
 
 import domain.movement.Movable;
 import domain.position.Position;
+import domain.score.Score;
 import java.util.List;
 import java.util.Objects;
 
-public class Bishop implements PieceRole {
+public class Bishop extends SlidingPiece {
+    private static final Score SCORE = new Score(3.0);
     private static final int MAX_MOVEMENT = 7;
     private static final List<Movable> ROUTES = List.of(
             new Movable(MAX_MOVEMENT, NE),
@@ -19,20 +21,14 @@ public class Bishop implements PieceRole {
             new Movable(MAX_MOVEMENT, SW)
     );
 
+    public Bishop() {
+        super(PieceType.BISHOP, SCORE);
+    }
+
     @Override
     public boolean canMove(final Position sourcePosition, final Position targetPosition) {
         return ROUTES.stream()
                 .anyMatch(movable -> movable.canMove(sourcePosition, targetPosition));
-    }
-
-    @Override
-    public boolean isPawn() {
-        return false;
-    }
-
-    @Override
-    public boolean isSlidingPiece() {
-        return true;
     }
 
     @Override

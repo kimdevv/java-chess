@@ -10,11 +10,12 @@ import domain.piece.piecerole.Queen;
 import domain.piece.piecerole.Rook;
 import domain.piece.piecerole.WhitePawn;
 import domain.position.Position;
+import domain.score.Score;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class OutputFormat {
-
     public static final int CHESSBOARD_SIZE = 8;
     public static final char START_RANK = 'a';
     public static final String BLANK_POSITION = ".";
@@ -64,5 +65,12 @@ public class OutputFormat {
             return PIECE_SYMBOL.get(piece);
         }
         return BLANK_POSITION;
+    }
+
+    public String parseScoreBoard(Map<Color, Score> scoreBoard) {
+        return scoreBoard.entrySet()
+                .stream()
+                .map(entry -> String.format("%s팀 점수 : %s점", entry.getKey(), entry.getValue().getValue()))
+                .collect(Collectors.joining("\n"));
     }
 }

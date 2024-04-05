@@ -7,37 +7,29 @@ import java.util.List;
 import java.util.Objects;
 
 public class BlackPawn extends Pawn {
+    private static final int INITIAL_RANK_POSITION = 7;
     private static final int INITIAL_MAX_MOVEMENT = 2;
     private static final int GENERAL_MAX_MOVEMENT = 1;
-    private static final List<Movable> INITIAL_ROUTES = List.of(
+    private static final List<Movable> ROUTES = List.of(
             new Movable(INITIAL_MAX_MOVEMENT, Direction.S),
-            new Movable(GENERAL_MAX_MOVEMENT, Direction.SE),
-            new Movable(GENERAL_MAX_MOVEMENT, Direction.SW)
-    );
-    private static final List<Movable> GENERAL_ROUTES = List.of(
             new Movable(GENERAL_MAX_MOVEMENT, Direction.S),
             new Movable(GENERAL_MAX_MOVEMENT, Direction.SE),
             new Movable(GENERAL_MAX_MOVEMENT, Direction.SW)
     );
 
+    public BlackPawn() {
+        super(PieceType.BLACK_PAWN);
+    }
+
     @Override
     public boolean canMove(Position sourcePosition, Position targetPosition) {
-        if (sourcePosition.isAtRank7()) {
-            return INITIAL_ROUTES.stream()
+        if (sourcePosition.isRankAt(INITIAL_RANK_POSITION)) {
+            return ROUTES.stream()
                     .anyMatch(movable -> movable.canMove(sourcePosition, targetPosition));
         }
-        return GENERAL_ROUTES.stream()
+        return ROUTES.stream()
+                .filter(movable -> movable.maxMovementIs(GENERAL_MAX_MOVEMENT))
                 .anyMatch(movable -> movable.canMove(sourcePosition, targetPosition));
-    }
-
-    @Override
-    public boolean isPawn() {
-        return true;
-    }
-
-    @Override
-    public boolean isSlidingPiece() {
-        return false;
     }
 
     @Override
@@ -50,6 +42,6 @@ public class BlackPawn extends Pawn {
 
     @Override
     public int hashCode() {
-        return Objects.hash(GENERAL_ROUTES);
+        return Objects.hash(ROUTES);
     }
 }

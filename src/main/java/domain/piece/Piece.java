@@ -2,6 +2,7 @@ package domain.piece;
 
 import domain.piece.piecerole.PieceRole;
 import domain.position.Position;
+import domain.score.Score;
 import java.util.Objects;
 
 public class Piece {
@@ -17,6 +18,10 @@ public class Piece {
         return this.color == target.color;
     }
 
+    public boolean isSameColor(final Color color) {
+        return this.color == color;
+    }
+
     public boolean isNotSameColor(final Color color) {
         return this.color != color;
     }
@@ -29,8 +34,24 @@ public class Piece {
         return pieceRole.isPawn();
     }
 
+    public boolean isKing() {
+        return pieceRole.isKing();
+    }
+
     public boolean isSlidingPiece() {
         return pieceRole.isSlidingPiece();
+    }
+
+    public Score getScore() {
+        return pieceRole.getScore();
+    }
+
+    public String getColor() {
+        return color.name();
+    }
+
+    public String getPieceType() {
+        return pieceRole.getPieceType();
     }
 
     @Override

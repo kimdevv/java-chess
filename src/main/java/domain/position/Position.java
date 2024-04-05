@@ -17,6 +17,10 @@ public class Position {
         this(new File(fileRank.charAt(0)), new Rank(fileRank.charAt(1)));
     }
 
+    public Position(final String file, final String rank) {
+        this(new File(file.charAt(0)), new Rank(rank.charAt(0)));
+    }
+
     public Position move(final Direction direction) {
         int fileVector = direction.getFileVector();
         int rankVector = direction.getRankVector();
@@ -27,12 +31,16 @@ public class Position {
         return new ChessVector(file.subtract(target.file), rank.subtract(target.rank));
     }
 
-    public boolean isAtRank2() {
-        return rank.isRank2();
+    public boolean isRankAt(int number) {
+        return rank.isRank(number);
     }
 
-    public boolean isAtRank7() {
-        return rank.isRank7();
+    public File getFile() {
+        return file;
+    }
+
+    public Rank getRank() {
+        return rank;
     }
 
     @Override

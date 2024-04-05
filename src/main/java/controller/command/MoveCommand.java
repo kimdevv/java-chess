@@ -1,19 +1,24 @@
-package domain.command;
+package controller.command;
 
-import domain.game.Executable;
+import domain.game.ChessGame;
 import domain.position.Position;
 import java.util.List;
 import java.util.regex.Pattern;
+import service.ChessGameService;
+import service.ServiceFactory;
+import view.OutputView;
 
 public class MoveCommand implements Command {
+    private static final int SOURCE_INDEX = 0;
+    private static final int TARGET_INDEX = 1;
+    private static final int MOVE_ARGUMENTS_SIZE = 2;
     private static final String MOVE_COMMAND_REGEX_FORMAT = "^[a-h][1-8]";
     private static final Pattern MOVE_COMMAND_PATTERN = Pattern.compile(MOVE_COMMAND_REGEX_FORMAT);
-    public static final int SOURCE_INDEX = 0;
-    public static final int TARGET_INDEX = 1;
-    public static final int MOVE_ARGUMENTS_SIZE = 2;
 
     private final Position source;
     private final Position target;
+    private final ChessGameService chessGameService = ServiceFactory.getInstance().getChessGameService();
+
 
     public MoveCommand(List<String> arguments) {
         validate(arguments);
@@ -51,7 +56,14 @@ public class MoveCommand implements Command {
 
 
     @Override
-    public void execute(Executable executable) {
-        executable.move(source, target);
+    public void execute(ChessGame chessGame, OutputView outputView) {
+        chessGame.move(source, target);
+
+        chessGameService.updateChessGame(chessGame);
+        outputView.printChessBoard(chessGame.getChessBoard());
+
+        if (chessGame.isEnd()) {
+            outputView.printWinner(chessGame.getColor());
+        }
     }
 }

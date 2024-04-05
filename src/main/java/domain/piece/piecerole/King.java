@@ -7,10 +7,12 @@ import static domain.movement.Direction.W;
 
 import domain.movement.Movable;
 import domain.position.Position;
+import domain.score.Score;
 import java.util.List;
 import java.util.Objects;
 
-public class King implements PieceRole {
+public class King extends NonSlidingPiece {
+    private static final Score SCORE = new Score(0.0);
     private static final int MAX_MOVEMENT = 1;
     private static final List<Movable> ROUTES = List.of(
             new Movable(MAX_MOVEMENT, N),
@@ -19,6 +21,9 @@ public class King implements PieceRole {
             new Movable(MAX_MOVEMENT, W)
     );
 
+    public King() {
+        super(PieceType.KING, SCORE);
+    }
 
     @Override
     public boolean canMove(Position sourcePosition, Position targetPosition) {
@@ -27,13 +32,8 @@ public class King implements PieceRole {
     }
 
     @Override
-    public boolean isPawn() {
-        return false;
-    }
-
-    @Override
-    public boolean isSlidingPiece() {
-        return false;
+    public boolean isKing() {
+        return true;
     }
 
     @Override

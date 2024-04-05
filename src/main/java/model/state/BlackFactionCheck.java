@@ -1,5 +1,6 @@
 package model.state;
 
+import model.piece.Color;
 import model.piece.Piece;
 import model.position.Position;
 
@@ -9,7 +10,7 @@ public final class BlackFactionCheck extends BlackFaction {
 
     @Override
     public boolean isCheck(final Map<Position, Piece> chessBoard) {
-        if (super.isCheck(chessBoard)) {
+        if (!super.possibleCheckMate(chessBoard, Color.BLACK, Color.WHITE) && super.isCheck(chessBoard)) {
             throw new IllegalArgumentException("해당 방향으로의 이동은 Check를 해소할 수 없습니다.");
         }
         return false;
@@ -18,5 +19,10 @@ public final class BlackFactionCheck extends BlackFaction {
     @Override
     public FactionState check() {
         return this;
+    }
+
+    @Override
+    public boolean defeat(final Map<Position, Piece> chessBoard) {
+        return kingNonExist(chessBoard, Color.BLACK);
     }
 }

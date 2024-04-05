@@ -7,6 +7,7 @@ import model.direction.WayPoints;
 import model.piece.Color;
 import model.position.Position;
 import model.position.Rank;
+import model.score.PieceScore;
 import model.shift.SingleShift;
 
 import java.util.ArrayList;
@@ -31,23 +32,24 @@ public final class Pawn extends Role {
 
     @Override
     public Set<Route> findPossibleAllRoute(final Position position) {
+        Set<Route> routes = super.findPossibleAllRoute(position);
         if (position.rank() == WHITE_INITIAL_RANK) {
-            return routes(Direction.N, position);
+            routes.add(route(Direction.N, position));
         }
         if (position.rank() == BLACK_INITIAL_RANK) {
-            return routes(Direction.S, position);
+            routes.add(route(Direction.S, position));
         }
-        return super.findPossibleAllRoute(position);
+        return routes;
     }
 
-    private Set<Route> routes(final Direction direction, final Position position) {
+    private Route route(final Direction direction, final Position position) {
         List<Position> sequentialPositions = new ArrayList<>();
         Position movingPosition = position;
         for (int i = 0; i < INITIAL_POSSIBLE_MOVEMENT; i++) {
             movingPosition = movingPosition.getNextPosition(direction);
             sequentialPositions.add(movingPosition);
         }
-        return Set.of(new Route(direction, sequentialPositions));
+        return new Route(direction, sequentialPositions);
     }
 
     @Override
@@ -73,5 +75,10 @@ public final class Pawn extends Role {
         if (ShiftPattern.isForward(direction) && target.isOccupied()) {
             throw new IllegalArgumentException("해당 방향으로 이동 시 도착지에 상대편의 기물이 존재할 경우 이동이 불가 합니다.");
         }
+    }
+
+    @Override
+    public PieceScore score() {
+        return PieceScore.PAWN;
     }
 }

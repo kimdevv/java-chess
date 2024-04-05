@@ -10,7 +10,7 @@ public sealed class WhiteFaction implements FactionState permits WhiteFactionChe
     @Override
     public void checkSameFaction(final Piece piece) {
         if (piece.color() != Color.WHITE) {
-            throw new IllegalArgumentException("현재 해당 진영의 차례가 아닙니다.");
+            throw new IllegalArgumentException("하얀색 진영의 기물을 이동해야 합니다.");
         }
     }
 
@@ -21,9 +21,12 @@ public sealed class WhiteFaction implements FactionState permits WhiteFactionChe
 
     @Override
     public boolean isCheck(final Map<Position, Piece> chessBoard) {
+        if (kingNonExist(chessBoard, Color.WHITE)) {
+            return false;
+        }
         Position kingPosition = positionOfKing(chessBoard, Color.WHITE);
         Map<Position, Piece> enemyFaction = factionOf(chessBoard, Color.BLACK);
-        return enemyFaction.entrySet()
+        return enemyFaction.keySet()
                            .stream()
                            .anyMatch(entry -> possibleAttacked(chessBoard, kingPosition, entry));
     }
@@ -31,5 +34,15 @@ public sealed class WhiteFaction implements FactionState permits WhiteFactionChe
     @Override
     public FactionState check() {
         return new WhiteFactionCheck();
+    }
+
+    @Override
+    public boolean defeat(final Map<Position, Piece> chessBoard) {
+        return kingNonExist(chessBoard, Color.WHITE);
+    }
+
+    @Override
+    public Color oppositeFaction() {
+        return Color.BLACK;
     }
 }

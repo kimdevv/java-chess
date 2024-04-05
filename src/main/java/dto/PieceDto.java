@@ -1,6 +1,6 @@
-package view.dto;
+package dto;
 
-public record PieceInfo(
+public record PieceDto(
         int file,
         int rank,
         char role

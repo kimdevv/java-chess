@@ -1,21 +1,18 @@
 package controller;
 
+import dto.PieceDto;
+import mapper.PieceDtoMapper;
 import model.chessboard.ChessBoard;
-import model.position.File;
+import model.piece.Color;
 import model.position.Position;
-import model.position.Rank;
-import util.PieceInfoMapper;
 import view.GameCommand;
 import view.InputView;
 import view.OutputView;
 import view.dto.GameProceedRequest;
-import view.dto.PieceInfo;
 
 import java.util.List;
 
 public class Controller {
-    private static final int FILE_INDEX = 0;
-    private static final int RANK_INDEX = 1;
     private final OutputView outputView;
 
     public Controller() {
@@ -23,35 +20,49 @@ public class Controller {
     }
 
     public void execute() {
-        outputView.printInitialGamePrompt();
-        GameCommand gameCommand = initGameCommand();
-        ChessBoard chessBoard = new ChessBoard();
-        while (gameCommand != GameCommand.END) {
-            List<PieceInfo> pieceInfos = PieceInfoMapper.toPieceInfo(chessBoard);
-            outputView.printChessBoard(pieceInfos);
+        outputView.printGamePrompt();
+        GameCommand gameCommand = initialGameCommand();
+        ChessBoard chessBoard = generateChessBoard(gameCommand);
+        while (gameCommand != GameCommand.END && !chessBoard.checkMate()) {
+            List<PieceDto> pieceDto = PieceDtoMapper.toPieceDto(chessBoard);
+            outputView.printChessBoard(pieceDto);
             gameCommand = play(chessBoard);
         }
+        chessBoardWinner(chessBoard);
+        chessBoardScore(chessBoard);
     }
 
-    private GameCommand initGameCommand() {
+    private GameCommand initialGameCommand() {
         try {
             return InputView.inputInitialGameCommand();
         } catch (IllegalArgumentException e) {
             outputView.printExceptionMessage(e.getMessage());
-            return initGameCommand();
+            return initialGameCommand();
         }
+    }
+
+    private ChessBoard generateChessBoard(final GameCommand gameCommand) {
+        try {
+            if (gameCommand == GameCommand.LOAD) {
+                return ChessBoard.load();
+            }
+        } catch (IllegalStateException e) {
+            outputView.printExceptionMessage(e.getMessage());
+        }
+        return ChessBoard.initialize();
     }
 
     private GameCommand play(final ChessBoard chessBoard) {
         try {
             GameProceedRequest gameProceedRequest = InputView.inputGameProceedCommand();
-            if (gameProceedRequest.gameCommand() == GameCommand.START) {
-                throw new IllegalArgumentException("이미 진행중인 게임이 존재합니다.");
+            GameCommand gameCommand = gameProceedRequest.gameCommand();
+            if (gameCommand != GameCommand.MOVE && gameCommand != GameCommand.END) {
+                throw new IllegalArgumentException("현재 진행중인 게임이 존재합니다.");
             }
-            if (gameProceedRequest.gameCommand() == GameCommand.MOVE) {
+            if (gameCommand == GameCommand.MOVE) {
                 controlChessBoard(chessBoard, gameProceedRequest);
             }
-            return gameProceedRequest.gameCommand();
+            return gameCommand;
         } catch (IllegalArgumentException e) {
             outputView.printExceptionMessage(e.getMessage());
             return play(chessBoard);
@@ -59,14 +70,25 @@ public class Controller {
     }
 
     private void controlChessBoard(final ChessBoard chessBoard, final GameProceedRequest gameProceedRequest) {
-        Position source = matchPosition(gameProceedRequest.sourcePosition().get());
-        Position destination = matchPosition(gameProceedRequest.targetPosition().get());
-        chessBoard.move(source, destination);
+        Position source = Position.from(gameProceedRequest.sourcePosition());
+        Position destination = Position.from(gameProceedRequest.targetPosition());
+        chessBoard.proceedToTurn(source, destination);
     }
 
-    private Position matchPosition(final String position) {
-        File sourceFile = File.from(position.charAt(FILE_INDEX));
-        Rank sourceRank = Rank.from(position.charAt(RANK_INDEX));
-        return Position.of(sourceFile, sourceRank);
+    private void chessBoardWinner(final ChessBoard chessBoard) {
+        try {
+            GameCommand gameCommand = InputView.inputGameStatusCommand();
+            if (gameCommand == GameCommand.STATUS) {
+                outputView.printWinner(chessBoard.winner());
+            }
+        } catch (IllegalArgumentException e) {
+            outputView.printExceptionMessage(e.getMessage());
+            chessBoardWinner(chessBoard);
+        }
+    }
+
+    private void chessBoardScore(final ChessBoard chessBoard) {
+        outputView.printScore(chessBoard.score(Color.BLACK).value(), Color.BLACK.name());
+        outputView.printScore(chessBoard.score(Color.WHITE).value(), Color.WHITE.name());
     }
 }

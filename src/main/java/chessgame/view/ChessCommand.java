@@ -6,7 +6,8 @@ public enum ChessCommand {
     PENDING(""),
     START("start"),
     END("end"),
-    MOVE("move");
+    MOVE("move"),
+    STATUS("status");
 
     private final String commandText;
 
@@ -14,10 +15,15 @@ public enum ChessCommand {
         this.commandText = commandText;
     }
 
-    public static ChessCommand from(final String commandText){
+    public static ChessCommand from(final String commandText) {
         return Arrays.stream(values())
                 .filter(value -> value.commandText.equals(commandText))
-                .findFirst()
+                .findAny()
                 .orElseThrow(() -> new IllegalArgumentException(String.format("%s는 없는 명령입니다.", commandText)));
     }
+
+    public boolean isEnd() {
+        return this == END;
+    }
+
 }

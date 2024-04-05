@@ -1,6 +1,6 @@
 package chessgame.domain.piece.attribute.point;
 
-import chessgame.dto.PointDto;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public record Point(File file, Rank rank) {
@@ -8,7 +8,7 @@ public record Point(File file, Rank rank) {
     private static final Pattern pattern = Pattern.compile("[a-h][1-8]");
 
     public Point move(final Movement direction) {
-        return moveVertical(direction.y()).moveHorizontal(direction.x());
+        return moveVertical(direction.getY()).moveHorizontal(direction.geyX());
     }
 
     private Point moveVertical(final int step) {
@@ -32,7 +32,7 @@ public record Point(File file, Rank rank) {
     }
 
     public boolean canMove(final Movement direction) {
-        return canVerticalMove(direction.y()) && canHorizontalMove(direction.x());
+        return canVerticalMove(direction.getY()) && canHorizontalMove(direction.geyX());
     }
 
     private boolean canVerticalMove(final int step) {
@@ -68,7 +68,6 @@ public record Point(File file, Rank rank) {
         return file.canMoveLeft(step);
     }
 
-
     public boolean canMoveRight(final int step) {
         return file.canMoveRight(step);
     }
@@ -89,6 +88,10 @@ public record Point(File file, Rank rank) {
         return new Point(file.moveRight(step), rank);
     }
 
+    public boolean isSameFile(final Point other) {
+        return this.file == other.file;
+    }
+
     public static Point from(final String value) {
         validate(value);
         final var file = File.from(value.charAt(0));
@@ -103,7 +106,21 @@ public record Point(File file, Rank rank) {
         }
     }
 
-    public PointDto toDto() {
-        return new PointDto(this.file.ordinal(), this.rank.ordinal());
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Point point = (Point) o;
+        return file == point.file && rank == point.rank;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(file, rank);
+    }
+
 }

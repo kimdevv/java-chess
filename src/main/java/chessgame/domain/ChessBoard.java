@@ -4,26 +4,32 @@ import chessgame.domain.piece.Piece;
 import chessgame.domain.piece.Pieces;
 import chessgame.domain.piece.attribute.Color;
 import chessgame.domain.piece.attribute.point.Point;
-import chessgame.dto.ChessBoardDto;
+import chessgame.view.Winner;
 import chessgame.dto.RouteDto;
 import chessgame.factory.ChessBoardGenerator;
-import java.util.Set;
 
 public class ChessBoard {
     private Pieces pieces;
-    private Color color;
+    private Color turn;
 
     public ChessBoard() {
-        color = Color.WHITE;
-        this.pieces = new Pieces(Set.of());
+        turn = Color.WHITE;
+        this.pieces = new Pieces();
     }
 
     public ChessBoard(final Pieces pieces) {
+        this.turn = Color.WHITE;
+        this.pieces = pieces;
+    }
+
+    public ChessBoard(final Pieces pieces, final Color color) {
+        this.turn = color;
         this.pieces = pieces;
     }
 
     public void reset() {
         this.pieces = ChessBoardGenerator.createDefaultPieces();
+        this.turn = Color.WHITE;
     }
 
     public Piece findPieceByPoint(final Point point) {
@@ -31,20 +37,27 @@ public class ChessBoard {
                 .orElseThrow(() -> new IllegalArgumentException("해당 포인트에는 기물이 없습니다"));
     }
 
-    public void move(final RouteDto dto) {
-        validateGameProceed();
-        final var startPoint = dto.getStartPoint();
+    public Winner move(final RouteDto dto) {
+        final var piece = findPieceByPoint(dto.getStartPoint());
         final var endPoint = dto.getEndPoint();
-        final var piece = findPieceByPoint(startPoint);
-        validateCorrectTurn(piece);
-        validateCanReplace(piece, endPoint, startPoint);
+        validate(piece, endPoint);
         pieces.replace(piece, endPoint);
-        color = color.getOpposite();
+        if (isGameOver()) {
+            return Winner.of(turn);
+        }
+        turn = turn.getOpposite();
+        return Winner.UNDETERMINED;
+    }
+
+    private void validate(final Piece piece, final Point endPoint) {
+        validateGameProceed();
+        validateCorrectTurn(piece);
+        validateCanReplace(piece, endPoint);
     }
 
     private void validateCorrectTurn(final Piece piece) {
-        if (!piece.isSameColor(color)) {
-            throw new IllegalStateException("현재는 %s의 턴입니다.".formatted(color.name()));
+        if (!piece.isSameColor(turn)) {
+            throw new IllegalStateException("현재는 %s의 턴입니다.".formatted(turn.name()));
         }
     }
 
@@ -54,18 +67,38 @@ public class ChessBoard {
         }
     }
 
-    private void validateCanReplace(final Piece piece, final Point endPoint, final Point startPoint) {
+    private void validateCanReplace(final Piece piece, final Point endPoint) {
         if (!pieces.canReplace(piece, endPoint)) {
             throw new IllegalArgumentException(
-                    String.format("%s 는 %s 에서 %s로 이동할 수 없습니다.", piece.status(), startPoint, endPoint));
+                    String.format("%s로 이동할 수 없습니다.", endPoint));
         }
+    }
+
+
+    public Winner findWinner() {
+        final var whiteScore = pieces.calculateTeamScore(Color.WHITE);
+        final var blackScore = pieces.calculateTeamScore(Color.BLACK);
+        return Winner.from(whiteScore, blackScore);
+    }
+
+    public double findTotalScore(final Color color) {
+        return pieces.calculateTeamScore(color);
+    }
+
+    public boolean isGameOver() {
+        return pieces.hasNotKing(this.turn.getOpposite()) || pieces.isCheckmate(this.turn.getOpposite());
     }
 
     public static ChessBoard createDefaultBoard() {
         return ChessBoardGenerator.createDefaultBoard();
     }
 
-    public ChessBoardDto toDto() {
-        return new ChessBoardDto(pieces.toDto());
+    public Pieces getPieces() {
+        return new Pieces(pieces);
     }
+
+    public Color getTurn() {
+        return turn;
+    }
+
 }

@@ -1,11 +1,13 @@
 package chessgame;
 
-import chessgame.controller.ChessController;
+import chessgame.dao.ChessDao;
+import chessgame.domain.ChessGame;
 
 public class Application {
     public static void main(String[] args) {
-        final var controller = new ChessController();
+        final var chessGame = new ChessGame(new ChessDao());
 
-        controller.start();
+        chessGame.run();
     }
+
 }

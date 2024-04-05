@@ -4,7 +4,7 @@ import chessgame.domain.piece.Piece;
 import chessgame.domain.piece.attribute.Color;
 import chessgame.domain.piece.attribute.point.Movement;
 import chessgame.domain.piece.attribute.point.Point;
-import chessgame.domain.piece.kind.PieceStatus;
+import chessgame.domain.piece.kind.Score;
 
 import java.util.Set;
 
@@ -21,12 +21,13 @@ public class Knight extends JumpingPiece {
     }
 
     @Override
-    public PieceStatus status() {
-        return PieceStatus.KNIGHT;
+    public Score getScore() {
+        return Score.KNIGHT;
     }
 
     @Override
     protected Piece update(final Point point) {
         return new Knight(point, color);
     }
+
 }

@@ -3,53 +3,64 @@ package chessgame.domain.piece.attribute.point;
 import java.util.Arrays;
 
 public enum File {
-    A('a'),
-    B('b'),
-    C('c'),
-    D('d'),
-    E('e'),
-    F('f'),
-    G('g'),
-    H('h');
-    private final char value;
+    A('a', 0),
+    B('b', 1),
+    C('c', 2),
+    D('d', 3),
+    E('e', 4),
+    F('f', 5),
+    G('g', 6),
+    H('h', 7);
 
-    File(final char value) {
+    private final char value;
+    private final int order;
+
+    File(final char value, final int order) {
         this.value = value;
+        this.order = order;
     }
 
     public static File from(final char value) {
         return Arrays.stream(values())
                 .filter(file -> file.value == value)
-                .findFirst()
+                .findAny()
                 .orElseThrow(() -> new IllegalArgumentException(String.format("%c는 파일에 존재하지 않습니다.", value)));
     }
 
+    public static File from(final String value) {
+        final var charValue = value.toLowerCase().charAt(0);
+        return Arrays.stream(values())
+                .filter(file -> file.value == charValue)
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("%s는 파일에 존재하지 않습니다.", value)));
+    }
+
     public boolean isFarLeft() {
-        return ordinal() == 0;
+        return order == 0;
     }
 
     public boolean isFarRight() {
-        return ordinal() == values().length - 1;
+        return order == values().length - 1;
     }
 
     public boolean canMoveLeft(final int step) {
-        return ordinal() - step >= 0;
+        return order - step >= 0;
     }
 
     public boolean canMoveRight(final int step) {
-        return ordinal() + step < values().length;
+        return order + step < values().length;
     }
 
     public File moveLeft(final int step) {
         if (canMoveLeft(step)) {
-            return values()[ordinal() - step];
+            return values()[order - step];
         }
         throw new IllegalStateException("움직일 수 없는 위치입니다.");
     }
 
     public File moveRight(final int step) {
         if (canMoveRight(step)) {
-            return values()[ordinal() + step];
+            return values()[order + step];
         }
         throw new IllegalStateException("움직일 수 없는 위치입니다.");
     }

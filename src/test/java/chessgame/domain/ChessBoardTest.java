@@ -1,6 +1,11 @@
 package chessgame.domain;
 
-import chessgame.domain.piece.kind.PieceStatus;
+import chessgame.domain.piece.kind.Score;
+import chessgame.view.Winner;
+import chessgame.domain.piece.kind.jumping.King;
+import chessgame.domain.piece.kind.sliding.Queen;
+import chessgame.domain.piece.kind.sliding.Rook;
+import chessgame.dto.RouteDto;
 import chessgame.fixture.PieceImpl;
 import java.util.Set;
 import org.assertj.core.api.Assertions;
@@ -17,8 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static chessgame.domain.piece.kind.PieceStatus.*;
+import static chessgame.domain.piece.kind.Score.*;
 import static org.assertj.core.api.Assertions.assertThat;
+
 
 class ChessBoardTest {
     @Test
@@ -72,20 +78,89 @@ class ChessBoardTest {
                                 .toList();
 
 
-        List<PieceStatus> pieceList = List.of(ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK);
-        List<PieceStatus> pawnList = IntStream.range(0, 8)
+        List<Score> pieceList = List.of(ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK);
+        List<Score> pawnList = IntStream.range(0, 8)
                                               .mapToObj(it -> PAWN)
                                               .toList();
 
-        List<List<PieceStatus>> expected = List.of(pieceList, pawnList, pawnList, pieceList);
+        List<List<Score>> expected = List.of(pieceList, pawnList, pawnList, pieceList);
         assertThat(result).isEqualTo(expected);
     }
 
-    private List<PieceStatus> getRankPieces(final ChessBoard chessBoard, final Rank rank) {
+    private List<Score> getRankPieces(final ChessBoard chessBoard, final Rank rank) {
         return Arrays.stream(File.values())
                      .map(file -> new Point(file, rank))
                      .map(chessBoard::findPieceByPoint)
-                     .map(Piece::status)
+                     .map(Piece::getScore)
                      .toList();
     }
+
+    @Test
+    @DisplayName("기물들의 점수를 바탕으로 승리자를 가린다. (흑 승리)")
+    void find_winner_by_each_team_score_black_win_case() {
+        final var rook = new Rook(new Point(File.E, Rank.ONE), Color.WHITE);
+        final var queen = new Queen(new Point(File.A, Rank.ONE), Color.BLACK);
+        final var sut = new ChessBoard(new Pieces(Set.of(rook, queen)));
+
+        assertThat(sut.findWinner()).isSameAs(Winner.BLACK);
+    }
+
+
+    @Test
+    @DisplayName("기물들의 점수를 바탕으로 승리자를 가린다. (백 승리)")
+    void find_winner_by_each_team_score_white_win_case() {
+        final var rook = new Rook(new Point(File.E, Rank.ONE), Color.BLACK);
+        final var queen = new Queen(new Point(File.A, Rank.ONE), Color.WHITE);
+        final var sut = new ChessBoard(new Pieces(Set.of(rook, queen)));
+
+        assertThat(sut.findWinner()).isSameAs(Winner.WHITE);
+    }
+
+    @Test
+    @DisplayName("기물들의 점수를 바탕으로 승리자를 가린다. (무승부)")
+    void find_winner_by_each_team_score_draw_case() {
+        final var queen1 = new Queen(new Point(File.E, Rank.ONE), Color.BLACK);
+        final var queen2 = new Queen(new Point(File.A, Rank.ONE), Color.WHITE);
+        final var sut = new ChessBoard(new Pieces(Set.of(queen1, queen2)));
+
+        assertThat(sut.findWinner()).isSameAs(Winner.DRAW);
+    }
+
+
+    @Test
+    @DisplayName("체크메이트가 아니면 게임이 끝나지 않는다.")
+    void game_over_if_king_dies_not_finish_case() {
+        final var queen = new Queen(new Point(File.E, Rank.TWO), Color.WHITE);
+        final var king = new King(new Point(File.A, Rank.ONE), Color.BLACK);
+        final var sut = new ChessBoard(new Pieces(Set.of(queen, king)));
+        assertThat(sut.move(new RouteDto("e2", "b2")))
+                .isSameAs(Winner.UNDETERMINED);
+    }
+
+     /*
+    ........ 8
+    ........ 7
+    ........ 6
+    ........ 5
+    ........ 4
+    R....... 3
+    XX..... 2
+    kXQ..... 1
+    abcdefgh
+     */
+
+    @Test
+    @DisplayName("체크메이트가 되면 게임이 끝난다.")
+    void game_over_if_king_dies() {
+        final var queen = new Queen(new Point(File.D, Rank.ONE), Color.WHITE);
+        final var rook = new Rook(new Point(File.A, Rank.THREE), Color.WHITE);
+        final var king = new King(new Point(File.A, Rank.ONE), Color.BLACK);
+        final var king2 = new King(new Point(File.H, Rank.ONE), Color.WHITE);
+
+        final var sut = new ChessBoard(new Pieces(Set.of(queen, rook, king, king2)));
+
+        assertThat(sut.move(new RouteDto("d1", "c1")))
+                .isSameAs(Winner.WHITE);
+    }
 }
+

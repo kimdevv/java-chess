@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public abstract class JumpingPiece extends Piece {
 
-    protected JumpingPiece(Point point, Color color) {
+    protected JumpingPiece(final Point point, final Color color) {
         super(point, color);
     }
 
@@ -19,10 +19,10 @@ public abstract class JumpingPiece extends Piece {
         return getMovableDirection().stream()
                 .filter(direction -> super.point.canMove(direction))
                 .map(direction -> super.point.move(direction))
-                .filter(point -> !pieces.isFriend(this, point))
+                .filter(point -> !pieces.isTeam(this, point))
                 .collect(Collectors.toSet());
     }
 
-
     protected abstract Set<Movement> getMovableDirection();
+
 }

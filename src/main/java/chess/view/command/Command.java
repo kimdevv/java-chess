@@ -5,9 +5,9 @@ public class Command {
     private final CommandType commandType;
     private final String description;
 
-    public Command(final CommandType commandType, final String description) {
-        this.commandType = commandType;
-        this.description = description;
+    public Command(final String command) {
+        this.commandType = CommandType.from(command);
+        this.description = command;
     }
 
     public MoveCommand toMoveCommand() {
@@ -27,5 +27,13 @@ public class Command {
 
     public boolean isMove() {
         return commandType == CommandType.MOVE;
+    }
+
+    public boolean isStatus() {
+        return commandType == CommandType.STATUS;
+    }
+
+    public boolean isLoad() {
+        return commandType == CommandType.LOAD;
     }
 }

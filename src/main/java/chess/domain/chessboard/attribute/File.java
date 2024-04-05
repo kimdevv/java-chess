@@ -4,7 +4,14 @@ import java.util.Arrays;
 import java.util.function.Predicate;
 
 public enum File {
-    A, B, C, D, E, F, G, H;
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    H;
 
     public static File from(final char value) {
         return from(String.valueOf(value));
@@ -32,5 +39,10 @@ public enum File {
 
     public int toColumn() {
         return ordinal();
+    }
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
     }
 }

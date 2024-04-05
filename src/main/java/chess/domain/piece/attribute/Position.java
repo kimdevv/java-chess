@@ -29,8 +29,8 @@ public class Position {
         return of(File.from(position.charAt(0)), Rank.from(position.charAt(1)));
     }
 
-    public static Position of(final Rank rank, final File file) {
-        return of(file, rank);
+    public static Position of(final int row, final int column) {
+        return of(File.from(column), Rank.from(row));
     }
 
     public static Position of(final File file, final Rank rank) {
@@ -41,7 +41,7 @@ public class Position {
         int row = rank.toRow() + direction.row();
         int column = file.toColumn() + direction.column();
         if (isInBoard(column, row)) {
-            return Optional.of(Position.of(File.from(column), Rank.from(row)));
+            return Optional.of(Position.of(row, column));
         }
         return Optional.empty();
     }
@@ -79,6 +79,6 @@ public class Position {
 
     @Override
     public String toString() {
-        return file.name() + rank.toString();
+        return file.toString() + rank.toString();
     }
 }

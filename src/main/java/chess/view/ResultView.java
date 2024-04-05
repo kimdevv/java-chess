@@ -2,8 +2,7 @@ package chess.view;
 
 import static chess.view.command.CommandType.END;
 
-import java.util.List;
-
+import chess.view.dto.ChessResultDto;
 import chess.view.dto.ChessboardDto;
 
 public class ResultView {
@@ -20,8 +19,18 @@ public class ResultView {
     }
 
     public void printBoard(final ChessboardDto chessboardDto) {
-        List<List<String>> chessboard = chessboardDto.get();
-        chessboard.forEach(positions -> System.out.println(String.join("", positions)));
-        System.out.println();
+        System.out.println(chessboardDto.getChessboard());
+    }
+
+    public void printCheckmate() {
+        System.out.printf("%n체크메이트. 'status'를 입력하면 게임 결과를 확인할 수 있습니다.%n");
+    }
+
+    public void printResult(final ChessResultDto chessResultDto) {
+        System.out.printf("%n> 결과%n"
+                + chessResultDto.scores()
+                + "%n"
+                + chessResultDto.winner()
+                + "의 승리입니다!%n");
     }
 }

@@ -11,6 +11,8 @@ import chess.domain.piece.attribute.Position;
 
 public class King extends UnslidingPiece {
 
+    private static final double SCORE = 0;
+
     private static final Position WHITE_INITIAL_POSITION = Position.from("e1");
     private static final Position BLACK_INITIAL_POSITION = Position.from("e8");
 
@@ -36,5 +38,15 @@ public class King extends UnslidingPiece {
     @Override
     public Set<Position> movablePositions(final Chessboard chessboard) {
         return movablePositions(chessboard, POSSIBLE_MOVEMENTS);
+    }
+
+    @Override
+    public double score(final boolean ignored) {
+        return SCORE;
+    }
+
+    @Override
+    public String toString() {
+        return "K" + position().toString();
     }
 }

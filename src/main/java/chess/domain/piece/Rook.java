@@ -10,6 +10,8 @@ import chess.domain.piece.attribute.Positions;
 
 public class Rook extends SlidingPiece {
 
+    private static final double SCORE = 5;
+
     private static final Set<Position> WHITE_INITIAL_POSITIONS = Positions.of("a1", "h1");
     private static final Set<Position> BLACK_INITIAL_POSITIONS = Positions.of("a8", "h8");
 
@@ -36,5 +38,15 @@ public class Rook extends SlidingPiece {
     @Override
     public Set<Position> movablePositions(final Chessboard chessboard) {
         return movablePositions(chessboard, POSSIBLE_DIRECTIONS);
+    }
+
+    @Override
+    public double score(final boolean ignored) {
+        return SCORE;
+    }
+
+    @Override
+    public String toString() {
+        return "R" + position().toString();
     }
 }

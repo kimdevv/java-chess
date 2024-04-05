@@ -1,12 +1,10 @@
 package chess.domain.chessboard;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import chess.domain.chessboard.attribute.Rank;
-import chess.domain.chessboard.attribute.Squares;
 import chess.domain.piece.Bishop;
 import chess.domain.piece.King;
 import chess.domain.piece.Knight;
@@ -15,7 +13,7 @@ import chess.domain.piece.Queen;
 import chess.domain.piece.Rook;
 import chess.domain.piece.StartingPawn;
 import chess.domain.piece.attribute.Color;
-import chess.domain.piece.attribute.Position;
+import chess.fen.Fen;
 
 public class ChessboardFactory {
 
@@ -23,39 +21,20 @@ public class ChessboardFactory {
     }
 
     public static Chessboard empty() {
-        return new Chessboard(emptyBoard());
+        return new Chessboard(new HashMap<>());
     }
 
     public static Chessboard create() {
-        List<Squares> chessboard = emptyBoard();
-        putInitialPieces(chessboard);
-        return new Chessboard(chessboard);
+        return from(initialPieces());
     }
 
-    public static Chessboard of(final Piece... pieces) {
-        List<Squares> chessboard = emptyBoard();
-        for (final Piece piece : pieces) {
-            Position position = piece.position();
-            Rank rank = position.rank();
-            Squares squares = chessboard.get(rank.toRow());
-            squares.put(position, piece);
-        }
-        return new Chessboard(chessboard);
+    public static Chessboard from(final Fen fen) {
+        return from(fen.toPieces());
     }
 
-    private static List<Squares> emptyBoard() {
-        return Arrays.stream(Rank.values())
-                .map(__ -> Squares.empty())
-                .toList();
-    }
-
-    private static void putInitialPieces(final List<Squares> chessboard) {
-        for (final Piece piece : initialPieces()) {
-            Position position = piece.position();
-            Rank rank = position.rank();
-            Squares squares = chessboard.get(rank.toRow());
-            squares.put(position, piece);
-        }
+    public static Chessboard from(final Set<Piece> pieces) {
+        return new Chessboard(pieces.stream()
+                .collect(Collectors.toMap(Piece::position, piece -> piece)));
     }
 
     private static Set<Piece> initialPieces() {

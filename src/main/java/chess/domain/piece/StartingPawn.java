@@ -11,7 +11,7 @@ import chess.domain.piece.attribute.Movement;
 import chess.domain.piece.attribute.Position;
 import chess.domain.piece.attribute.Positions;
 
-public class StartingPawn extends AbstractPawn {
+public class StartingPawn extends Pawn {
 
     private static final Set<Position> WHITE_INITIAL_POSITIONS = Positions.of(
             "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"
@@ -42,10 +42,14 @@ public class StartingPawn extends AbstractPawn {
         );
     }
 
+    public static Set<Position> startingPositions(final Color color) {
+        return selectByColor(color, WHITE_INITIAL_POSITIONS, BLACK_INITIAL_POSITIONS);
+    }
+
     @Override
     public Piece move(final Chessboard chessboard, final Position target) {
         validateTarget(movablePositions(chessboard), target);
-        return new Pawn(color(), target);
+        return new DefaultPawn(color(), target);
     }
 
     @Override

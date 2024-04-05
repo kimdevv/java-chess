@@ -1,12 +1,13 @@
 package chess.domain.piece;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import chess.domain.chessboard.Chessboard;
 import chess.domain.chessboard.attribute.Direction;
-import chess.domain.chessboard.attribute.Square;
 import chess.domain.piece.attribute.Color;
 import chess.domain.piece.attribute.Position;
 
@@ -17,11 +18,10 @@ public abstract class SlidingPiece extends Piece {
     }
 
     protected Set<Position> movablePositions(final Chessboard chessboard, final Set<Direction> directions) {
-        Set<Position> positions = new HashSet<>();
-        for (Direction direction : directions) {
-            positions.addAll(movablePositionsOf(chessboard, direction, position()));
-        }
-        return positions;
+        return directions.stream()
+                .map(direction -> movablePositionsOf(chessboard, direction, position()))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     private Set<Position> movablePositionsOf(
@@ -42,13 +42,12 @@ public abstract class SlidingPiece extends Piece {
             final Direction direction,
             final Position position
     ) {
-        Square square = chessboard.squareIn(position);
-        if (square.isEmpty()) {
+        if (chessboard.isEmpty(position)) {
             Set<Position> positions = new HashSet<>(movablePositionsOf(chessboard, direction, position));
             positions.add(position);
             return positions;
         }
-        if (isAttackable(square)) {
+        if (isAttackable(chessboard, position)) {
             return Set.of(position);
         }
         return Set.of();

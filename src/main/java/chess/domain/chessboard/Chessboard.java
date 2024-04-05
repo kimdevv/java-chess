@@ -1,19 +1,23 @@
 package chess.domain.chessboard;
 
 import java.util.List;
+import java.util.Map;
 
 import chess.domain.chessboard.attribute.File;
 import chess.domain.chessboard.attribute.Rank;
-import chess.domain.chessboard.attribute.Square;
-import chess.domain.chessboard.attribute.Squares;
+import chess.domain.piece.King;
 import chess.domain.piece.Piece;
+import chess.domain.piece.attribute.Color;
 import chess.domain.piece.attribute.Position;
+import chess.domain.piece.attribute.Positions;
 
 public class Chessboard {
 
-    private final List<Squares> chessboard;
+    private static final int CHECKMATE_KING_COUNT = 1;
 
-    protected Chessboard(final List<Squares> chessboard) {
+    private final Map<Position, Piece> chessboard;
+
+    protected Chessboard(final Map<Position, Piece> chessboard) {
         this.chessboard = chessboard;
     }
 
@@ -21,12 +25,16 @@ public class Chessboard {
         return File.isInRange(column) && Rank.isInRange(row);
     }
 
-    public void move(final Position source, final Position target) {
-        validateSource(source);
-        Piece sourcePiece = squareIn(source).piece();
-        Piece targetPiece = sourcePiece.move(this, target);
+    public Piece move(final Position source, final Position target) {
+        Piece piece = get(source).move(this, target);
         remove(source);
-        put(target, targetPiece);
+        put(target, piece);
+        return piece;
+    }
+
+    public Piece get(final Position position) {
+        validateSource(position);
+        return chessboard.get(position);
     }
 
     private void validateSource(final Position position) {
@@ -36,33 +44,45 @@ public class Chessboard {
     }
 
     public boolean isEmpty(final Position position) {
-        return squareIn(position).isEmpty();
+        return !isPresent(position);
+    }
+
+    public boolean isPresent(final Position position) {
+        return chessboard.containsKey(position);
     }
 
     private void remove(final Position position) {
-        Rank rank = position.rank();
-        Squares squares = chessboard.get(rank.toRow());
-        squares.remove(position);
+        chessboard.remove(position);
     }
 
     private void put(final Position position, final Piece piece) {
-        Squares squares = squaresIn(piece.position());
-        squares.put(position, piece);
+        chessboard.put(position, piece);
     }
 
-    public Square squareIn(final Position position) {
-        Squares squares = squaresIn(position);
-        return squares.squareIn(position);
+    public List<Piece> getAllFrom(final File file) {
+        return Positions.from(file)
+                .stream()
+                .filter(this::isPresent)
+                .map(chessboard::get)
+                .toList();
     }
 
-    private Squares squaresIn(final Position position) {
-        Rank rank = position.rank();
-        return chessboard.get(rank.toRow());
+    public boolean isCheckmate() {
+        return chessboard.values()
+                .stream()
+                .filter(King.class::isInstance)
+                .count() == CHECKMATE_KING_COUNT;
     }
 
-    public List<List<Square>> getSquares() {
-        return List.copyOf(chessboard.stream()
-                .map(Squares::getSquares)
-                .toList());
+    public Color winner() {
+        if (!isCheckmate()) {
+            throw new IllegalStateException("체크메이트인 경우에만 승자를 알 수 있습니다.");
+        }
+        return chessboard.values()
+                .stream()
+                .filter(King.class::isInstance)
+                .findFirst()
+                .map(Piece::color)
+                .orElseThrow(IllegalStateException::new);
     }
 }

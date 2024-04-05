@@ -59,7 +59,6 @@ class StartingPawnTest {
     void movablePositions(Color color, Chessboard chessboard, Position source, Set<Position> expected) {
         Piece sut = new StartingPawn(color, source);
         var actual = sut.movablePositions(chessboard);
-        System.out.println(actual);
         assertThat(actual).containsAll(expected);
     }
 }

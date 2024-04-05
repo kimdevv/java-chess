@@ -18,12 +18,12 @@ import chess.domain.piece.attribute.Color;
 import chess.domain.piece.attribute.Position;
 import chess.domain.piece.attribute.Positions;
 
-class PawnTest {
+class DefaultPawnTest {
 
     @DisplayName("폰이 이동한다.")
     @Test
     void move() {
-        Piece sut = new Pawn(Color.WHITE, Position.from("d3"));
+        Piece sut = new DefaultPawn(Color.WHITE, Position.from("d3"));
         Position actual = sut.move(ChessboardFactory.empty(), Position.from("d4")).position();
         assertThat(actual).isEqualTo(Position.from("d4"));
     }
@@ -31,7 +31,7 @@ class PawnTest {
     @DisplayName("이동할 수 없는 위치를 입력받으면 예외를 발생한다.")
     @Test
     void moveException() {
-        Piece sut = new Pawn(Color.WHITE, Position.from("d5"));
+        Piece sut = new DefaultPawn(Color.WHITE, Position.from("d5"));
         assertThatCode(() -> sut.move(ChessboardFactory.empty(), Position.from("e3")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이동할 수 없는 위치입니다: E3");
@@ -70,9 +70,8 @@ class PawnTest {
     @MethodSource
     @ParameterizedTest
     void movablePositions(Color color, Chessboard chessboard, Position source, Set<Position> expected) {
-        Piece sut = new Pawn(color, source);
+        Piece sut = new DefaultPawn(color, source);
         var actual = sut.movablePositions(chessboard);
-        System.out.println(actual);
         assertThat(actual).containsAll(expected);
     }
 }

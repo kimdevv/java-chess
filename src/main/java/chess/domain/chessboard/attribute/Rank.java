@@ -5,7 +5,14 @@ import java.util.function.Predicate;
 
 public enum Rank {
 
-    EIGHT, SEVEN, SIX, FIVE, FOUR, THREE, TWO, ONE;
+    EIGHT,
+    SEVEN,
+    SIX,
+    FIVE,
+    FOUR,
+    THREE,
+    TWO,
+    ONE;
 
     private static final int RANK_MIN = 1;
     private static final int RANK_MAX = 8;

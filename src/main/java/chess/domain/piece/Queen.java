@@ -9,6 +9,8 @@ import chess.domain.piece.attribute.Position;
 
 public class Queen extends SlidingPiece {
 
+    private static final double SCORE = 9;
+
     private static final Position WHITE_INITIAL_POSITION = Position.from("d1");
     private static final Position BLACK_INITIAL_POSITION = Position.from("d8");
 
@@ -31,5 +33,15 @@ public class Queen extends SlidingPiece {
     @Override
     public Set<Position> movablePositions(final Chessboard chessboard) {
         return movablePositions(chessboard, POSSIBLE_DIRECTIONS);
+    }
+
+    @Override
+    public double score(final boolean ignored) {
+        return SCORE;
+    }
+
+    @Override
+    public String toString() {
+        return "Q" + position().toString();
     }
 }

@@ -10,6 +10,8 @@ import chess.domain.piece.attribute.Positions;
 
 public class Bishop extends SlidingPiece {
 
+    private static final double SCORE = 3;
+
     private static final Set<Position> WHITE_INITIAL_POSITIONS = Positions.of("c1", "f1");
     private static final Set<Position> BLACK_INITIAL_POSITIONS = Positions.of("c8", "f8");
 
@@ -36,5 +38,15 @@ public class Bishop extends SlidingPiece {
     @Override
     public Set<Position> movablePositions(final Chessboard chessboard) {
         return movablePositions(chessboard, POSSIBLE_DIRECTIONS);
+    }
+
+    @Override
+    public double score(final boolean ignored) {
+        return SCORE;
+    }
+
+    @Override
+    public String toString() {
+        return "B" + position().toString();
     }
 }

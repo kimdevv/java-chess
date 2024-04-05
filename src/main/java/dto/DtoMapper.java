@@ -1,5 +1,6 @@
 package dto;
 
+import domain.board.Board;
 import domain.board.position.Position;
 import domain.piece.Piece;
 import java.util.ArrayList;
@@ -14,10 +15,17 @@ public class DtoMapper {
     private DtoMapper() {
     }
 
-    public static BoardResponse generateBoardResponse(final Map<Position, Piece> squares) {
+
+    public static GameResultResponse generateGameResultResponse(final Double whiteScore, final Double blackScore,
+                                                                final boolean isWhiteKingDead,
+                                                                final boolean isBlackKingDead) {
+        return new GameResultResponse(whiteScore, blackScore, isWhiteKingDead, isBlackKingDead);
+    }
+
+    public static BoardResponse generateBoardResponse(final Board board) {
         final List<RankResponse> rankResponses = new ArrayList<>();
         for (int rank = 7; rank >= 0; rank--) {
-            final RankResponse pieceShapeOfRank = DtoMapper.generateRankResponse(squares, rank);
+            final RankResponse pieceShapeOfRank = DtoMapper.generateRankResponse(board.getSquares(), rank);
             rankResponses.add(pieceShapeOfRank);
         }
         return new BoardResponse(rankResponses);
@@ -34,7 +42,8 @@ public class DtoMapper {
     }
 
     private static List<Piece> findPiecesByOrderOfRank(final Map<Position, Piece> squares, final int rank) {
-        return squares.entrySet().stream()
+        return squares.entrySet()
+                .stream()
                 .filter(entry -> entry.getKey().toRankIndex() == rank)
                 .sorted(Comparator.comparingInt(entry -> entry.getKey().toFileIndex()))
                 .map(Entry::getValue)

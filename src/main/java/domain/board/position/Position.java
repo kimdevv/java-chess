@@ -11,14 +11,12 @@ public class Position {
         this.rank = rank;
     }
 
-    public static Position from(final String command) {
-        if (command.length() != 2) {
-            throw new IllegalArgumentException(String.format("입력된 명령어: %s, 명령어는 파일, 랭크로 구성되어 있어야 합니다", command));
-        }
-        final File file = File.from(command.substring(0, 1));
-        final Rank rank = Rank.from(command.substring(1, 2));
+    public static Position from(final String fileSource, final String rankSource) {
+        final File file = File.from(fileSource);
+        final Rank rank = Rank.from(rankSource);
         return new Position(file, rank);
     }
+
 
     public Position next(final int fileDelta, final int rankDelta) {
         return new Position(File.of(file.toIndex() + fileDelta), Rank.of(rank.toIndex() + rankDelta));
@@ -30,6 +28,10 @@ public class Position {
 
     public int toRankIndex() {
         return rank.toIndex();
+    }
+
+    public String toFileName() {
+        return file.name();
     }
 
     @Override

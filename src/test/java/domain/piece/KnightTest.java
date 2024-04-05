@@ -1,9 +1,17 @@
 package domain.piece;
 
-import static domain.PositionFixture.*;
-import static domain.piece.Color.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static domain.PositionFixture.B_FIVE;
+import static domain.PositionFixture.B_THREE;
+import static domain.PositionFixture.C_SIX;
+import static domain.PositionFixture.C_TWO;
+import static domain.PositionFixture.D_FOUR;
+import static domain.PositionFixture.E_SIX;
+import static domain.PositionFixture.E_TWO;
+import static domain.PositionFixture.F_FIVE;
+import static domain.PositionFixture.F_THREE;
+import static domain.piece.Color.BLACK;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import domain.board.position.Vector;
 import org.junit.jupiter.api.DisplayName;

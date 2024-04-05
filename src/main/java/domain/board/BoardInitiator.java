@@ -16,13 +16,12 @@ import static domain.board.position.Rank.SEVEN;
 import static domain.board.position.Rank.SIX;
 import static domain.board.position.Rank.THREE;
 import static domain.board.position.Rank.TWO;
-import static domain.piece.Color.BLACK;
-import static domain.piece.Color.WHITE;
 
 import domain.board.position.File;
 import domain.board.position.Position;
 import domain.board.position.Rank;
 import domain.piece.Bishop;
+import domain.piece.Color;
 import domain.piece.Empty;
 import domain.piece.InitPawn;
 import domain.piece.King;
@@ -31,25 +30,27 @@ import domain.piece.Piece;
 import domain.piece.Queen;
 import domain.piece.Rook;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public enum BoardInitiator {
 
-    WHITE_KING(List.of(E), List.of(ONE), new King(WHITE)),
-    WHITE_QUEEN(List.of(D), List.of(ONE), new Queen(WHITE)),
-    WHITE_BISHOP(List.of(C, F), List.of(ONE), new Bishop(WHITE)),
-    WHITE_KNIGHT(List.of(B, G), List.of(ONE), new Knight(WHITE)),
-    WHITE_ROOK(List.of(A, H), List.of(ONE), new Rook(WHITE)),
-    WHITE_PAWN(List.of(A, B, C, D, E, F, G, H), List.of(TWO), new InitPawn(WHITE)),
+    WHITE_KING(List.of(E), List.of(ONE), new King(Color.WHITE)),
+    WHITE_QUEEN(List.of(D), List.of(ONE), new Queen(Color.WHITE)),
+    WHITE_BISHOP(List.of(C, F), List.of(ONE), new Bishop(Color.WHITE)),
+    WHITE_KNIGHT(List.of(B, G), List.of(ONE), new Knight(Color.WHITE)),
+    WHITE_ROOK(List.of(A, H), List.of(ONE), new Rook(Color.WHITE)),
+    WHITE_PAWN(List.of(A, B, C, D, E, F, G, H), List.of(TWO), new InitPawn(Color.WHITE)),
 
-    BLACK_KING(List.of(E), List.of(EIGHT), new King(BLACK)),
-    BLACK_QUEEN(List.of(D), List.of(EIGHT), new Queen(BLACK)),
-    BLACK_BISHOP(List.of(C, F), List.of(EIGHT), new Bishop(BLACK)),
-    BLACK_KNIGHT(List.of(B, G), List.of(EIGHT), new Knight(BLACK)),
-    BLACK_ROOK(List.of(A, H), List.of(EIGHT), new Rook(BLACK)),
-    BLACK_PAWN(List.of(A, B, C, D, E, F, G, H), List.of(SEVEN), new InitPawn(BLACK)),
+    BLACK_KING(List.of(E), List.of(EIGHT), new King(Color.BLACK)),
+    BLACK_QUEEN(List.of(D), List.of(EIGHT), new Queen(Color.BLACK)),
+    BLACK_BISHOP(List.of(C, F), List.of(EIGHT), new Bishop(Color.BLACK)),
+    BLACK_KNIGHT(List.of(B, G), List.of(EIGHT), new Knight(Color.BLACK)),
+    BLACK_ROOK(List.of(A, H), List.of(EIGHT), new Rook(Color.BLACK)),
+    BLACK_PAWN(List.of(A, B, C, D, E, F, G, H), List.of(SEVEN), new InitPawn(Color.BLACK)),
 
     EMPTY(List.of(A, B, C, D, E, F, G, H), List.of(THREE, FOUR, FIVE, SIX), Empty.INSTANCE),
     ;
@@ -91,5 +92,24 @@ public enum BoardInitiator {
         for (final Rank rank : ranks) {
             positions.add(new Position(file, rank));
         }
+    }
+
+    public static Map<Position, Piece> createInitBoard() {
+        final LinkedHashMap<Position, Piece> squares = new LinkedHashMap<>();
+        for (int fileIndex = 0; fileIndex < 8; fileIndex++) {
+            for (int rankIndex = 0; rankIndex < 8; rankIndex++) {
+                squares.put(new Position(File.of(fileIndex), Rank.of(rankIndex)), Empty.INSTANCE);
+            }
+        }
+        return squares;
+    }
+
+    @SafeVarargs
+    public static Map<Position, Piece> create(final Entry<Position, Piece>... entries) {
+        final Map<Position, Piece> squares = createInitBoard();
+        for (final Entry<Position, Piece> entry : entries) {
+            squares.put(entry.getKey(), entry.getValue());
+        }
+        return Collections.unmodifiableMap(squares);
     }
 }

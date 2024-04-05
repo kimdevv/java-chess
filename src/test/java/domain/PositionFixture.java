@@ -1,7 +1,21 @@
 package domain;
 
-import static domain.board.position.File.*;
-import static domain.board.position.Rank.*;
+import static domain.board.position.File.A;
+import static domain.board.position.File.B;
+import static domain.board.position.File.C;
+import static domain.board.position.File.D;
+import static domain.board.position.File.E;
+import static domain.board.position.File.F;
+import static domain.board.position.File.G;
+import static domain.board.position.File.H;
+import static domain.board.position.Rank.EIGHT;
+import static domain.board.position.Rank.FIVE;
+import static domain.board.position.Rank.FOUR;
+import static domain.board.position.Rank.ONE;
+import static domain.board.position.Rank.SEVEN;
+import static domain.board.position.Rank.SIX;
+import static domain.board.position.Rank.THREE;
+import static domain.board.position.Rank.TWO;
 
 import domain.board.position.Position;
 

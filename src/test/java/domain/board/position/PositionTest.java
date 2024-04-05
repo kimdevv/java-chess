@@ -13,14 +13,14 @@ class PositionTest {
     @ValueSource(strings = {"a1", "a8", "h1", "h8"})
     @DisplayName("파일, 랭크로 주어진 문자열 명령어가 주어지면 그에 맞는 포지션을 반환한다")
     void command(final String command) {
-        assertThatCode(() -> Position.from(command)).doesNotThrowAnyException();
+        assertThatCode(() -> Position.from("" + command.charAt(0), "" + command.charAt(1))).doesNotThrowAnyException();
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "a", "x1", "p8", "qwe"})
+    @ValueSource(strings = {"  ", "a ", "x1", "p8", "qwe"})
     @DisplayName("유효하지 않은 문자열 명령어가 주어지면 예외가 발생한다")
     void commandException(final String command) {
-        assertThatThrownBy(() -> Position.from(command)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Position.from("" + command.charAt(0), "" + command.charAt(1))).isInstanceOf(
+                IllegalArgumentException.class);
     }
-
 }

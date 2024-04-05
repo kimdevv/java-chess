@@ -8,24 +8,61 @@ import domain.piece.Piece;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Board {
     private final Map<Position, Piece> squares;
-    private Color currentTurnColor;
 
     public Board(final Map<Position, Piece> squares) {
-        this.currentTurnColor = Color.WHITE;
         this.squares = squares;
     }
 
     public void move(final String source, final String target) {
-        move(Position.from(source), Position.from(target));
+        move(Position.from(String.valueOf(source.charAt(0)), String.valueOf(source.charAt(1))),
+                Position.from(String.valueOf(target.charAt(0)), String.valueOf(target.charAt(1))));
     }
 
     public void move(final Position source, final Position target) {
         validateMovement(source, target);
         updateBoard(source, target);
-        switchTurn();
+    }
+
+    public double calculateScore(final Color color) {
+        final List<Piece> pieces = getPiecesBy(color);
+        double totalSCore = calculateWithoutPawnScore(color, pieces);
+        totalSCore += calculatePawnScore(color);
+        return totalSCore;
+    }
+
+    private List<Piece> getPiecesBy(final Color color) {
+        return squares.values().stream().filter(piece -> piece.hasColor(color)).toList();
+    }
+
+    private double calculateWithoutPawnScore(final Color color, final List<Piece> pieces) {
+        return pieces.stream()
+                .filter(piece -> piece.hasColor(color))
+                .filter(piece -> !piece.isPawn())
+                .map(Piece::getScore)
+                .mapToDouble(Double::doubleValue)
+                .sum();
+    }
+
+    private double calculatePawnScore(final Color color) {
+        final Map<Integer, Long> collect = squares.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().hasColor(color))
+                .filter(entry -> entry.getValue().isPawn())
+                .map(entry -> entry.getKey().toFileIndex())
+                .collect(Collectors.groupingBy(fileIndex -> fileIndex, Collectors.counting()));
+
+        return collect.values().stream().map(this::determinePawnScore).mapToDouble(Double::doubleValue).sum();
+    }
+
+    private double determinePawnScore(final Long counter) {
+        if (counter >= 2) {
+            return (double) counter / 2;
+        }
+        return counter;
     }
 
     private void validateMovement(final Position source, final Position target) {
@@ -34,7 +71,6 @@ public class Board {
         final Vector vector = new Vector(source, target);
 
         validateEmptiness(currentPiece);
-        validateCurrentTurn(currentPiece);
         validateReachability(vector, currentPiece, targetPiece);
         validateNoPieceOnPath(source, vector);
     }
@@ -70,21 +106,29 @@ public class Board {
         }
     }
 
-    private void validateCurrentTurn(final Piece currentPiece) {
-        if (!currentPiece.hasColor(currentTurnColor)) {
-            throw new IllegalArgumentException(
-                    String.format("현재 차례: %s, 현재 차례의 말만 움직일 수 있습니다", currentTurnColor.name()));
-        }
-    }
 
     private void updateBoard(final Position source, final Position target) {
         squares.put(target, squares.get(source).move());
         squares.put(source, Empty.INSTANCE);
+
     }
 
-    private void switchTurn() {
-        currentTurnColor = currentTurnColor.reverse();
+    public boolean isKingDeadOf(final Color color) {
+        return squares.values()
+                .stream()
+                .filter(Piece::isKing)
+                .map(Piece::getColor)
+                .noneMatch(r -> r.isSameColor(color));
     }
+
+    public Piece getPiece(final String source) {
+        return squares.get(Position.from(String.valueOf(source.charAt(0)), String.valueOf(source.charAt(1))));
+    }
+
+    public Piece getPiece(final Position source) {
+        return squares.get(source);
+    }
+
 
     public Map<Position, Piece> getSquares() {
         return Collections.unmodifiableMap(squares);

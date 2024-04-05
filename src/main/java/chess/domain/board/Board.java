@@ -1,94 +1,45 @@
 package chess.domain.board;
 
-import chess.domain.location.Column;
+import chess.domain.location.File;
 import chess.domain.location.Location;
-import chess.domain.location.Row;
 import chess.domain.piece.Color;
 import chess.domain.piece.Piece;
-import chess.domain.piece.implement.Bishop;
-import chess.domain.piece.implement.BlackPawn;
-import chess.domain.piece.implement.King;
-import chess.domain.piece.implement.Knight;
-import chess.domain.piece.implement.Queen;
-import chess.domain.piece.implement.Rook;
-import chess.domain.piece.implement.WhitePawn;
+import chess.domain.piece.PieceType;
+import chess.domain.piece.Score;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Board {
 
     private final Map<Location, Piece> board;
 
-    public Board() {
-        this.board = initialBoard();
+    public Board(Map<Location, Piece> board) {
+        this.board = board;
     }
 
-    private Map<Location, Piece> initialBoard() {
-        Map<Location, Piece> initialBoard = new HashMap<>();
-        initialPawnSetting(initialBoard);
-        initialRookSetting(initialBoard);
-        initialKnightSetting(initialBoard);
-        initialBishopSetting(initialBoard);
-        initialQueenSetting(initialBoard);
-        initialKingSetting(initialBoard);
-        return initialBoard;
+    public static Board createInitialBoard() {
+        return InitialBoardFactory.create();
     }
 
-    private void initialPawnSetting(Map<Location, Piece> board) {
-        for (Column value : Column.values()) {
-            board.put(new Location(value, Row.TWO), new WhitePawn());
-            board.put(new Location(value, Row.SEVEN), new BlackPawn());
-        }
+    public static Board createEmptyBoard() {
+        return new Board(Map.of());
     }
 
-    private void initialRookSetting(Map<Location, Piece> board) {
-        board.put(new Location(Column.A, Row.ONE), new Rook(Color.WHITE));
-        board.put(new Location(Column.A, Row.EIGHT), new Rook(Color.BLACK));
-        board.put(new Location(Column.H, Row.ONE), new Rook(Color.WHITE));
-        board.put(new Location(Column.H, Row.EIGHT), new Rook(Color.BLACK));
-    }
-
-    private void initialKnightSetting(Map<Location, Piece> board) {
-        board.put(new Location(Column.B, Row.ONE), new Knight(Color.WHITE));
-        board.put(new Location(Column.B, Row.EIGHT), new Knight(Color.BLACK));
-        board.put(new Location(Column.G, Row.ONE), new Knight(Color.WHITE));
-        board.put(new Location(Column.G, Row.EIGHT), new Knight(Color.BLACK));
-    }
-
-    private void initialBishopSetting(Map<Location, Piece> board) {
-        board.put(new Location(Column.C, Row.ONE), new Bishop(Color.WHITE));
-        board.put(new Location(Column.C, Row.EIGHT), new Bishop(Color.BLACK));
-        board.put(new Location(Column.F, Row.ONE), new Bishop(Color.WHITE));
-        board.put(new Location(Column.F, Row.EIGHT), new Bishop(Color.BLACK));
-    }
-
-    private void initialQueenSetting(Map<Location, Piece> board) {
-        board.put(new Location(Column.D, Row.ONE), new Queen(Color.WHITE));
-        board.put(new Location(Column.D, Row.EIGHT), new Queen(Color.BLACK));
-    }
-
-    private void initialKingSetting(Map<Location, Piece> board) {
-        board.put(new Location(Column.E, Row.ONE), new King(Color.WHITE));
-        board.put(new Location(Column.E, Row.EIGHT), new King(Color.BLACK));
-    }
-
-    public void move(Location source, Location target) {
+    public void move(Location source, Location target, Color turnPlayer) {
         Piece selectedPiece = findPieceAt(source);
-        Path path = createPath(source, target);
-        if (selectedPiece.canMove(path)) {
-            selectedPiece.move();
-            updateLocation(source, target, selectedPiece);
-            return;
+        if (!selectedPiece.isColor(turnPlayer)) {
+            throw new IllegalArgumentException("본인 기물만 움직일 수 있습니다.");
         }
-        throw new IllegalArgumentException("유효하지 않은 움직임입니다.");
-    }
 
-    private void updateLocation(Location source, Location target, Piece movingPiece) {
-        board.remove(source);
-        board.put(target, movingPiece);
+        Path path = createPath(source, target);
+        if (!selectedPiece.canMove(path)) {
+            throw new IllegalArgumentException("유효하지 않은 움직임입니다.");
+        }
+        selectedPiece = selectedPiece.move();
+        updateLocation(source, target, selectedPiece);
     }
 
     private Path createPath(Location source, Location target) {
@@ -97,14 +48,23 @@ public class Board {
         return Path.of(directions, locationStates);
     }
 
-    private List<LocationState> createPathState(Location current, List<Direction> directions) {
-        Piece movingPiece = findPieceAt(current);
+    private List<LocationState> createPathState(Location source, List<Direction> directions) {
+        Piece movingPiece = findPieceAt(source);
+        Location movedLocation = source.copy();
         List<LocationState> locationStates = new ArrayList<>();
         for (Direction direction : directions) {
-            current = current.move(direction);
-            locationStates.add(findLocationStates(movingPiece, current));
+            movedLocation = movedLocation.move(direction);
+            locationStates.add(findLocationStates(movingPiece, movedLocation));
         }
         return locationStates;
+    }
+
+    private Piece findPieceAt(Location source) {
+        Piece piece = board.get(source);
+        if (piece == null) {
+            throw new IllegalArgumentException("말이 존재하지 않습니다.");
+        }
+        return piece;
     }
 
     private LocationState findLocationStates(Piece movingPiece, Location current) {
@@ -118,12 +78,68 @@ public class Board {
         return LocationState.ENEMY;
     }
 
-    private Piece findPieceAt(Location source) {
-        Piece piece = board.get(source);
-        if (piece == null) {
-            throw new IllegalArgumentException("말이 존재하지 않습니다.");
+    private void updateLocation(Location source, Location target, Piece movingPiece) {
+        board.remove(source);
+        board.put(target, movingPiece);
+    }
+
+    public boolean isKingDead() {
+        return board.values().stream()
+                .filter(piece -> piece.isTypeOf(PieceType.KING))
+                .count() != 2;
+    }
+
+    public Score calculateScore(Color color) {
+        Score defaultScoreSum = calculateDefaultScore(color);
+        Score sameRankPawnScore = calculateSameRankPawnScore(color);
+        return defaultScoreSum.subtract(sameRankPawnScore);
+    }
+
+    private Score calculateDefaultScore(Color color) {
+        return board.values().stream()
+                .filter(piece -> piece.isColor(color))
+                .map(Piece::getPieceScore)
+                .reduce(Score::add)
+                .orElse(Score.ZERO);
+    }
+
+    private Score calculateSameRankPawnScore(Color color) {
+        Score sameRankPawnScore = new Score(0.5);
+        Map<File, Long> countPawnLocationByFile = groupingPawnLocationByRank(color);
+        int sameRankPawnCount = countPawnLocationByFile.values().stream()
+                .mapToInt(Long::intValue)
+                .filter(count -> count != 1)
+                .sum();
+        return sameRankPawnScore.multiply(sameRankPawnCount);
+    }
+
+    private Map<File, Long> groupingPawnLocationByRank(Color color) {
+        return board.keySet().stream()
+                .filter(location -> hasPawn(location))
+                .filter(location -> hasPieceColoredOf(location, color))
+                .collect(Collectors.groupingBy(
+                        Location::getFile, Collectors.counting()
+                ));
+    }
+
+    private boolean hasPawn(Location location) {
+        return board.get(location).isPawn();
+    }
+
+    private boolean hasPieceColoredOf(Location location, Color color) {
+        return board.get(location).isColor(color);
+    }
+
+    public Color getWinner() {
+        List<Piece> aliveKings = board.values().stream()
+                .filter(piece -> piece.isTypeOf(PieceType.KING))
+                .toList();
+
+        if (aliveKings.size() != 1) {
+            throw new IllegalStateException("승부가 나지 않았습니다.");
         }
-        return piece;
+
+        return aliveKings.get(0).getColor();
     }
 
     public Map<Location, Piece> getBoard() {

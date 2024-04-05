@@ -56,7 +56,7 @@ class PathTest {
                 new Step(Direction.DOWN, LocationState.EMPTY)
         ));
 
-        assertThat(path.hasCountOfDirection(2)).isTrue();
+        assertThat(path.hasCountOfDistinctDirection(2)).isTrue();
     }
 
     @DisplayName("대각선을 포함하고 있는지 확인할 수 있다.")
@@ -149,7 +149,7 @@ class PathTest {
                     new Step(Direction.DOWN_LEFT, LocationState.EMPTY)
             ));
 
-            assertThat(path.isNotAllyAtTarget()).isTrue();
+            assertThat(path.isAllyAtTarget()).isFalse();
         }
 
         @DisplayName("목적지에 적 기물이 있으면 도달할 수 있다.")
@@ -160,7 +160,7 @@ class PathTest {
                     new Step(Direction.DOWN_LEFT, LocationState.ENEMY)
             ));
 
-            assertThat(path.isNotAllyAtTarget()).isTrue();
+            assertThat(path.isAllyAtTarget()).isFalse();
         }
 
 
@@ -172,7 +172,7 @@ class PathTest {
                     new Step(Direction.DOWN_LEFT, LocationState.ALLY)
             ));
 
-            assertThat(path.isNotAllyAtTarget()).isFalse();
+            assertThat(path.isAllyAtTarget()).isTrue();
         }
     }
 }

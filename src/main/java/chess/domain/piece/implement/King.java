@@ -4,8 +4,10 @@ import chess.domain.board.Path;
 import chess.domain.piece.Color;
 import chess.domain.piece.Piece;
 import chess.domain.piece.PieceType;
+import chess.domain.piece.Score;
 
 public class King extends Piece {
+    private static final Score KING_SCORE = Score.ZERO;
 
     private static final int MAX_MOVE_DISTANCE = 1;
 
@@ -15,10 +17,17 @@ public class King extends Piece {
 
     @Override
     public boolean canMove(Path path) {
-        return path.isDistanceOf(MAX_MOVE_DISTANCE) && path.isNotAllyAtTarget();
+        return path.isDistanceOf(MAX_MOVE_DISTANCE)
+                && !path.isAllyAtTarget();
     }
 
     @Override
-    public void move() {
+    public Piece move() {
+        return this;
+    }
+
+    @Override
+    public Score getPieceScore() {
+        return KING_SCORE;
     }
 }

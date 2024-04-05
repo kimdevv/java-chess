@@ -1,10 +1,13 @@
-package chess.domain.piece;
+package chess.domain.piece.implement;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import chess.domain.board.Direction;
 import chess.domain.board.LocationState;
 import chess.domain.board.Path;
 import chess.domain.board.Step;
-import chess.domain.piece.implement.Knight;
+import chess.domain.piece.Color;
+import chess.domain.piece.Score;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -60,5 +63,11 @@ class KnightTest {
 
         Assertions.assertThat(KNIGHT.canMove(wrongDistancePath))
                 .isFalse();
+    }
+
+    @DisplayName("나이트는 2.5점으로 계산된다.")
+    @Test
+    void scoreTest() {
+        assertThat(KNIGHT.getPieceScore()).isEqualTo(new Score(2.5));
     }
 }

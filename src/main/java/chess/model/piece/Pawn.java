@@ -1,76 +1,90 @@
 package chess.model.piece;
 
+import chess.model.board.ChessBoard;
+import chess.model.board.Point;
 import chess.model.position.ChessPosition;
-import chess.model.position.Distance;
-import chess.model.position.File;
-import chess.model.position.Rank;
-import java.util.Arrays;
-import java.util.List;
+import chess.model.position.Direction;
+import java.util.Set;
 
-public class Pawn extends Piece {
-    private static final int DISPLACEMENT = 1;
-    private static final int INITIAL_SPECIAL_DISPLACEMENT = 2;
-    private static final List<ChessPosition> INITIAL_WHITE_POSITION = Arrays.stream(File.values())
-            .map(file -> new ChessPosition(file, Rank.TWO))
-            .toList();
-    private static final List<ChessPosition> INITIAL_BLACK_POSITION = Arrays.stream(File.values())
-            .map(file -> new ChessPosition(file, Rank.SEVEN))
-            .toList();
+public abstract class Pawn extends Piece {
+    private static final int PAWN_POINT = 1;
 
-    public Pawn(final Side side) {
+    protected Pawn(final Side side) {
         super(side);
     }
 
+    protected abstract boolean isPawnInitialPosition(final ChessPosition source);
+
+    protected abstract boolean canMoveVerticalPaths(final ChessPosition source,
+                                                    final ChessBoard chessBoard,
+                                                    final Direction direction);
+
     @Override
-    public List<ChessPosition> findPath(
-            final ChessPosition source, final ChessPosition target, final Piece targetPiece
-    ) {
-        checkValidTargetPiece(targetPiece);
-        final Distance distance = target.calculateDistance(source);
-        validateForwardPath(source, targetPiece, distance);
-        if (canCrossMove(source, distance) || canDiagonalMove(targetPiece, distance)) {
-            return distance.findPath(source);
+    public boolean isKing() {
+        return false;
+    }
+
+    @Override
+    public boolean isPawn() {
+        return true;
+    }
+
+    @Override
+    public Point getPoint() {
+        return Point.from(PAWN_POINT);
+    }
+
+    @Override
+    protected void addPossiblePaths(final ChessPosition source,
+                                    final ChessBoard chessBoard,
+                                    final Set<ChessPosition> paths,
+                                    final Set<Direction> directions) {
+        directions.stream()
+                .filter(direction -> isValidPawn(source, direction))
+                .forEach(direction -> addPossiblePaths(source, chessBoard, paths, direction));
+    }
+
+    @Override
+    protected void addPossiblePaths(final ChessPosition source,
+                                    final ChessBoard chessBoard,
+                                    final Set<ChessPosition> paths,
+                                    final Direction direction) {
+        if (canMove(source, chessBoard, direction)) {
+            paths.add(source.move(direction));
         }
-        throw new IllegalStateException("폰은 해당 경로로 이동할 수 없습니다.");
     }
 
-    private void validateForwardPath(
-            final ChessPosition source, final Piece targetPiece, final Distance distance
-    ) {
-        if (!targetPiece.isEmpty() && canCrossMove(source, distance)) {
-            throw new IllegalArgumentException("타겟 위치에 기물이 존재하여 전진할 수 없습니다.");
-        }
+    protected boolean canMoveVertical(final ChessPosition source,
+                                      final ChessBoard chessBoard,
+                                      final int step) {
+        return source.canMoveVertical(step)
+                && !chessBoard.isNotEmpty(source.moveVertical(step));
     }
 
-    private boolean canCrossMove(final ChessPosition source, final Distance distance) {
-        if (isPawnInitialPosition(source)) {
-            return canMoveForwardWith(distance, DISPLACEMENT) ||
-                    canMoveForwardWith(distance, INITIAL_SPECIAL_DISPLACEMENT);
-        }
-        return canMoveForwardWith(distance, DISPLACEMENT);
+    private boolean isValidPawn(final ChessPosition source, final Direction direction) {
+        return isPawnInitialPosition(source)
+                || !direction.isDoubleForward();
     }
 
-    private boolean isPawnInitialPosition(final ChessPosition source) {
-        if (side.isWhite()) {
-            return INITIAL_WHITE_POSITION.contains(source);
-        }
-        if (side.isBlack()) {
-            return INITIAL_BLACK_POSITION.contains(source);
-        }
-        throw new IllegalStateException("Source 위치가 비어있습니다.");
+    private boolean canMove(final ChessPosition source,
+                            final ChessBoard chessBoard,
+                            final Direction direction) {
+        return canMoveDiagonal(chessBoard, direction, source)
+                || canMoveVertical(direction, chessBoard, source);
     }
 
-    private boolean canDiagonalMove(final Piece targetPiece, final Distance distance) {
-        return isPossibleDiagonal(distance)
-                && !targetPiece.isEmpty()
-                && !isSameSide(targetPiece);
+    private boolean canMoveDiagonal(final ChessBoard chessBoard,
+                                    final Direction direction,
+                                    final ChessPosition current) {
+        return direction.isDiagonal()
+                && current.canMove(direction)
+                && chessBoard.isEnemy(current.move(direction), side);
     }
 
-    private boolean canMoveForwardWith(final Distance distance, final int displacement) {
-        return distance.isForward(side) && distance.hasSame(displacement);
-    }
-
-    private boolean isPossibleDiagonal(final Distance distance) {
-        return distance.isDiagonalMovement() && distance.hasSame(DISPLACEMENT);
+    private boolean canMoveVertical(final Direction direction,
+                                    final ChessBoard chessBoard,
+                                    final ChessPosition source) {
+        return direction.isVertical()
+                && canMoveVerticalPaths(source, chessBoard, direction);
     }
 }

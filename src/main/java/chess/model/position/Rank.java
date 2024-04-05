@@ -1,47 +1,56 @@
 package chess.model.position;
 
-import chess.model.piece.Side;
 import java.util.Arrays;
 
 public enum Rank {
-    EIGHT(8),
-    SEVEN(7),
-    SIX(6),
-    FIVE(5),
-    FOUR(4),
-    THREE(3),
-    TWO(2),
-    ONE(1);
+    EIGHT(1, "8"),
+    SEVEN(2, "7"),
+    SIX(3, "6"),
+    FIVE(4, "5"),
+    FOUR(5, "4"),
+    THREE(6, "3"),
+    TWO(7, "2"),
+    ONE(8, "1");
 
     private final int coordinate;
+    private final String name;
 
-    Rank(final int coordinate) {
+    Rank(final int coordinate, final String name) {
         this.coordinate = coordinate;
+        this.name = name;
     }
 
-    public static Rank from(final int coordinate) {
+    public static Rank from(final String name) {
         return Arrays.stream(values())
-                .filter(rank -> rank.coordinate == coordinate)
+                .filter(rank -> rank.name.equals(name))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Rank 좌표입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Rank 이름입니다."));
     }
 
-    public int minus(final Rank other) {
-        return this.coordinate - other.coordinate;
-    }
-
-    public boolean isPawnInitialRank(final Side side) {
-        if (side.isWhite()) {
-            return TWO.equals(this);
-        }
-        return SEVEN.equals(this);
+    public boolean canMove(final int step) {
+        return canMoveUp(step) && canMoveDown(step);
     }
 
     public Rank findNextRank(final int offset) {
-        final int nextCoordinate = offset + coordinate;
         return Arrays.stream(values())
-                .filter(file -> file.coordinate == nextCoordinate)
+                .filter(rank -> hasSameCoordinate(offset, rank))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 Rank 좌표입니다."));
+                .orElseThrow(() -> new IllegalStateException("Rank가 이동 가능한 범위를 벗어났습니다."));
+    }
+
+    private boolean hasSameCoordinate(final int offset, final Rank rank) {
+        return rank.coordinate == offset + coordinate;
+    }
+
+    private boolean canMoveUp(final int step) {
+        return coordinate + step <= values().length;
+    }
+
+    private boolean canMoveDown(final int step) {
+        return coordinate + step >= 1;
+    }
+
+    public String getName() {
+        return name;
     }
 }

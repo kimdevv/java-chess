@@ -1,25 +1,64 @@
 package chess.model.piece;
 
+import static chess.model.position.Direction.DOWN;
+import static chess.model.position.Direction.DOWN_LEFT;
+import static chess.model.position.Direction.DOWN_RIGHT;
+import static chess.model.position.Direction.LEFT;
+import static chess.model.position.Direction.RIGHT;
+import static chess.model.position.Direction.UP;
+import static chess.model.position.Direction.UP_LEFT;
+import static chess.model.position.Direction.UP_RIGHT;
+
+import chess.model.board.ChessBoard;
+import chess.model.board.Point;
 import chess.model.position.ChessPosition;
-import chess.model.position.Distance;
-import java.util.List;
+import chess.model.position.Direction;
+import java.util.Set;
 
 public class King extends Piece {
-    private static final int DISPLACEMENT = 1;
+    private static final int KING_POINT = 0;
 
     public King(final Side side) {
         super(side);
     }
 
     @Override
-    public List<ChessPosition> findPath(
-            final ChessPosition source, final ChessPosition target, final Piece targetPiece
-    ) {
-        checkValidTargetPiece(targetPiece);
-        final Distance distance = target.calculateDistance(source);
-        if (distance.hasSame(DISPLACEMENT)) {
-            return List.of(target);
+    public boolean isKing() {
+        return true;
+    }
+
+    @Override
+    public boolean isPawn() {
+        return false;
+    }
+
+    @Override
+    public Point getPoint() {
+        return Point.from(KING_POINT);
+    }
+
+    @Override
+    protected void addPossiblePaths(final ChessPosition source,
+                                    final ChessBoard chessBoard,
+                                    final Set<ChessPosition> paths,
+                                    final Set<Direction> directions) {
+        directions.forEach(direction -> addPossiblePaths(source, chessBoard, paths, direction));
+    }
+
+    @Override
+    protected void addPossiblePaths(final ChessPosition source,
+                                    final ChessBoard chessBoard,
+                                    final Set<ChessPosition> paths,
+                                    final Direction direction) {
+        if (source.canMove(direction) && !chessBoard.isSameSide(source.move(direction), side)) {
+            paths.add(source.move(direction));
         }
-        throw new IllegalStateException("왕은 해당 경로로 이동할 수 없습니다.");
+    }
+
+    @Override
+    protected Set<Direction> availableDirections() {
+        return Set.of(
+                UP, DOWN, LEFT, RIGHT,
+                UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT);
     }
 }

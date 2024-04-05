@@ -1,23 +1,29 @@
 package chess.model.piece;
 
-import chess.model.position.ChessPosition;
-import chess.model.position.Distance;
-import java.util.List;
+import static chess.model.position.Direction.DOWN_LEFT;
+import static chess.model.position.Direction.DOWN_RIGHT;
+import static chess.model.position.Direction.UP_LEFT;
+import static chess.model.position.Direction.UP_RIGHT;
 
-public class Bishop extends Piece {
+import chess.model.board.Point;
+import chess.model.position.Direction;
+import java.util.Set;
+
+public class Bishop extends JumpingPiece {
+
+    private static final double BISHOP_POINT = 3;
+
     public Bishop(final Side side) {
         super(side);
     }
 
     @Override
-    public List<ChessPosition> findPath(
-            final ChessPosition source, final ChessPosition target, final Piece targetPiece
-    ) {
-        checkValidTargetPiece(targetPiece);
-        Distance distance = target.calculateDistance(source);
-        if (distance.isDiagonalMovement()) {
-            return distance.findPath(source);
-        }
-        throw new IllegalStateException("비숍은 해당 경로로 이동할 수 없습니다.");
+    public Point getPoint() {
+        return Point.from(BISHOP_POINT);
+    }
+
+    @Override
+    protected Set<Direction> availableDirections() {
+        return Set.of(UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT);
     }
 }

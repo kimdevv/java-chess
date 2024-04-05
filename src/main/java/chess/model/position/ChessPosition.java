@@ -2,7 +2,7 @@ package chess.model.position;
 
 import java.util.Objects;
 
-public class ChessPosition {
+public final class ChessPosition {
     private final File file;
     private final Rank rank;
 
@@ -11,34 +11,51 @@ public class ChessPosition {
         this.rank = rank;
     }
 
-    public Distance calculateDistance(final ChessPosition other) {
-        final int fileDifference = file.minus(other.file);
-        final int rankDifference = rank.minus(other.rank);
-        return new Distance(fileDifference, rankDifference);
+    public boolean canMove(final Direction direction) {
+        return file.canMove(direction.getX())
+                && rank.canMove(direction.getY());
     }
 
-    public File findNextFile(final int offset) {
-        return file.findNextFile(offset);
+    public boolean canMoveVertical(final int step) {
+        return rank.canMove(step);
     }
 
-    public Rank findNextRank(final int offset) {
-        return rank.findNextRank(offset);
+    public boolean hasSameFile(final ChessPosition target) {
+        return file.equals(target.file);
     }
 
-    public File getFile() {
-        return file;
+    public ChessPosition move(final Direction direction) {
+        if (canMove(direction)) {
+            final File nextFile = file.findNextFile(direction.getX());
+            final Rank nextRank = rank.findNextRank(direction.getY());
+            return new ChessPosition(nextFile, nextRank);
+        }
+        throw new IllegalArgumentException("해당 방향으로 움직일 수 없습니다");
+    }
+
+    public ChessPosition moveVertical(final int step) {
+        if (canMoveVertical(step)) {
+            final Rank nextRank = rank.findNextRank(step);
+            return new ChessPosition(file, nextRank);
+        }
+        throw new IllegalArgumentException("해당 크기만큼 수직 방향으로 움직일 수 없습니다");
+    }
+
+    public String getName() {
+        return file.getName() + rank.getName();
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        ChessPosition that = (ChessPosition) o;
-        return file == that.file && rank == that.rank;
+        final ChessPosition other = (ChessPosition) obj;
+        return this.file == other.file
+                && this.rank == other.rank;
     }
 
     @Override

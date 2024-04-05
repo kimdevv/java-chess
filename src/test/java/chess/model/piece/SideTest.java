@@ -1,40 +1,20 @@
 package chess.model.piece;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 class SideTest {
     @ParameterizedTest
-    @CsvSource(value = {"WHITE,true", "BLACK,false", "EMPTY,false"})
-    @DisplayName("흰색 진영인지 판단한다.")
-    void isWhite(Side given, boolean expected) {
-        //when
-        boolean result = given.isWhite();
-
-        //then
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"BLACK,true", "WHITE,false", "EMPTY,false"})
-    @DisplayName("흰색 진영인지 판단한다.")
-    void isBlack(Side given, boolean expected) {
-        //when
-        boolean result = given.isBlack();
-
-        //then
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @ParameterizedTest
     @CsvSource(value = {"EMPTY,true", "WHITE,false", "BLACK,false"})
     @DisplayName("흰색 진영인지 판단한다.")
-    void isEmpty(Side given, boolean expected) {
+    void isEmpty(final Side given, final boolean expected) {
         //when
-        boolean result = given.isEmpty();
+        final boolean result = given.isEmpty();
 
         //then
         assertThat(result).isEqualTo(expected);
@@ -47,11 +27,35 @@ class SideTest {
             "EMPTY,WHITE,false", "EMPTY,BLACK,false", "EMPTY,EMPTY,false",
     })
     @DisplayName("적 기물인지 판단한다.")
-    void isEnemy(Side now, Side other, boolean expected) {
+    void isEnemy(final Side now,
+                 final Side other,
+                 final boolean expected) {
         //when
-        boolean result = now.isEnemy(other);
+        final boolean result = now.isEnemy(other);
 
         //then
         assertThat(result).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"WHITE,BLACK", "BLACK,WHITE"})
+    @DisplayName("적 진영을 반환한다.")
+    void getEnemy(final Side given, final Side expected) {
+        //when
+        final Side result = given.getEnemy();
+
+        //then
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("빈 진영의 적을 반환하려하면 예외가 발생한다.")
+    void getEnemy() {
+        //given
+        final Side given = Side.EMPTY;
+
+        //when         //then
+        assertThatThrownBy(given::getEnemy)
+                .isInstanceOf(IllegalStateException.class);
     }
 }

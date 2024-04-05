@@ -16,12 +16,16 @@ public class Player {
         this.team = team;
     }
 
-    public void move(Point departure, Point destination) {
+    public double score() {
+        return board.score(this.team);
+    }
+
+    public Piece move(Point departure, Point destination) {
         Piece currentPiece = board.get(departure);
         Piece targetPiece = board.get(destination);
         validateMove(departure, destination, currentPiece, targetPiece);
 
-        board.move(departure, destination);
+        return board.move(departure, destination);
     }
 
     private void validateMove(Point currentPoint, Point destination, Piece currentPiece,

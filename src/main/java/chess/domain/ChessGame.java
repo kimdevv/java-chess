@@ -1,29 +1,56 @@
 package chess.domain;
 
 import chess.domain.board.Board;
+import chess.domain.piece.Piece;
 import chess.domain.piece.Team;
-import chess.domain.player.Player;
+import chess.domain.player.Players;
 import chess.domain.point.Point;
-import java.util.Map;
 
 public class ChessGame {
 
-    private final Map<Team, Player> players;
-    private Team turn;
+    private final Board board;
+    private final Players players;
+    private Team winner;
 
-    public ChessGame(Board board) {
-        this.players = Map.of(
-                Team.WHITE, new Player(Team.WHITE, board),
-                Team.BLACK, new Player(Team.BLACK, board));
-        this.turn = Team.WHITE;
+    public ChessGame(Board board, Team turn) {
+        this.players = new Players(board, turn);
+        this.board = board;
+        this.winner = Team.EMPTY;
     }
 
     public void currentTurnPlayerMove(Point departure, Point destination) {
-        Player player = this.players.get(turn);
-        player.move(departure, destination);
+        Piece targetPiece = players.move(departure, destination);
+
+        if (Piece.kingFrom(Team.WHITE).equals(targetPiece)) {
+            winner = Team.WHITE;
+        }
+        if (Piece.kingFrom(Team.BLACK).equals(targetPiece)) {
+            winner = Team.BLACK;
+        }
+
+        players.turnOver();
     }
 
-    public void turnOver() {
-        this.turn = turn.opponent();
+    public Status playerStatus() {
+        double whiteScore = players.whiteScore();
+        double blackScore = players.blackScore();
+
+        return new Status(whiteScore, blackScore);
+    }
+
+    public boolean isGameOver() {
+        return !winner.equals(Team.EMPTY);
+    }
+
+    public Team getWinner() {
+        return winner;
+    }
+
+    public Team currentTurn() {
+        return players.currentTurn();
+    }
+
+    public Board getBoard() {
+        return board;
     }
 }

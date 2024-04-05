@@ -1,0 +1,13 @@
+USE chess;
+
+CREATE TABLE chess_board
+(
+    id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+    board   VARCHAR(64) NOT NULL
+);
+
+CREATE TABLE turn
+(
+    id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+    team   VARCHAR(5) NOT NULL
+);

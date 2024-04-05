@@ -5,10 +5,26 @@ import chess.domain.piece.Team;
 import chess.domain.point.File;
 import chess.domain.point.Point;
 import chess.domain.point.Rank;
+import chess.view.PieceCharacters;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BoardFactory {
+
+
+    public static Board createChessBoard(String rawBoard) {
+        if (rawBoard.length() != 64) {
+            return createInitialChessBoard();
+        }
+        Map<Point, Piece> board = new HashMap<>();
+
+        StringBuilder boardBuilder = new StringBuilder(rawBoard);
+        BoardIterator.loop((point) -> {
+            board.put(point, PieceCharacters.pieceFrom(boardBuilder.charAt(0)));
+            boardBuilder.deleteCharAt(0);
+        });
+        return new Board(board);
+    }
 
     public static Board createInitialChessBoard() {
         Map<Point, Piece> board = new HashMap<>();

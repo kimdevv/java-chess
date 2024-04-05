@@ -3,84 +3,112 @@ package chess.controller;
 import chess.domain.ChessGame;
 import chess.domain.board.Board;
 import chess.domain.board.BoardFactory;
-import chess.domain.point.File;
+import chess.domain.piece.Team;
 import chess.domain.point.Point;
-import chess.domain.point.Rank;
+import chess.service.GameService;
 import chess.view.InputView;
 import chess.view.OutputView;
+import chess.view.command.Command;
+import chess.view.command.CommandType;
+import chess.view.command.MoveOption;
+import java.util.EnumMap;
 
 public class ChessController {
 
-    private static final String COMMAND_END = "end";
-    private static final int DEPARTURE_INDEX = 1;
-    private static final int DESTINATION_INDEX = 2;
-    private static final int FILE_INDEX = 0;
-    private static final int RANK_INDEX = 1;
-
     private final InputView inputView;
     private final OutputView outputView;
+    private final GameService gameService;
+    private final EnumMap<CommandType, CommandExecute> commandExecutor;
 
-    public ChessController(InputView inputView, OutputView outputView) {
+    public ChessController(InputView inputView, OutputView outputView, GameService gameService) {
         this.inputView = inputView;
         this.outputView = outputView;
+        this.gameService = gameService;
+        this.commandExecutor = createCommandExecutor();
+    }
+
+    private EnumMap<CommandType, CommandExecute> createCommandExecutor() {
+        EnumMap<CommandType, CommandExecute> commandExecutor = new EnumMap<>(CommandType.class);
+        commandExecutor.put(CommandType.MOVE, this::move);
+        commandExecutor.put(CommandType.STATUS, this::status);
+        commandExecutor.put(CommandType.END, this::end);
+        return commandExecutor;
     }
 
     public void run() {
-        startGame();
-        runGame();
+        try {
+            Command command = startGame();
+            runGame(loadGame(), command);
+        } catch (IllegalStateException e) {
+            outputView.printErrorMessage(e.getMessage());
+        }
     }
 
-    private void startGame() {
+    private Command startGame() {
         outputView.printGameStart();
         while (true) {
             try {
-                inputView.readStart();
-                return;
+                return new Command(inputView.readStart());
             } catch (IllegalArgumentException e) {
                 outputView.printErrorMessage(e.getMessage());
             }
         }
     }
 
-    private void runGame() {
-        Board board = BoardFactory.createInitialChessBoard();
-        ChessGame game = new ChessGame(board);
-        while (true) {
+    private ChessGame loadGame() {
+        Board board = BoardFactory.createChessBoard(gameService.loadChessBoard());
+        Team turn = Team.valueOf(gameService.loadTurn());
+        return new ChessGame(board, turn);
+    }
+
+    private void runGame(ChessGame game, Command command) {
+        outputView.printBoardTurn(game.getBoard(), game.currentTurn());
+        while (!game.isGameOver() && !command.isEnd()) {
             try {
-                outputView.printBoard(board.getBoard());
+                command = new Command(inputView.readCommand());
+                CommandExecute commandExecute = commandExecutor.get(command.type());
 
-                String readCommand = inputView.readCommand();
-                if (COMMAND_END.equals(readCommand)) {
-                    outputView.printGameEnd();
-                    return;
-                }
-                pieceMove(readCommand, game);
-            } catch (IllegalStateException e) {
-                outputView.printErrorMessage(e.getMessage());
-                return;
+                commandExecute.execute(command, game);
             } catch (IllegalArgumentException e) {
                 outputView.printErrorMessage(e.getMessage());
             }
         }
+        gameOver(game);
     }
 
-    private void pieceMove(String readCommand, ChessGame game) {
-        Point departure;
-        Point destination;
-        try {
-            String[] splitCommands = readCommand.split(" ");
-            departure = parsePoint(splitCommands[DEPARTURE_INDEX]);
-            destination = parsePoint(splitCommands[DESTINATION_INDEX]);
-        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-            throw new IllegalArgumentException("잘못된 위치를 입력하였습니다. 입력값 : " + readCommand);
+    private void status(Command command, ChessGame game) {
+        outputView.printStatus(game.playerStatus());
+    }
+
+    private void end(Command command, ChessGame game) {
+        gameService.saveChessBoard(game);
+        gameService.saveTurn(game.currentTurn());
+        outputView.printGameEnd();
+    }
+
+    private void move(Command command, ChessGame game) {
+        pieceMove(command, game);
+        outputView.printBoardTurn(game.getBoard(), game.currentTurn());
+    }
+
+    private void pieceMove(final Command command, ChessGame game) {
+        MoveOption moveOption = new MoveOption(command.options());
+        String source = moveOption.source();
+        String target = moveOption.target();
+
+        game.currentTurnPlayerMove(Point.of(source), Point.of(target));
+    }
+
+    private void gameOver(ChessGame game) {
+        if (game.isGameOver()) {
+            outputView.printWinner(game.getWinner());
+            gameService.deleteAll();
         }
-        game.currentTurnPlayerMove(departure, destination);
-        game.turnOver();
     }
 
-    private Point parsePoint(String splitCommand) {
-        File file = File.of(splitCommand.charAt(FILE_INDEX));
-        Rank rank = Rank.of(Integer.parseInt(String.valueOf(splitCommand.charAt(RANK_INDEX))));
-        return Point.of(file, rank);
+    @FunctionalInterface
+    interface CommandExecute {
+
+        void execute(Command command, ChessGame game);
     }
 }

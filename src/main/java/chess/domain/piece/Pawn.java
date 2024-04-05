@@ -1,72 +1,44 @@
 package chess.domain.piece;
 
-import chess.domain.board.InitialPosition;
-import chess.domain.route.Route;
 import chess.domain.position.Position;
+import chess.domain.route.Route;
 import java.util.List;
 
-public class Pawn extends Piece {
+public abstract class Pawn extends Piece {
 
     public Pawn(Side side) {
         super(side);
     }
 
+    protected abstract boolean isAttackable(Position source, Position target, Route route);
+
+    protected abstract boolean isTwoForwardFromInitialPosition(Position source, Position target);
+
+    protected abstract boolean isOneForward(Position source, Position target);
+
     @Override
-    boolean hasFollowedRule(Position source, Position target, Route route) {
-        if (isBlack()) {
-            return hasFollowedBlackRule(source, target, route);
+    protected boolean hasFollowedRule(Position source, Position target, Route route) {
+        return isAttackable(source, target, route) ||
+                isNotAttack(route) && (isTwoForwardFromInitialPosition(source, target) || isOneForward(source, target));
+    }
+
+    private boolean isNotAttack(Route route) {
+        return route.isTargetPieceEmpty();
+    }
+
+    @Override
+    public double score(List<Piece> pieces) {
+        int sameSidePawnCount = countSameSidePawn(pieces);
+
+        if (sameSidePawnCount > 1) {
+            return 0.5;
         }
-        return hasFollowedWhiteRule(source, target, route);
+        return 1;
     }
 
-    private boolean hasFollowedBlackRule(Position source, Position target, Route route) {
-        Side side = Side.BLACK;
-
-        boolean diagonalAttack = isDownDiagonal(source, target) && route.isOpponentTargetPiece(side);
-        boolean notAttack = route.isTargetPieceEmpty();
-        boolean downTwoAtInitialPosition = isInitialPosition(source, side) && isDownTwo(source, target);
-        boolean downOne = isDownOne(source, target);
-
-        return diagonalAttack || notAttack && (downTwoAtInitialPosition || downOne);
-    }
-
-    private boolean hasFollowedWhiteRule(Position source, Position target, Route route) {
-        Side side = Side.WHITE;
-
-        boolean diagonalAttack = isUpDiagonal(source, target) && route.isOpponentTargetPiece(side);
-        boolean notAttack = route.isTargetPieceEmpty();
-        boolean upTwoAtInitialPosition = isInitialPosition(source, side) && isUpTwo(source, target);
-        boolean upOne = isUpOne(source, target);
-
-        return diagonalAttack || notAttack && (upTwoAtInitialPosition || upOne);
-    }
-
-    private boolean isDownDiagonal(Position source, Position target) {
-        return source.hasHigherRankByOne(target) && source.hasOneFileGap(target);
-    }
-
-    private boolean isUpDiagonal(Position source, Position target) {
-        return target.hasHigherRankByOne(source) && source.hasOneFileGap(target);
-    }
-
-    private boolean isInitialPosition(Position source, Side side) {
-        List<Position> positions = InitialPosition.PAWN.positions(side);
-        return positions.contains(source);
-    }
-
-    private boolean isDownTwo(Position source, Position target) {
-        return source.hasHigherRankByTwo(target) && source.isSameFile(target);
-    }
-
-    private boolean isUpTwo(Position source, Position target) {
-        return target.hasHigherRankByTwo(source) && source.isSameFile(target);
-    }
-
-    private boolean isDownOne(Position source, Position target) {
-        return source.hasHigherRankByOne(target) && source.isSameFile(target);
-    }
-
-    private boolean isUpOne(Position source, Position target) {
-        return target.hasHigherRankByOne(source) && source.isSameFile(target);
+    private int countSameSidePawn(List<Piece> pieces) {
+        return (int) pieces.stream()
+                .filter(this::equals)
+                .count();
     }
 }

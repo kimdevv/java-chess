@@ -19,17 +19,11 @@ public enum Side {
         return this == EMPTY;
     }
 
-    public Side opponent() {
-        if (isBlack()) {
-            return WHITE;
-        }
-        if (isWhite()) {
-            return BLACK;
-        }
-        return EMPTY;
-    }
-
     public boolean isSame(Side otherSide) {
         return this == otherSide;
+    }
+
+    public boolean isOpponentTo(Side other) {
+        return this.isBlack() && other.isWhite() || this.isWhite() && other.isBlack();
     }
 }

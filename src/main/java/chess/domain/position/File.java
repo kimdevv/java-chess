@@ -1,8 +1,9 @@
 package chess.domain.position;
 
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public enum File {
 
@@ -31,22 +32,18 @@ public enum File {
     }
 
     public List<File> findBetween(File other) {
-        if (this.order < other.order) {
-            return betweenAcs(other);
+        List<File> files = Arrays.stream(values())
+                .filter(file -> isBetween(file, this.order, other.order))
+                .collect(Collectors.toList());
+
+        if (this.order > other.order) {
+            Collections.reverse(files);
         }
-        return betweenDesc(other);
+        return files;
     }
 
-    private List<File> betweenAcs(File other) {
-        return Arrays.stream(values())
-                .filter(file -> file.order > this.order && file.order < other.order)
-                .toList();
-    }
-
-    private List<File> betweenDesc(File other) {
-        return Arrays.stream(values())
-                .filter(file -> file.order > other.order && file.order < this.order)
-                .sorted(Comparator.comparingInt(File::ordinal).reversed())
-                .toList();
+    private boolean isBetween(File file, int thisOrder, int otherOrder) {
+        return (file.order > thisOrder && file.order < otherOrder) ||
+                (file.order > otherOrder && file.order < thisOrder);
     }
 }

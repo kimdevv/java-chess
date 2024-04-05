@@ -33,6 +33,10 @@ public class Position {
         return file == other.file;
     }
 
+    public boolean isSameFile(File otherFile) {
+        return file == otherFile;
+    }
+
     public boolean isSameRank(Position other) {
         return rank == other.rank;
     }

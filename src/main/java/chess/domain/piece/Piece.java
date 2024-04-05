@@ -2,6 +2,7 @@ package chess.domain.piece;
 
 import chess.domain.route.Route;
 import chess.domain.position.Position;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class Piece {
@@ -12,7 +13,9 @@ public abstract class Piece {
         this.side = side;
     }
 
-    abstract boolean hasFollowedRule(Position source, Position target, Route route);
+    protected abstract boolean hasFollowedRule(Position source, Position target, Route route);
+
+    public abstract double score(List<Piece> pieces);
 
     public void checkValidMove(Position source, Position target, Route route) {
         checkDifferentPosition(source, target);
@@ -37,7 +40,7 @@ public abstract class Piece {
     }
 
     private void checkNoPathPieces(Route route) {
-        if (route.notAllPathPiecesEmpty()) {
+        if (route.hasNonEmptyPathPieces()) {
             throw new IllegalArgumentException("source 위치에서 target 위치까지의 경로에 기물이 존재하면 이동할 수 없습니다.");
         }
     }
@@ -50,12 +53,16 @@ public abstract class Piece {
         return side.isBlack();
     }
 
+    public boolean isWhite() {
+        return side.isWhite();
+    }
+
     public boolean isSameSide(Side otherSide) {
         return side.isSame(otherSide);
     }
 
     public boolean isOpponentSide(Side otherSide) {
-        return side.opponent().isSame(otherSide);
+        return side.isOpponentTo(otherSide);
     }
 
     public boolean isEmpty() {
@@ -64,6 +71,10 @@ public abstract class Piece {
 
     public boolean isNotEmpty() {
         return !isEmpty();
+    }
+
+    public boolean isKing() {
+        return false;
     }
 
     @Override

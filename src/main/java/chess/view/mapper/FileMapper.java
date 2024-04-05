@@ -27,7 +27,7 @@ public enum FileMapper {
     public static File from(String input) {
         return Arrays.stream(values())
                 .filter(it -> it.symbol.equals(input))
-                .findFirst()
+                .findAny()
                 .map(it -> it.file)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가로 위치입니다."));
     }

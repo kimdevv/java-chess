@@ -1,4 +1,4 @@
-package chess.domain.board;
+package chess.domain.game;
 
 import chess.domain.position.File;
 import chess.domain.position.Position;
@@ -18,11 +18,11 @@ public enum InitialPosition {
     ;
 
     private final List<File> files;
-    private final Function<Side, Rank> rank;
+    private final Function<Side, Rank> rankDecider;
 
-    InitialPosition(List<File> files, Function<Side, Rank> rank) {
+    InitialPosition(List<File> files, Function<Side, Rank> rankDecider) {
         this.files = files;
-        this.rank = rank;
+        this.rankDecider = rankDecider;
     }
 
     private static Function<Side, Rank> nonPawnRank() {
@@ -66,6 +66,6 @@ public enum InitialPosition {
     }
 
     private Rank rank(Side side) {
-        return rank.apply(side);
+        return rankDecider.apply(side);
     }
 }

@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import chess.domain.position.Position;
 import chess.domain.route.Route;
 import chess.fixture.MovePathFixture;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,11 @@ public class PieceTest {
             @Override
             public boolean hasFollowedRule(Position source, Position target, Route route) {
                 return true;
+            }
+
+            @Override
+            public double score(List<Piece> pieces) {
+                return 0;
             }
         };
     }
@@ -59,6 +65,11 @@ public class PieceTest {
             @Override
             public boolean hasFollowedRule(Position source, Position target, Route movePath) {
                 return false;
+            }
+
+            @Override
+            public double score(List<Piece> pieces) {
+                return 0;
             }
         };
 

@@ -4,27 +4,29 @@ import chess.domain.board.Board;
 import chess.domain.piece.Side;
 import chess.domain.position.Position;
 import chess.domain.piece.Piece;
+import java.util.List;
 import java.util.Objects;
 
 public class Route {
 
-    private final Pieces pathPieces;
+    private final List<Piece> pathPieces;
     private final Piece targetPiece;
 
-    public Route(Pieces pathPieces, Piece targetPiece) {
+    public Route(List<Piece> pathPieces, Piece targetPiece) {
         this.pathPieces = pathPieces;
         this.targetPiece = targetPiece;
     }
 
     public static Route create(Position source, Position target, Board board) {
         Path path = Path.of(source, target);
-        Pieces pathPieces = board.findPieces(path);
+        List<Piece> pathPieces = board.findPieces(path);
         Piece targetPiece = board.findPiece(target);
         return new Route(pathPieces, targetPiece);
     }
 
-    public boolean notAllPathPiecesEmpty() {
-        return pathPieces.notAllEmpty();
+    public boolean hasNonEmptyPathPieces() {
+        return pathPieces.stream()
+                .anyMatch(Piece::isNotEmpty);
     }
 
     public boolean isTargetPieceEmpty() {

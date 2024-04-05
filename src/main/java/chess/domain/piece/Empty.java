@@ -2,6 +2,7 @@ package chess.domain.piece;
 
 import chess.domain.position.Position;
 import chess.domain.route.Route;
+import java.util.List;
 
 public class Empty extends Piece {
 
@@ -16,7 +17,12 @@ public class Empty extends Piece {
     }
 
     @Override
-    boolean hasFollowedRule(Position source, Position target, Route route) {
+    protected boolean hasFollowedRule(Position source, Position target, Route route) {
         return false;
+    }
+
+    @Override
+    public double score(List<Piece> pieces) {
+        return 0;
     }
 }

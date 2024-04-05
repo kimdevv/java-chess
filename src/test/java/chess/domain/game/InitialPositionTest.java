@@ -1,4 +1,4 @@
-package chess.domain.board;
+package chess.domain.game;
 
 import static chess.fixture.PositionFixture.A1;
 import static chess.fixture.PositionFixture.A2;
@@ -34,6 +34,7 @@ import static chess.fixture.PositionFixture.H7;
 import static chess.fixture.PositionFixture.H8;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import chess.domain.game.InitialPosition;
 import chess.domain.position.Position;
 import chess.domain.piece.Side;
 import java.util.List;

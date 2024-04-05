@@ -27,7 +27,7 @@ public enum RankMapper {
     public static Rank from(String input) {
         return Arrays.stream(values())
                 .filter(it -> it.symbol.equals(input))
-                .findFirst()
+                .findAny()
                 .map(it -> it.rank)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 세로 위치입니다."));
     }

@@ -1,4 +1,4 @@
-package chess.domain.board;
+package chess.domain.game;
 
 import static chess.fixture.PieceFixture.BLACK_BISHOP;
 import static chess.fixture.PieceFixture.BLACK_KING;
@@ -79,13 +79,14 @@ import static chess.fixture.PositionFixture.H7;
 import static chess.fixture.PositionFixture.H8;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import chess.domain.game.InitialGameCreator;
 import chess.domain.position.Position;
 import chess.domain.piece.Piece;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class BoardCreatorTest {
+class InitialGameCreatorTest {
 
     /*
     RNBQKBNR  8
@@ -102,9 +103,9 @@ class BoardCreatorTest {
     @DisplayName("초기화된 체스판을 생성한다.")
     @Test
     void create() {
-        BoardCreator boardCreator = new BoardCreator();
+        InitialGameCreator initialBoardCreator = new InitialGameCreator();
 
-        Map<Position, Piece> board = boardCreator.create();
+        Map<Position, Piece> board = initialBoardCreator.createBoard();
 
         assertThat(board).containsExactly(
                 Map.entry(A8, BLACK_ROOK),

@@ -14,6 +14,8 @@ import model.position.Route;
 public final class Pawn extends Role {
     private static final int INITIAL_WHITE_PAWN_RANK = 2;
     private static final int INITIAL_BLACK_PAWN_RANK = 7;
+    private static final double SCORE = 1;
+
     private boolean isTryToTake;
 
     private Pawn(Color color, ShiftPattern shiftPattern) {
@@ -72,13 +74,20 @@ public final class Pawn extends Role {
     }
 
     @Override
-    public void traversalRoles(List<Role> rolesInRoute, Role destinationRole) {
-        if (destinationRole.isSameColor(color)) {
-            throw new IllegalArgumentException("목적지에 같은 색깔의 기물이 위치하여 이동할 수 없습니다.");
-        }
-        if (isTryToTake != destinationRole.isOccupied()) {
-            throw new IllegalArgumentException("해당 Pawn이 이동할 수 없는 좌표입니다");
+    public boolean canCapture(Role destinationRole) {
+        if (isTryToTake != (destinationRole.isOccupied() && destinationRole.color != this.color)) {
+            isTryToTake = false;
+            return false;
         }
         isTryToTake = false;
+        return true;
+    }
+
+    @Override
+    public double score(boolean hasPawnInFile) {
+        if (hasPawnInFile) {
+            return SCORE / 2;
+        }
+        return SCORE;
     }
 }

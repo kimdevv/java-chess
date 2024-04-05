@@ -17,7 +17,9 @@ import static util.Rank.THREE;
 import static util.Rank.TWO;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import model.direction.Direction;
 import model.piece.Color;
 import model.piece.PieceHolder;
 import model.piece.role.Bishop;
@@ -26,6 +28,7 @@ import model.piece.role.Pawn;
 import model.piece.role.Rook;
 import model.piece.role.Square;
 import model.position.Position;
+import model.position.Route;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,8 +63,8 @@ class CurrentTurnTest {
     @Test
     @DisplayName("유효한 이동 시 체스판 상태가 올바르게 업데이트 됨")
     void move_ShouldUpdateBoard_WhenValidMove() {
-        Position source = Position.of(2, 2);
-        Position destination = Position.of(3, 3);
+        Position source = Position.of(1, 1);
+        Position destination = Position.of(8, 8);
         PieceHolder ownPiece = new PieceHolder(Bishop.from(Color.WHITE));
 
         chessBoard.put(source, ownPiece);
@@ -73,6 +76,16 @@ class CurrentTurnTest {
                 .getRole());
     }
 
+    /**
+     * ....K... -> ....K...
+     * ....R... -> ....R...
+     * ........ -> ........
+     * ........ -> ........
+     * ........ -> ........
+     * ........ -> ........
+     * ....r... -> .....r..
+     * ....k... -> ....k... <- k checked by R
+     */
     @Test
     @DisplayName("이동 후 자신의 킹이 체크 상태인 경우 예외를 던진다.")
     void move_ShouldRollback_WhenSelfInCheckAfterMove() {
@@ -85,7 +98,7 @@ class CurrentTurnTest {
         chessBoard.put(blackRookPosition, rookFacingWhiteKing);
         chessBoard.put(source, rookBlockingCheck);
 
-        currentTurn = new CurrentTurn(chessBoard, Color.WHITE);
+        currentTurn = new CurrentTurn(chessBoard, Color.BLACK);
 
         assertThrows(IllegalArgumentException.class, () -> currentTurn.move(source, destination));
     }
@@ -100,6 +113,16 @@ class CurrentTurnTest {
         assertEquals(Color.BLACK, nextState.currentColor);
     }
 
+    /**
+     * ....K...
+     * ........
+     * ........
+     * ........
+     * ........
+     * ........
+     * ....r...
+     * ....k...
+     */
     @Test
     @DisplayName("isCheckedBy_적이 킹을 체크하고 있을 때 true 반환")
     void isCheckedBy_ShouldReturnTrue_WhenEnemyChecksKing() {
@@ -107,6 +130,7 @@ class CurrentTurnTest {
         PieceHolder rookAttackingBlackKing = new PieceHolder(Rook.from(Color.WHITE));
 
         chessBoard.put(source, rookAttackingBlackKing);
+        currentTurn = new CurrentTurn(chessBoard, Color.BLACK);
 
         assertTrue(currentTurn.isCheckedBy(Color.WHITE));
     }

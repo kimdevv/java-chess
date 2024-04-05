@@ -29,4 +29,9 @@ public final class CheckMate extends DefaultState {
     public boolean isFinish() {
         return true;
     }
+
+    @Override
+    public Color winner() {
+        return currentColor.opponent();
+    }
 }

@@ -6,41 +6,69 @@ import static view.OutputView.printInitialGamePrompt;
 
 import java.util.List;
 import model.chessboard.ChessBoard;
+import model.chessboard.ChessBoardFenConverter;
+import model.chessboard.FenCommand;
+import model.chessboard.Score;
 import model.position.Position;
+import repository.ChessDao;
 import view.GameCommand;
 import view.InputView;
+import view.OutputView;
 import view.dto.InfoMapper;
 import view.dto.PieceInfo;
 
 public class Controller {
+    private final ChessDao chessDao = new ChessDao();
 
     public void execute() {
         GameCommand gameCommand = executeInitial();
-        ChessBoard chessBoard = new ChessBoard();
-        while (gameCommand != GameCommand.END && !chessBoard.isFinish()) {
+        ChessBoard chessBoard = new ChessBoard(new FenCommand(chessDao.loadFenValue(), chessDao.isInitialGame()));
+        while (!gameCommand.isEnd() && !chessBoard.isFinish()) {
             List<PieceInfo> pieceInfos = InfoMapper.toPieceInfoMapper(chessBoard);
             printChessBoard(pieceInfos);
             gameCommand = inputRetryHelper(() -> runGame(chessBoard));
+            showCurrentStatus(gameCommand, chessBoard);
         }
-        List<PieceInfo> pieceInfos = InfoMapper.toPieceInfoMapper(chessBoard);
-        printChessBoard(pieceInfos);
+        processFinalStatus(chessBoard);
     }
 
     private GameCommand executeInitial() {
         printInitialGamePrompt();
+        if (!chessDao.isInitialGame()) {
+            OutputView.printSavedGameExistPrompt();
+        }
         return inputRetryHelper(InputView::inputInitialGameCommand);
+    }
+
+    private void processFinalStatus(ChessBoard chessBoard) {
+        List<PieceInfo> pieceInfos = InfoMapper.toPieceInfoMapper(chessBoard);
+        printChessBoard(pieceInfos);
+        Score currentScore = chessBoard.aggregateScore();
+        OutputView.printScore(currentScore, chessBoard.isFinish());
+        if (chessBoard.isFinish()) {
+            chessDao.initFen();
+            return;
+        }
+        chessDao.updateFen(ChessBoardFenConverter.toFEN(chessBoard));
+    }
+
+    private void showCurrentStatus(GameCommand gameCommand, ChessBoard chessBoard) {
+        if (gameCommand == GameCommand.STATUS) {
+            Score currentScore = chessBoard.aggregateScore();
+            OutputView.printScore(currentScore, false);
+        }
     }
 
     private GameCommand runGame(ChessBoard chessBoard) {
         List<String> inputCommand = InputView.parseCommand();
         GameCommand gameCommand = inputRetryHelper(() -> GameCommand.from(inputCommand));
         if (gameCommand == GameCommand.MOVE) {
-            controlChessBoard(chessBoard, inputCommand);
+            executeMoveCommand(chessBoard, inputCommand);
         }
         return gameCommand;
     }
 
-    private void controlChessBoard(ChessBoard chessBoard, List<String> inputCommand) {
+    private void executeMoveCommand(ChessBoard chessBoard, List<String> inputCommand) {
         Position source = generateSourcePosition(inputCommand);
         Position destination = generateDestinationPosition(inputCommand);
         chessBoard.move(source, destination);

@@ -1,0 +1,14 @@
+CREATE DATABASE IF NOT EXISTS chess;
+
+USE chess;
+
+CREATE TABLE IF NOT EXISTS fen (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fen_value VARCHAR (255) NULL
+    );
+
+INSERT INTO fen (fen_value)
+SELECT * FROM (SELECT NULL AS fen_value) AS tmp
+WHERE NOT EXISTS (
+    SELECT * FROM fen
+);

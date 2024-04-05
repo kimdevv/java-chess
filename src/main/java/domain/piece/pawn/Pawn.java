@@ -6,13 +6,16 @@ import domain.piece.Color;
 import domain.piece.base.ChessPieceBase;
 import domain.piece.strategy.PieceStrategy;
 import java.util.Set;
+import score.Score;
 
 public abstract class Pawn extends ChessPieceBase {
 
     private final PieceStrategy pieceStrategy;
 
+    private static final double PAWN_SCORE = 1;
+
     public Pawn(Color color, Set<Direction> directions) {
-        super(color);
+        super(color, new Score(PAWN_SCORE));
         this.pieceStrategy = new PieceStrategy(directions);
     }
 
@@ -26,6 +29,21 @@ public abstract class Pawn extends ChessPieceBase {
             pieceStrategy.findDirection(rowDifference, columnDifference);
         }
         return pieceStrategy.findDirection(divideValueByAbs(rowDifference), divideValueByAbs(columnDifference));
+    }
+
+    @Override
+    public boolean isPawn() {
+        return true;
+    }
+
+    @Override
+    public boolean isKing() {
+        return false;
+    }
+
+    @Override
+    public boolean isBlank() {
+        return false;
     }
 
     private int divideValueByAbs(int value) {

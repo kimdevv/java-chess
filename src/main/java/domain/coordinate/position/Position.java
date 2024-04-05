@@ -17,6 +17,10 @@ public class Position {
         return position.position - this.position;
     }
 
+    public int getPosition() {
+        return position;
+    }
+
     public Position next(int direction) {
         int movedPosition = position + direction;
 

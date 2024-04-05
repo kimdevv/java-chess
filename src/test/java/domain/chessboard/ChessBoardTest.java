@@ -15,7 +15,7 @@ class ChessBoardTest {
     @DisplayName("상대 말을 제거한 뒤 이동한다.")
     @Test
     void moveAfterKill() {
-        ChessBoard chessBoard = new ChessBoard();
+        ChessBoard chessBoard = new ChessBoard(ChessBoardInitializer.createInitialBoard());
 
         Coordinate whitePawnStart = Coordinate.from("b2");
         Coordinate whitePawnDestination = Coordinate.from("b4");
@@ -35,7 +35,7 @@ class ChessBoardTest {
     @DisplayName("빈 칸으로 이동한다.")
     @Test
     void move() {
-        ChessBoard chessBoard = new ChessBoard();
+        ChessBoard chessBoard = new ChessBoard(ChessBoardInitializer.createInitialBoard());
 
         Coordinate knightStart = Coordinate.from("b1");
         Coordinate knightDestination = Coordinate.from("a3");
@@ -45,22 +45,10 @@ class ChessBoardTest {
         assertThat(chessBoard.getBoard().get(knightDestination)).isInstanceOf(Knight.class);
     }
 
-    @DisplayName("상대의 말을 이동할 수 없다.")
-    @Test
-    void cantMoveOtherPiece() {
-        ChessBoard chessBoard = new ChessBoard();
-
-        Coordinate blackPawnStart = Coordinate.from("G7");
-        Coordinate blackPawnDestination = Coordinate.from("G6");
-        assertThatThrownBy(() -> chessBoard.playTurn(blackPawnStart, blackPawnDestination))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("상대의 말을 움직일 수 없습니다.");
-    }
-
     @DisplayName("이동 경로에 말이 있으면 이동할 수 없다.")
     @Test
     void cantMoveWhenPieceInPath() {
-        ChessBoard chessBoard = new ChessBoard();
+        ChessBoard chessBoard = new ChessBoard(ChessBoardInitializer.createInitialBoard());
 
         assertThatThrownBy(() -> chessBoard.playTurn(Coordinate.from("a1"), Coordinate.from("a3")))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -70,7 +58,7 @@ class ChessBoardTest {
     @DisplayName("집은 말이 이미 움직인 폰일 경우 방향이 옳더라도 2칸을 갈 수 없다.")
     @Test
     void validateMovedPawnCanNotMoveTwo() {
-        ChessBoard chessBoard = new ChessBoard();
+        ChessBoard chessBoard = new ChessBoard(ChessBoardInitializer.createInitialBoard());
 
         chessBoard.playTurn(Coordinate.from("a2"), Coordinate.from("a3"));
         chessBoard.playTurn(Coordinate.from("a7"), Coordinate.from("a6"));

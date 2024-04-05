@@ -27,6 +27,16 @@ public enum ColumnSymbol {
                 .orElseThrow(() -> new IllegalArgumentException("존재하는 식별자가 아닙니다."));
     }
 
+    public static String identifierFrom(String column) {
+        ColumnSymbol columnSymbol = Arrays.stream(values())
+                .filter(symbol -> column.equals(String.valueOf(symbol.position)))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("존재하는 위치가 아닙니다."));
+
+        return columnSymbol.identifier;
+    }
+
+
     public int getPosition() {
         return this.position;
     }

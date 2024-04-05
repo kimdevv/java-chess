@@ -18,6 +18,10 @@ public class Column {
         return position.getMinusPosition(column.position);
     }
 
+    public int getPosition() {
+        return position.getPosition();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

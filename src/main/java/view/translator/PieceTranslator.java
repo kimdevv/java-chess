@@ -1,7 +1,9 @@
 package view.translator;
 
+import db.entity.Piece;
 import domain.piece.Bishop;
 import domain.piece.Blank;
+import domain.piece.Color;
 import domain.piece.King;
 import domain.piece.Knight;
 import domain.piece.Queen;
@@ -20,7 +22,7 @@ public enum PieceTranslator {
     KNIGHT(Knight.class, "n"),
     WHITE_PAWN(WhitePawn.class, "p"),
     BLACK_PAWN(BlackPawn.class, "P"),
-    NONE(Blank.class, ".");
+    BLANK(Blank.class, ".");
 
     private final Class<? extends ChessPiece> classType;
     private final String name;
@@ -36,15 +38,22 @@ public enum PieceTranslator {
         if (pieceTranslator.classType == Blank.class) {
             return pieceTranslator.name;
         }
-        if (piece.isBlack()) {
+        if (piece.isSameColor(Color.BLACK)) {
             return pieceTranslator.name.toUpperCase();
         }
         return pieceTranslator.name;
     }
 
-    private static PieceTranslator from(ChessPiece chessPiece) {
+    public static PieceTranslator from(ChessPiece chessPiece) {
         return Arrays.stream(values())
                 .filter(piece -> piece.classType == chessPiece.getClass())
+                .findAny()
+                .orElseThrow();
+    }
+
+    public static PieceTranslator from(Piece piece) {
+        return Arrays.stream(values())
+                .filter(singlePiece -> String.valueOf(singlePiece).equals(piece.getPieceType()))
                 .findAny()
                 .orElseThrow();
     }

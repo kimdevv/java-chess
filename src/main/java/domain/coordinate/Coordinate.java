@@ -41,6 +41,18 @@ public class Coordinate {
         return new Coordinate(row.next(direction.getRowDirection()), column.next(direction.getColumnDirection()));
     }
 
+    public Column getColumn() {
+        return column;
+    }
+
+    public String getColumnPosition() {
+        return String.valueOf(column.getPosition());
+    }
+
+    public String getRowPosition() {
+        return String.valueOf(row.getPosition());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

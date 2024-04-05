@@ -1,0 +1,6 @@
+url: localhost:13306
+option: ?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+name: chess
+username: polla
+password: password
+driver-name: com.mysql.cj.jdbc.Driver

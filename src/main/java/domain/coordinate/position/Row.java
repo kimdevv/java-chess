@@ -22,6 +22,10 @@ public class Row {
         return position.isSame(otherPosition);
     }
 
+    public int getPosition() {
+        return position.getPosition();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

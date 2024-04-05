@@ -1,17 +1,16 @@
 import controller.ChessGameController;
-import java.util.Scanner;
-import view.InputView;
-import view.OutputView;
+import java.sql.SQLException;
+import service.ChessGameService;
+import service.PieceService;
 
 public class Application {
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        InputView inputView = new InputView(scanner);
+    public static void main(String[] args) throws SQLException {
+        ChessGameService chessGameService = new ChessGameService();
+        PieceService pieceService = new PieceService();
 
-        OutputView outputView = new OutputView();
+        ChessGameController chessGameController = new ChessGameController(chessGameService, pieceService);
 
-        ChessGameController chessGameController = new ChessGameController(inputView, outputView);
         chessGameController.run();
     }
 }

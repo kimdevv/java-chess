@@ -10,8 +10,12 @@ public class InputView {
 
     private final Scanner scanner = new Scanner(System.in);
 
+    private String readLine() {
+        return scanner.nextLine();
+    }
+
     public Command readCommand() {
-        return Command.from(scanner.nextLine());
+        return Command.from(readLine());
     }
 
     public Position resolvePosition(String rawPosition) {

@@ -1,12 +1,22 @@
 package chess.domain.piece;
 
+import static chess.domain.piece.Color.NO_COLOR;
+
 import chess.domain.position.Position;
 import java.util.Map;
 
 public class NoPiece extends Piece {
 
-    public NoPiece(Color color) {
-        super(color);
+    private static final double NO_SCORE = 0.0;
+
+    private static final NoPiece INSTANCE = new NoPiece();
+
+    private NoPiece() {
+        super(NO_COLOR);
+    }
+
+    public static NoPiece getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -15,7 +25,13 @@ public class NoPiece extends Piece {
     }
 
     @Override
-    public boolean exists() {
-        return false;
+    public boolean isEmpty() {
+        return true;
     }
+
+    @Override
+    public double score() {
+        return NO_SCORE;
+    }
+
 }

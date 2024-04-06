@@ -1,5 +1,9 @@
 package chess.domain.piece;
 
+import static chess.domain.piece.Color.BLACK;
+import static chess.domain.piece.Color.WHITE;
+import static chess.domain.piece.Color.oppose;
+
 import chess.domain.position.Position;
 import java.util.Map;
 import java.util.Objects;
@@ -14,22 +18,30 @@ public abstract class Piece {
 
     public abstract boolean canMove(Position source, Position target, Map<Position, Piece> board);
 
-    public abstract boolean exists();
+    public abstract double score();
 
-    public boolean doesNotExist() {
-        return !exists();
+    public boolean isEmpty() {
+        return this.equals(NoPiece.getInstance());
     }
 
     public boolean isWhite() {
-        return color == Color.WHITE;
+        return color == WHITE;
+    }
+
+    public boolean isColored(Color color) {
+        return this.color == color;
     }
 
     public boolean isNotColored(Color color) {
         return this.color != color;
     }
 
+    public boolean isKing() {
+        return this.equals(King.withColor(WHITE)) || this.equals(King.withColor(BLACK));
+    }
+
     public boolean hasOppositeColorFrom(Piece other) {
-        return this.color == Color.oppose(other.color);
+        return this.color == oppose(other.color);
     }
 
     protected Color color() {

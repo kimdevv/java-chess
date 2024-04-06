@@ -1,5 +1,6 @@
 package domain.board;
 
+import db.TurnDto;
 import domain.piece.Color;
 
 import java.util.Objects;
@@ -12,13 +13,17 @@ public class Turn {
         this.color = color;
     }
 
+    public Turn() {
+        this.color = Color.WHITE;
+    }
+
     public void swap() {
         this.color = color.opposite();
     }
 
     public void validate(Color color) {
         if (this.color != color) {
-            throw new IllegalArgumentException("올바른 차례가 아닙니다.");
+            throw new IllegalArgumentException(String.format("[ERROR] 현재는 %s 턴입니다.", this.color));
         }
     }
 
@@ -33,5 +38,9 @@ public class Turn {
     @Override
     public int hashCode() {
         return Objects.hash(color);
+    }
+
+    public TurnDto turnDto() {
+        return new TurnDto(color);
     }
 }

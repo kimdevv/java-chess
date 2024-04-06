@@ -11,7 +11,8 @@ public enum CommandInput {
 
     START(Command.START, Pattern.compile("start")),
     MOVE(Command.MOVE, Pattern.compile("^move [a-h][1-8] [a-h][1-8]$")),
-    END(Command.END, Pattern.compile("end"));
+    END(Command.END, Pattern.compile("end")),
+    STATUS(Command.STATUS, Pattern.compile("status"));
 
     private final Command command;
     private final Pattern pattern;
@@ -30,14 +31,14 @@ public enum CommandInput {
     }
 
     public static PlayCommand asPlayCommand(String input) {
-        Command command = Stream.of(CommandInput.MOVE, CommandInput.END)
+        Command command = Stream.of(CommandInput.MOVE, CommandInput.END, CommandInput.STATUS)
                 .filter(commandInput -> commandInput.pattern.matcher(input).matches())
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("[ERROR] 올바른 명령어를 입력해주세요."))
                 .command;
-        if (command.isEnd()) {
-            return new PlayCommand(command);
+        if (command.isMove()) {
+            return new PlayCommand(command, new PositionCommand(input.split(" ", 2)[1]));
         }
-        return new PlayCommand(command, new PositionCommand(input.split(" ", 2)[1]));
+        return new PlayCommand(command);
     }
 }

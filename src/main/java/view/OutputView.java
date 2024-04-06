@@ -1,8 +1,11 @@
 package view;
 
 import domain.board.Board;
+import domain.piece.Color;
 import domain.piece.Piece;
 import domain.piece.PieceType;
+import domain.score.Score;
+import domain.score.Scores;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,27 +43,39 @@ public class OutputView {
         System.out.println(errorMessage);
     }
 
+    public void printScore(Scores scores) {
+        System.out.println("-------- 점수 --------");
+        System.out.println(ScoreOutput.asString(scores.white()));
+        System.out.println(ScoreOutput.asString(scores.black()));
+        System.out.println();
+    }
+
+    public void printWinner(Color winnerColor, Color loserColor) {
+        System.out.println(loserColor + " 킹이 잡혔습니다.");
+        System.out.println("우승 진영은 " + winnerColor + "입니다.");
+    }
+
     private enum PieceOutput {
 
-        BISHOP(PieceType.BISHOP, "B"),
-        KING(PieceType.KING, "K"),
-        KNIGHT(PieceType.KNIGHT, "N"),
-        PAWN(PieceType.PAWN, "P"),
-        QUEEN(PieceType.QUEEN, "Q"),
-        ROOK(PieceType.ROOK, "R"),
-        NONE(PieceType.NONE, ".");
+        BISHOP(List.of(PieceType.BISHOP), "B"),
+        KING(List.of(PieceType.KING), "K"),
+        KNIGHT(List.of(PieceType.KNIGHT), "N"),
+        PAWN(List.of(PieceType.FIRST_PAWN, PieceType.PAWN), "P"),
+        QUEEN(List.of(PieceType.QUEEN), "Q"),
+        ROOK(List.of(PieceType.ROOK), "R"),
+        NONE(List.of(PieceType.NONE), ".");
 
-        private final PieceType pieceType;
+        private final List<PieceType> pieceTypes;
         private final String output;
 
-        PieceOutput(PieceType pieceType, String output) {
-            this.pieceType = pieceType;
+        PieceOutput(List<PieceType> pieceTypes, String output) {
+            this.pieceTypes = pieceTypes;
             this.output = output;
         }
 
         private static String asString(Piece piece) {
             String output = Arrays.stream(values())
-                    .filter(pieceOutput -> piece.isSameType(pieceOutput.pieceType))
+                    .filter(pieceOutput -> isAnyMatch(piece, pieceOutput.pieceTypes))
                     .findFirst()
                     .orElse(NONE)
                     .output;
@@ -68,6 +83,32 @@ public class OutputView {
                 return output.toLowerCase();
             }
             return output;
+        }
+
+        private static boolean isAnyMatch(Piece piece, List<PieceType> pieceTypes) {
+            return pieceTypes.stream()
+                    .anyMatch(piece::isSameType);
+        }
+    }
+
+    private enum ScoreOutput {
+        WHITE_SCORE(Color.WHITE, "흰색(소문자) = %.1f점"),
+        BLACK_SCORE(Color.BLACK, "검은색(대문자) = %.1f점");
+
+        private final Color color;
+        private final String format;
+
+        ScoreOutput(Color color, String format) {
+            this.color = color;
+            this.format = format;
+        }
+
+        private static String asString(Score score) {
+            return Arrays.stream(values())
+                    .filter(scoreOutput -> scoreOutput.color == score.color())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 색입니다."))
+                    .format.formatted(score.totalValue());
         }
     }
 }

@@ -1,8 +1,9 @@
 package domain.position;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import db.PositionDto;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Position {
 
@@ -18,6 +19,10 @@ public class Position {
         this.rank = rank;
     }
 
+    public Position(PositionDto positionDto) {
+        this(positionDto.file(), positionDto.rank());
+    }
+
     public int rankDirection(Position target) {
         return rank.forwardDistance(target.rank);
     }
@@ -26,6 +31,12 @@ public class Position {
         int fileDistance = file.distance(target.file);
         int rankDistance = rank.distance(target.rank);
         return fileDistance == rankDistance;
+    }
+
+    public boolean isDiagonal(Position target, int step) {
+        int fileDistance = file.distance(target.file);
+        int rankDistance = rank.distance(target.rank);
+        return step == fileDistance && fileDistance == rankDistance;
     }
 
     public boolean isStraight(Position target) {
@@ -53,21 +64,13 @@ public class Position {
     }
 
     public boolean isForwardStraight(Position target) {
+        return isForwardStraight(target, 1);
+    }
+
+    public boolean isForwardStraight(Position target, int... steps) {
         int forwardDistance = rank.distance(target.rank);
-        if (isFirstMove()) {
-            return (isOneStep(forwardDistance) || isTwoStep(forwardDistance)) && file.isSame(target.file);
-        }
-        return isOneStep(forwardDistance) && file.isSame(target.file);
-    }
-
-    private boolean isFirstMove() {
-        return rank.isSame(Rank.TWO) || rank.isSame(Rank.SEVEN);
-    }
-
-    public boolean canAttackDiagonal(Position target) {
-        int rankDistance = rank.distance(target.rank);
-        int fileDistance = file.distance(target.file);
-        return isNoneStep(rankDistance) || isOneStep(fileDistance);
+        return Arrays.stream(steps)
+                .anyMatch(step -> step == forwardDistance && file.isSame(target.file));
     }
 
     public List<Position> findBetweenStraightPositions(Position target) {
@@ -93,6 +96,12 @@ public class Position {
         return positions;
     }
 
+    public Set<Position> findSameFilePositions() {
+        return Arrays.stream(Rank.values())
+                .map(rank -> new Position(this.file, rank))
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
     private boolean isNoneStep(int rankDistance) {
         return rankDistance == ZERO_STEP;
     }
@@ -103,6 +112,10 @@ public class Position {
 
     private boolean isTwoStep(int fileDistance) {
         return fileDistance == TWO_STEP;
+    }
+
+    public PositionDto positionDto() {
+        return new PositionDto(file, rank);
     }
 
     @Override

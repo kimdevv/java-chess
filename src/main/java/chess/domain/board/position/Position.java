@@ -13,13 +13,14 @@ public class Position {
         this.column = column;
     }
 
+    public Position(int row, String column) {
+        this(Row.findByIndex(row), Column.valueOf(column));
+    }
+
     public Position calculateNextPosition(Direction direction, int weight) {
         int rowDistance = direction.calculateRowDistance(weight);
         int columnDistance = direction.calculateColumnDistance(weight);
-
-        Row nextRow = row.calculateNextRow(rowDistance);
-        Column nextColumn = column.calculateNextColumn(columnDistance);
-        return new Position(nextRow, nextColumn);
+        return new Position(row.calculateNextRow(rowDistance), column.calculateNextColumn(columnDistance));
     }
 
     public int calculateMaxDistance(Direction direction, int maxMoveDistance) {
@@ -32,7 +33,6 @@ public class Position {
     private boolean isInRange(Direction direction, int weight) {
         int rowDistance = direction.calculateRowDistance(weight);
         int columnDistance = direction.calculateColumnDistance(weight);
-
         return row.isNextInRange(rowDistance) && column.isNextInRange(columnDistance);
     }
 
@@ -40,12 +40,20 @@ public class Position {
         return this.row == row;
     }
 
+    public int getColumnIndex() {
+        return column.getIndex();
+    }
+
     public int getRowIndex() {
         return row.getIndex();
     }
 
-    public int getColumnIndex() {
-        return column.getIndex();
+    public Row getRow() {
+        return row;
+    }
+
+    public Column getColumn() {
+        return column;
     }
 
     @Override

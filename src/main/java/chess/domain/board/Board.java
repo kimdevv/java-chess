@@ -1,28 +1,39 @@
 package chess.domain.board;
 
 import chess.domain.board.position.Position;
+import chess.domain.piece.Color;
 import chess.domain.piece.Piece;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class Board {
 
-    private final Map<Position, Piece> board;
+    private static final int GAME_OVER_KING_COUNT = 1;
 
-    public Board() {
-        this.board = new HashMap<>();
-        BoardFactory boardFactory = new BoardFactory();
-        boardFactory.initialize(this);
-    }
+    private final Map<Position, Piece> board;
 
     public Board(Map<Position, Piece> board) {
         this.board = board;
     }
 
+    public boolean isGameOver() {
+        return findKing().size() == GAME_OVER_KING_COUNT;
+    }
+
+    public Color findWinnerColor() {
+        return findKing().get(0).getColor();
+    }
+
+    private List<Piece> findKing() {
+        return board.values().stream()
+                .filter(Piece::isKing)
+                .toList();
+    }
+
     public void movePiece(Position from, Position to) {
-        Piece piece = board.get(from);
-        board.put(to, piece);
+        Piece fromPiece = board.get(from);
+        board.put(to, fromPiece);
         board.remove(from);
     }
 
@@ -41,28 +52,11 @@ public class Board {
         return board.containsKey(position);
     }
 
-    public Map<Position, Piece> getBoard() {
-        return board;
-    }
-
-    void put(Position position, Piece piece) {
+    public void put(Position position, Piece piece) {
         board.put(position, piece);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Board other = (Board) o;
-        return Objects.equals(board, other.board);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(board);
+    public Map<Position, Piece> getBoard() {
+        return new HashMap<>(board);
     }
 }

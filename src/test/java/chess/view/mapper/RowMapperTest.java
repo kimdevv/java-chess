@@ -34,5 +34,4 @@ class RowMapperTest {
         assertThatThrownBy(() -> RowMapper.findByInputValue(value))
                 .isInstanceOf(IllegalArgumentException.class);
     }
-
 }

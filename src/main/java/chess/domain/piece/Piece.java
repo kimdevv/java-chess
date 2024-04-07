@@ -16,20 +16,31 @@ public class Piece {
         this.color = color;
     }
 
+    public Piece(String pieceType, String color) {
+        this(PieceType.valueOf(pieceType), Color.valueOf(color));
+    }
+
     public Map<Direction, Queue<Position>> generateAllDirectionPositions(Position currentPosition) {
         return pieceType.generateAllDirectionPositions(currentPosition);
     }
 
     public boolean isEnemy(Piece piece) {
-        return isNotSameColor(piece.color);
+        return !isSameColor(piece.color);
     }
 
-    public boolean isBlack() {
-        return this.color == Color.BLACK;
+    public boolean isSameColor(Color color) {
+        return this.color == color;
     }
 
-    public boolean isNotSameColor(Color turn) {
-        return this.color != turn;
+    public boolean isKing() {
+        return this.pieceType == PieceType.KING;
+    }
+
+    public boolean isPawn(Color color) {
+        if (color == Color.BLACK) {
+            return pieceType.isBlackPawn();
+        }
+        return pieceType.isWhitePawn();
     }
 
     public boolean isPawnAttackPossible(Direction direction) {
@@ -54,6 +65,14 @@ public class Piece {
 
     public PieceType getPieceType() {
         return pieceType;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public double getScore() {
+        return pieceType.getScore();
     }
 
     @Override

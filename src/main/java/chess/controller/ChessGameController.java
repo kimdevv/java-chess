@@ -1,66 +1,53 @@
 package chess.controller;
 
-import chess.domain.board.Board;
-import chess.domain.board.position.Column;
-import chess.domain.board.position.Position;
-import chess.domain.board.position.Row;
+import chess.controller.command.Command;
+import chess.controller.command.CommandRouter;
 import chess.domain.game.ChessGame;
-import chess.view.Command;
+import chess.domain.game.Room;
+import chess.service.GameService;
 import chess.view.InputView;
-import chess.view.MoveRequestDto;
 import chess.view.OutputView;
-import chess.view.mapper.ColumnMapper;
-import chess.view.mapper.RowMapper;
 
 public class ChessGameController {
-    private final InputView inputView = new InputView();
-    private final OutputView outputView = new OutputView();
+
+    private final GameService gameService;
+
+    public ChessGameController(GameService gameService) {
+        this.gameService = gameService;
+    }
 
     public void run() {
-        ChessGame chessGame = new ChessGame(new Board());
-        outputView.printStartMessage();
-        process(chessGame);
+        OutputView.printSavedRoomNames(gameService.findAllRoomNames());
+        Room room = loadRoom();
+        OutputView.printEnterRoomMessage(room.getName());
+        ChessGame chessGame = gameService.createChessGame(room.getId());
+        process(room.getId(), chessGame);
     }
 
-    private void process(ChessGame chessGame) {
-        boolean isRunning = true;
-        while (isRunning) {
-            isRunning = processGame(chessGame);
-        }
-    }
-
-    private boolean processGame(ChessGame chessGame) {
+    private Room loadRoom() {
         try {
-            Command command = inputView.readCommend();
-            if (command == Command.START) {
-                handleStart(chessGame);
-            }
-            if (command == Command.MOVE) {
-                handleMove(chessGame);
-            }
-            return command != Command.END;
-        } catch (IllegalArgumentException error) {
-            outputView.printError(error);
-            process(chessGame);
-            return false;
+            String input = InputView.readRoomName();
+            return gameService.loadRoom(input);
+        } catch (RuntimeException error) {
+            OutputView.printError(error);
+            return loadRoom();
         }
     }
 
-    private void handleStart(ChessGame chessGame) {
-        outputView.printBoard(chessGame.getBoard());
+    private void process(Long roomId, ChessGame chessGame) {
+        State state = State.RUNNING;
+        do {
+            state = executeCommand(state, chessGame, roomId);
+        } while (state != State.END);
     }
 
-    private void handleMove(ChessGame chessGame) {
-        MoveRequestDto moveRequestDto = inputView.readPositions();
-        Position from = createPosition(moveRequestDto.getFromColumn(), moveRequestDto.getFromRow());
-        Position to = createPosition(moveRequestDto.getToColumn(), moveRequestDto.getToRow());
-        chessGame.movePiece(from, to);
-        outputView.printBoard(chessGame.getBoard());
-    }
-
-    private Position createPosition(String requestColumn, String requestRow) {
-        Column column = ColumnMapper.findByInputValue(requestColumn);
-        Row row = RowMapper.findByInputValue(requestRow);
-        return new Position(row, column);
+    private State executeCommand(State state, ChessGame chessGame, Long roomId) {
+        try {
+            Command command = CommandRouter.findCommandByInput(InputView.readCommand());
+            return command.execute(gameService, chessGame, roomId);
+        } catch (RuntimeException error) {
+            OutputView.printError(error);
+            return state;
+        }
     }
 }

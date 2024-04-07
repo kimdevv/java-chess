@@ -11,22 +11,22 @@ import java.util.Queue;
 
 public class PositionsFilter {
 
-    public List<Position> generateValidPositions(Map<Direction, Queue<Position>> candidateAllPositions,
+    public static List<Position> generateValidPositions(Map<Direction, Queue<Position>> candidatePositions,
                                                  Piece piece,
                                                  Board board) {
-        return candidateAllPositions.keySet().stream()
-                .map(direction -> filterInvalidPositions(candidateAllPositions.get(direction), direction, piece, board))
+        return candidatePositions.keySet().stream()
+                .map(direction -> filterInvalidPositions(candidatePositions.get(direction), direction, piece, board))
                 .flatMap(List::stream)
                 .toList();
     }
 
-    private List<Position> filterInvalidPositions(Queue<Position> expectedPositions, Direction direction,
+    private static List<Position> filterInvalidPositions(Queue<Position> positions, Direction direction,
                                                   Piece piece, Board board) {
         List<Position> result = new ArrayList<>();
-        Position currentPosition = expectedPositions.poll();
+        Position currentPosition = positions.poll();
         while (isEmptySpace(direction, piece, currentPosition, board)) {
             result.add(currentPosition);
-            currentPosition = expectedPositions.poll();
+            currentPosition = positions.poll();
         }
         if (isEnemySpace(direction, piece, currentPosition, board)) {
             result.add(currentPosition);
@@ -34,13 +34,13 @@ public class PositionsFilter {
         return result;
     }
 
-    private boolean isEmptySpace(Direction direction, Piece piece, Position currentPosition, Board board) {
+    private static boolean isEmptySpace(Direction direction, Piece piece, Position currentPosition, Board board) {
         return currentPosition != null
                 && piece.isPawnMovePossible(direction)
                 && board.isEmptySpace(currentPosition);
     }
 
-    private boolean isEnemySpace(Direction direction, Piece piece, Position currentPosition, Board board) {
+    private static boolean isEnemySpace(Direction direction, Piece piece, Position currentPosition, Board board) {
         return currentPosition != null
                 && piece.isPawnAttackPossible(direction)
                 && board.existPiece(currentPosition)

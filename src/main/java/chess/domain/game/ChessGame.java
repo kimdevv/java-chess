@@ -26,6 +26,10 @@ public class ChessGame {
         return new ChessGame(new NotStartState(), PiecePositions.createBoard());
     }
 
+    public void loadGame(Color currentTurn, Map<Position, Piece> loadedBoard) {
+        state = state.load(currentTurn, board, loadedBoard);
+    }
+
     public void startGame() {
         state = state.start();
     }
@@ -42,8 +46,8 @@ public class ChessGame {
         return isKingDead(Color.BLACK) || isKingDead(Color.WHITE);
     }
 
-    public boolean isNotProcess() {
-        return !state.isProcess();
+    public boolean isProcess() {
+        return state.isProcess();
     }
 
     public Color winnerColor() {
@@ -76,5 +80,9 @@ public class ChessGame {
 
     public Map<Position, Piece> getPieces() {
         return board.getPieces();
+    }
+
+    public Color currentTurn() {
+        return state.getCurrentTurn();
     }
 }

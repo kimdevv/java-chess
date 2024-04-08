@@ -6,7 +6,7 @@ public enum Color {
     NONE,
     ;
 
-    public boolean isNotSameTeam(final Piece piece) {
-        return this != piece.color();
+    public boolean isSameColor(final Color color) {
+        return this == color;
     }
 }

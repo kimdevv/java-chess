@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import chess.domain.piece.Color;
+import chess.domain.piece.Empty;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -20,9 +21,9 @@ class ColorPolicyTest {
 
         assertAll(
                 () -> assertThat(policy.isSatisfied(Color.WHITE, PAWN_NOT_FIRST_MOVE_POSITION.getPosition(),
-                        existEnemy)).isTrue(),
+                        Empty.getInstance())).isTrue(),
                 () -> assertThat(policy.isSatisfied(Color.WHITE, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(),
-                        existEnemy)).isTrue());
+                        Empty.getInstance())).isTrue());
     }
 
     @ParameterizedTest
@@ -31,6 +32,7 @@ class ColorPolicyTest {
     void isNotSatisfied(boolean existEnemy) {
         ColorPolicy policy = new ColorPolicy(Color.WHITE);
 
-        assertThat(policy.isSatisfied(Color.BLACK, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(), existEnemy)).isFalse();
+        assertThat(policy.isSatisfied(Color.BLACK, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(),
+                Empty.getInstance())).isFalse();
     }
 }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import chess.domain.piece.Color;
+import chess.domain.piece.Empty;
 import chess.domain.position.Position;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,8 @@ class CombinationPolicyTest {
         CombinationPolicy policy = new CombinationPolicy(new ColorPolicy(Color.WHITE), new PawnFirstMovePolicy());
 
         assertAll(
-                () -> assertThat(policy.isSatisfied(Color.WHITE, Position.of(1, 2), false)),
-                () -> assertThat(policy.isSatisfied(Color.WHITE, Position.of(1, 2), true))
+                () -> assertThat(policy.isSatisfied(Color.WHITE, Position.of(1, 2), Empty.getInstance())),
+                () -> assertThat(policy.isSatisfied(Color.WHITE, Position.of(1, 2), Empty.getInstance()))
         );
     }
 
@@ -27,8 +28,8 @@ class CombinationPolicyTest {
         CombinationPolicy policy = new CombinationPolicy(new ColorPolicy(Color.WHITE), new PawnFirstMovePolicy());
 
         assertAll(
-                () -> assertThat(policy.isSatisfied(Color.BLACK, Position.of(1, 2), false)),
-                () -> assertThat(policy.isSatisfied(Color.WHITE, Position.of(1, 7), true))
+                () -> assertThat(policy.isSatisfied(Color.BLACK, Position.of(1, 2), Empty.getInstance())),
+                () -> assertThat(policy.isSatisfied(Color.WHITE, Position.of(1, 7), Empty.getInstance()))
         );
     }
 

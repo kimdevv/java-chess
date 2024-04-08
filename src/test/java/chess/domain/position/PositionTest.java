@@ -126,4 +126,16 @@ class PositionTest {
     void canNotMoveOneSpace(final int file, final int rank) {
         assertThat(Position.of(2, 2).isDiagonalBy(Position.of(file, rank))).isFalse();
     }
+
+    @Test
+    @DisplayName("file이 동일한 경우 참을 반환한다.")
+    void isRankMove() {
+        assertThat(Position.of(1, 2).isRankMove(Position.of(1, 3))).isTrue();
+    }
+
+    @Test
+    @DisplayName("file이 동일한 경우 거짓을 반환한다.")
+    void isNotRankMove() {
+        assertThat(Position.of(1, 2).isRankMove(Position.of(2, 2))).isFalse();
+    }
 }

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import chess.domain.piece.Color;
+import chess.domain.piece.Empty;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,13 +19,17 @@ class PawnFirstMovePolicyTest {
 
         assertAll(
                 () -> assertThat(
-                        policy.isSatisfied(Color.BLACK, BLACK_PAWN_FIRST_MOVE_POSITION.getPosition(), false)).isTrue(),
+                        policy.isSatisfied(Color.BLACK, BLACK_PAWN_FIRST_MOVE_POSITION.getPosition(),
+                                Empty.getInstance())).isTrue(),
                 () -> assertThat(
-                        policy.isSatisfied(Color.BLACK, BLACK_PAWN_FIRST_MOVE_POSITION.getPosition(), true)).isTrue(),
+                        policy.isSatisfied(Color.BLACK, BLACK_PAWN_FIRST_MOVE_POSITION.getPosition(),
+                                Empty.getInstance())).isTrue(),
                 () -> assertThat(
-                        policy.isSatisfied(Color.WHITE, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(), false)).isTrue(),
+                        policy.isSatisfied(Color.WHITE, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(),
+                                Empty.getInstance())).isTrue(),
                 () -> assertThat(
-                        policy.isSatisfied(Color.WHITE, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(), true)).isTrue()
+                        policy.isSatisfied(Color.WHITE, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(),
+                                Empty.getInstance())).isTrue()
         );
     }
 
@@ -35,13 +40,17 @@ class PawnFirstMovePolicyTest {
 
         assertAll(
                 () -> assertThat(
-                        policy.isSatisfied(Color.BLACK, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(), false)).isFalse(),
+                        policy.isSatisfied(Color.BLACK, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(),
+                                Empty.getInstance())).isFalse(),
                 () -> assertThat(
-                        policy.isSatisfied(Color.BLACK, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(), true)).isFalse(),
+                        policy.isSatisfied(Color.BLACK, WHITE_PAWN_FIRST_MOVE_POSITION.getPosition(),
+                                Empty.getInstance())).isFalse(),
                 () -> assertThat(
-                        policy.isSatisfied(Color.WHITE, BLACK_PAWN_FIRST_MOVE_POSITION.getPosition(), false)).isFalse(),
+                        policy.isSatisfied(Color.WHITE, BLACK_PAWN_FIRST_MOVE_POSITION.getPosition(),
+                                Empty.getInstance())).isFalse(),
                 () -> assertThat(
-                        policy.isSatisfied(Color.WHITE, BLACK_PAWN_FIRST_MOVE_POSITION.getPosition(), true)).isFalse()
+                        policy.isSatisfied(Color.WHITE, BLACK_PAWN_FIRST_MOVE_POSITION.getPosition(),
+                                Empty.getInstance())).isFalse()
         );
     }
 }

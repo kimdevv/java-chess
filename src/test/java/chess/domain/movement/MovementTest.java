@@ -8,6 +8,7 @@ import chess.domain.movement.direction.DownDirection;
 import chess.domain.movement.direction.UpRightDirection;
 import chess.domain.movement.policy.ColorPolicy;
 import chess.domain.piece.Color;
+import chess.domain.piece.Empty;
 import chess.domain.position.Position;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,8 @@ class MovementTest {
     void isSatisfied() {
         Movement movement = new Movement(new ColorPolicy(Color.WHITE), new UpRightDirection(2));
         assertAll(
-                () -> assertThat(movement.isSatisfied(Color.WHITE, Position.of(1, 1), false)).isTrue(),
-                () -> assertThat(movement.isSatisfied(Color.BLACK, Position.of(1, 1), false)).isFalse()
+                () -> assertThat(movement.isSatisfied(Color.WHITE, Position.of(1, 1), Empty.getInstance())).isTrue(),
+                () -> assertThat(movement.isSatisfied(Color.BLACK, Position.of(1, 1), Empty.getInstance())).isFalse()
         );
     }
 

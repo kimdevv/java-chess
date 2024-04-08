@@ -1,6 +1,6 @@
 package chess.view;
 
-import chess.domain.board.Board;
+import chess.domain.piece.Color;
 import chess.domain.piece.Piece;
 import chess.domain.position.Position;
 import java.util.Arrays;
@@ -24,8 +24,7 @@ public class OutputView {
         System.out.println(commandMessage);
     }
 
-    public void printBoard(final Board board) {
-        Map<Position, Piece> positions = board.getBoard();
+    public void printBoard(final Map<Position, Piece> positions) {
         for (int rank = MAXIMUM_RANK_RANGE; rank >= MINIMUM_RANK_RANGE; rank--) {
             printRankLine(positions, rank);
         }
@@ -39,5 +38,17 @@ public class OutputView {
                 .map(PieceSymbol::getDisplay)
                 .collect(Collectors.joining(""));
         System.out.println(rankLine);
+    }
+
+    public void printScore(final double teamScore, final Color color) {
+        System.out.println(color + "팀의 현재 점수는 " + teamScore + "입니다.");
+    }
+
+    public void printFinish() {
+        System.out.println("King이 잡혔습니다. 게임을 종료합니다.");
+    }
+
+    public void printCurrentTurn(final Color color) {
+        System.out.println(ColorDisplay.getValue(color) + "팀 차례입니다.");
     }
 }

@@ -15,17 +15,15 @@ import chess.domain.movement.policy.CombinationPolicy;
 import chess.domain.movement.policy.EnemyExistPolicy;
 import chess.domain.movement.policy.NoRestrictionPolicy;
 import chess.domain.movement.policy.PawnFirstMovePolicy;
-import chess.domain.piece.obstaclerule.DiagonalCaptureObstacleRule;
-import chess.domain.piece.obstaclerule.NoObstacleRule;
-import chess.domain.piece.obstaclerule.ObstacleRule;
-import chess.domain.piece.obstaclerule.StraightCaptureObstacleRule;
 import chess.domain.position.Position;
+import chess.domain.scorerule.NoScoreRule;
+import chess.domain.scorerule.NormalScoreRule;
+import chess.domain.scorerule.PawnScoreRule;
+import chess.domain.scorerule.ScoreRule;
 import java.util.List;
-import java.util.Map;
 
 public enum PieceType {
-    KING(new StraightCaptureObstacleRule(),
-            new Movement(new NoRestrictionPolicy(), new UpDirection(1)),
+    KING(new NoScoreRule(), new Movement(new NoRestrictionPolicy(), new UpDirection(1)),
             new Movement(new NoRestrictionPolicy(), new DownDirection(1)),
             new Movement(new NoRestrictionPolicy(), new LeftDirection(1)),
             new Movement(new NoRestrictionPolicy(), new RightDirection(1)),
@@ -35,8 +33,7 @@ public enum PieceType {
             new Movement(new NoRestrictionPolicy(), new DownRightDirection(1))
     ),
 
-    QUEEN(new StraightCaptureObstacleRule(),
-            new Movement(new NoRestrictionPolicy(), new UpDirection(8)),
+    QUEEN(new NormalScoreRule(9), new Movement(new NoRestrictionPolicy(), new UpDirection(8)),
             new Movement(new NoRestrictionPolicy(), new DownDirection(8)),
             new Movement(new NoRestrictionPolicy(), new LeftDirection(8)),
             new Movement(new NoRestrictionPolicy(), new RightDirection(8)),
@@ -46,25 +43,22 @@ public enum PieceType {
             new Movement(new NoRestrictionPolicy(), new DownRightDirection(8))
     ),
 
-    BISHOP(new StraightCaptureObstacleRule(),
-            new Movement(new NoRestrictionPolicy(), new UpLeftDirection(8)),
+    BISHOP(new NormalScoreRule(3), new Movement(new NoRestrictionPolicy(), new UpLeftDirection(8)),
             new Movement(new NoRestrictionPolicy(), new UpRightDirection(8)),
             new Movement(new NoRestrictionPolicy(), new DownLeftDirection(8)),
             new Movement(new NoRestrictionPolicy(), new DownRightDirection(8))
     ),
 
-    ROOK(new StraightCaptureObstacleRule(),
-            new Movement(new NoRestrictionPolicy(), new UpDirection(8)),
+    ROOK(new NormalScoreRule(5), new Movement(new NoRestrictionPolicy(), new UpDirection(8)),
             new Movement(new NoRestrictionPolicy(), new DownDirection(8)),
             new Movement(new NoRestrictionPolicy(), new LeftDirection(8)),
             new Movement(new NoRestrictionPolicy(), new RightDirection(8))
     ),
 
-    KNIGHT(new StraightCaptureObstacleRule(),
-            new Movement(new NoRestrictionPolicy(), new KnightDirection())
+    KNIGHT(new NormalScoreRule(2.5), new Movement(new NoRestrictionPolicy(), new KnightDirection())
     ),
 
-    PAWN(new DiagonalCaptureObstacleRule(),
+    PAWN(new PawnScoreRule(),
             new Movement(new CombinationPolicy(new ColorPolicy(Color.WHITE), new PawnFirstMovePolicy()),
                     new UpDirection(2)),
             new Movement(new CombinationPolicy(new ColorPolicy(Color.WHITE), new EnemyExistPolicy()),
@@ -82,14 +76,14 @@ public enum PieceType {
             new Movement(new ColorPolicy(Color.BLACK), new DownDirection(1))
     ),
 
-    EMPTY(new NoObstacleRule()),
+    EMPTY(new NoScoreRule()),
     ;
 
-    private final ObstacleRule obstacleRule;
+    private final ScoreRule scoreRule;
     private final List<Movement> movements;
 
-    PieceType(final ObstacleRule obstacleRule, final Movement... movements) {
-        this.obstacleRule = obstacleRule;
+    PieceType(final ScoreRule scoreRule, final Movement... movements) {
+        this.scoreRule = scoreRule;
         this.movements = List.of(movements);
     }
 
@@ -97,7 +91,7 @@ public enum PieceType {
         return movements;
     }
 
-    public List<Position> getObstacle(final Position source, final Position target, final Map<Position, Piece> pieces) {
-        return obstacleRule.findObstacle(source, target, pieces);
+    public double findScore(final List<Position> piecesPosition) {
+        return scoreRule.findScore(piecesPosition);
     }
 }

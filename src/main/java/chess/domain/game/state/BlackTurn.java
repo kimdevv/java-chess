@@ -9,21 +9,23 @@ import java.util.NoSuchElementException;
 
 public class BlackTurn extends Running {
 
+    private static final State INSTANCE = new BlackTurn();
+
+    private BlackTurn() {
+    }
+
+    public static State getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public State move(final Board board, final Coordinate source, final Coordinate target) {
-        validateCoordinate(source, target);
         validateSourcePiece(board.findByCoordinate(source));
         Piece captured = board.move(source, target);
         if (captured.isSameType(PieceType.KING)) {
-            return new End();
+            return GameOver.getInstance();
         }
-        return new WhiteTurn();
-    }
-
-    private void validateCoordinate(final Coordinate source, final Coordinate target) {
-        if (source.equals(target)) {
-            throw new IllegalArgumentException("동일한 위치로 이동할 수 없습니다.");
-        }
+        return WhiteTurn.getInstance();
     }
 
     private void validateSourcePiece(final Piece sourcePiece) {

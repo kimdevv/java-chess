@@ -1,63 +1,110 @@
 package chess;
 
 import chess.domain.game.ChessGame;
-import chess.domain.game.ChessStatus;
+import chess.domain.game.Movement;
+import chess.service.ChessGameService;
 import chess.view.Command;
 import chess.view.InputTokens;
 import chess.view.InputView;
 import chess.view.OutputView;
+import chess.view.RoomNameToken;
+import java.util.List;
 
 class Controller {
 
     private final InputView inputView;
     private final OutputView outputView;
-
-    private final ChessGame chessGame = new ChessGame();
-
+    private final ChessGameService chessGameService = new ChessGameService();
+    
     public Controller(InputView inputView, OutputView outputView) {
         this.inputView = inputView;
         this.outputView = outputView;
     }
 
     public void run() {
-        outputView.printStartMessage();
-        repeatUntilLegalState(this::start);
+        enterGameRoom();
     }
 
-    private void start() {
+    private void enterGameRoom() {
+        try {
+            checkPresentRoomName();
+        } catch (IllegalArgumentException e) {
+            outputView.printErrorMessage(e.getMessage());
+            enterGameRoom();
+        }
+    }
+
+    private void checkPresentRoomName() {
+        List<String> roomNames = chessGameService.gameNames();
+        RoomNameToken roomName = inputView.readGameRoomName(roomNames);
+        while (roomName.isNotExit()) {
+            checkStartOrContinue(roomNames, roomName);
+            roomNames = chessGameService.gameNames();
+            roomName = inputView.readGameRoomName(chessGameService.gameNames());
+        }
+    }
+
+    private void checkStartOrContinue(final List<String> roomNames, final RoomNameToken roomName) {
+        String gameName = roomName.value();
+        if (roomName.isIn(roomNames)) {
+            continueGame(gameName);
+        }
+        if (roomName.isNotIn(roomNames)) {
+            startNewGame(roomName, gameName);
+        }
+    }
+
+    private void startNewGame(final RoomNameToken roomName, final String gameName) {
+        repeatUntilLegalState(() -> start(gameName, chessGameService.newGame(roomName.value())));
+    }
+
+    private void continueGame(final String gameName) {
+        outputView.printStartMessage();
+        repeatUntilLegalState(() -> proceed(gameName, chessGameService.selectGame(gameName)));
+    }
+
+
+    private void start(final String gameName, final ChessGame chessGame) {
+        outputView.printStartMessage();
         Command command = repeatUntilLegalCommand();
         if (command.isStart()) {
             chessGame.start();
-            repeatUntilLegalState(this::proceed);
+            repeatUntilLegalState(() -> proceed(gameName, chessGame));
             return;
         }
 
         if (command.isEnd()) {
+            chessGame.end();
             return;
         }
 
         throw new IllegalArgumentException("잘못된 입력입니다.");
     }
 
-    private void proceed() {
+    private void proceed(final String gameName, final ChessGame chessGame) {
         outputView.printBoard(chessGame.board());
         while (chessGame.isRunning()) {
-            execute();
+            execute(gameName, chessGame);
+        }
+
+        if (chessGame.isGameOver()) {
+            chessGameService.removeHistory(gameName);
         }
     }
 
-    private void execute() {
+    private void execute(final String gameName, final ChessGame chessGame) {
         InputTokens inputTokens = inputView.readCommand();
         Command command = Command.from(inputTokens);
         if (command.isMove()) {
-            chessGame.move(command.sourceCoordinate(inputTokens), command.targetCoordinate(inputTokens));
+            Movement movement = command.movement(inputTokens);
+            chessGame.move(movement);
+            chessGameService.addHistory(gameName, movement);
             outputView.printBoard(chessGame.board());
             return;
         }
 
         if (command.isStatus()) {
-            ChessStatus status = chessGame.status();
-            outputView.printStatus(status);
+            outputView.printStatus(chessGame.status());
             return;
         }
 

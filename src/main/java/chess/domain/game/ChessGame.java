@@ -1,7 +1,6 @@
 package chess.domain.game;
 
 import chess.domain.board.Board;
-import chess.domain.board.Coordinate;
 import chess.domain.game.state.Ready;
 import chess.domain.game.state.State;
 import chess.domain.piece.Team;
@@ -13,19 +12,24 @@ public class ChessGame {
     private final Board board;
     private State state;
 
-
     public ChessGame() {
         this.board = new Board();
-        state = new Ready();
+        this.state = Ready.getInstance();
+    }
+
+    public ChessGame(final State state) {
+        this.board = new Board();
+        this.state = state;
     }
 
     public void start() {
         state = state.start();
     }
 
-    public void move(final Coordinate source, final Coordinate target) {
-        state = state.move(board, source, target);
+    public void move(final Movement movement) {
+        state = state.move(board, movement.source(), movement.target());
     }
+
 
     public ChessStatus status() {
         state = state.status();
@@ -43,7 +47,15 @@ public class ChessGame {
         return state.isRunning();
     }
 
+    public boolean isGameOver() {
+        return state.isGameOver();
+    }
+
     public Board board() {
         return board;
+    }
+
+    public State state() {
+        return state;
     }
 }

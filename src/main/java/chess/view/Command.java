@@ -3,6 +3,7 @@ package chess.view;
 import chess.domain.board.Coordinate;
 import chess.domain.board.File;
 import chess.domain.board.Rank;
+import chess.domain.game.Movement;
 import java.util.Arrays;
 
 public enum Command {
@@ -25,24 +26,16 @@ public enum Command {
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 입력입니다."));
     }
 
-    public Coordinate sourceCoordinate(final InputTokens tokens) {
+    public Movement movement(final InputTokens tokens) {
         if (isNotMove()) {
             throw new UnsupportedOperationException("지원하지 않는 Command 기능입니다.");
         }
-        Coordinate source = mapToCoordinate(tokens.getSourceCoordinateToken());
-        return source;
+        return new Movement(toCoordinate(tokens.getSourceCoordinateToken()),
+                toCoordinate(tokens.getTargetCoordinateToken()));
     }
 
-    public Coordinate targetCoordinate(final InputTokens tokens) {
-        if (isNotMove()) {
-            throw new UnsupportedOperationException("지원하지 않는 Command 기능입니다.");
-        }
-        Coordinate target = mapToCoordinate(tokens.getTargetCoordinateToken());
-        return target;
-    }
-
-    private Coordinate mapToCoordinate(final String input) {
-        return Coordinate.of(File.from(input.charAt(0)), Rank.from(input.charAt(1) - '0'));
+    private static Coordinate toCoordinate(final String coordinate) {
+        return Coordinate.of(File.from(coordinate.charAt(0)), Rank.from(coordinate.charAt(1) - '0'));
     }
 
     public boolean isStart() {

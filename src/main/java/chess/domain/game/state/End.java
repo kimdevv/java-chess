@@ -5,8 +5,22 @@ import chess.domain.board.Coordinate;
 
 public class End implements State {
 
+    private static final State INSTANCE = new End();
+
+    private End() {
+    }
+
+    public static State getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public boolean isRunning() {
+        return false;
+    }
+
+    @Override
+    public boolean isGameOver() {
         return false;
     }
 

@@ -8,6 +8,7 @@ import chess.model.piece.Piece;
 import chess.model.position.Movement;
 import chess.model.position.Position;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,12 @@ public class Board {
     private Color currnetColor = START_COLOR;
 
     public Board(Map<Position, Piece> squares) {
+        this.squares = new HashMap<>(squares);
+        ALL_POSITIONS.forEach(position -> this.squares.putIfAbsent(position, Empty.getInstance()));
+    }
+
+    public Board(Map<Position, Piece> squares, Color currnetColor) {
+        this.currnetColor = currnetColor;
         this.squares = new HashMap<>(squares);
         ALL_POSITIONS.forEach(position -> this.squares.putIfAbsent(position, Empty.getInstance()));
     }
@@ -148,5 +155,13 @@ public class Board {
     private Piece getDestinationPiece(Movement movement) {
         Position destination = movement.getDestination();
         return squares.get(destination);
+    }
+
+    public Color getCurrentColor() {
+        return currnetColor;
+    }
+
+    public Map<Position, Piece> getSquares() {
+        return Collections.unmodifiableMap(squares);
     }
 }

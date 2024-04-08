@@ -1,30 +1,61 @@
 package chess.view;
 
 import chess.dto.PositionDTO;
+import java.util.List;
 import java.util.Scanner;
 
 public class InputView {
     private static final Scanner SCANNER = new Scanner(System.in);
+    private static final int TEAM_CODE_MIN_LENGTH = 2;
+    private static final int TEAM_CODE_MAX_LENGTH = 5;
     private static final int POSITION_LENGTH = 2;
     private static final int FILE_INDEX = 0;
     private static final int RANK_INDEX = 1;
     private static final int FILE_START_ASCII = 'a' - 1;
     private static final int RANK_START_ASCII = '1' - 1;
 
-    public Command askStartCommand() {
+    public Command askStartOrRecordCommand() {
+        System.out.print("> [record] 혹은 [start] 명령어를 입력하세요: ");
         String input = SCANNER.next();
         Command command = Command.findBy(input);
-        validateStartCommand(command);
+        validateStartOrRecordCommand(command);
         return command;
     }
 
-    private void validateStartCommand(Command command) {
-        if (command != Command.START) {
-            throw new IllegalArgumentException("게임을 시작하려면 start를 입력해야 합니다.");
+    private void validateStartOrRecordCommand(Command command) {
+        if (command != Command.START && command != Command.RECORD) {
+            throw new IllegalArgumentException("게임을 시작하지 않은 상태에선 start를 혹은 record를 입력해야 합니다.");
+        }
+    }
+
+    public Long askBoardIdToShowDetail(List<Long> boardIds) {
+        System.out.print("> 상세 정보를 보고 싶은 게임 id를 입력하세요: ");
+        Long boardId = SCANNER.nextLong();
+        validateBoardId(boardId, boardIds);
+        return boardId;
+    }
+
+    private void validateBoardId(Long boardId, List<Long> boardIds) {
+        if (!boardIds.contains(boardId)) {
+            throw new IllegalArgumentException("완료한 게임 id 목록에 있는 id를 입력해야 합니다.");
+        }
+    }
+
+    public String askTeamCode() {
+        System.out.print("> 팀 코드를 입력하세요: ");
+        String teamCode = SCANNER.next();
+        validateTeamCode(teamCode);
+        return teamCode;
+    }
+
+    private void validateTeamCode(String teamCode) {
+        if (teamCode.length() < TEAM_CODE_MIN_LENGTH || teamCode.length() > TEAM_CODE_MAX_LENGTH) {
+            throw new IllegalArgumentException("팀 코드는 2글자 이상 5글자 이하로 입력해야 합니다.");
         }
     }
 
     public Command askMoveOrStatusOrEndCommand() {
+        System.out.print("> [move b2 b3] 혹은 [status] 혹은 [end] 명령어를 입력하세요: ");
         String input = SCANNER.next();
         Command command = Command.findBy(input);
         validateMoveOrStatusOrEndCommand(command);

@@ -1,10 +1,13 @@
 package view;
 
 import controller.Command;
+import controller.RoomCommand;
 import domain.position.Position;
 import domain.position.PositionGenerator;
+import java.util.InputMismatchException;
 import java.util.Scanner;
-import view.mapper.CommandInput;
+import view.mapper.input.CommandInput;
+import view.mapper.input.RoomCommandInput;
 
 public class InputView {
 
@@ -35,6 +38,21 @@ public class InputView {
     private void validatePositionLength(String rawPosition) {
         if (rawPosition.length() != POSITION_LENGTH) {
             throw new IllegalArgumentException("[ERROR] 올바른 위치를 입력해주세요.");
+        }
+    }
+
+    public RoomCommand readRoomCommand() {
+        System.out.println("> 게임방 입장 : enter 방번호 - 예. enter 5");
+        System.out.println("> 게임방 개설 : create");
+        String input = scanner.next();
+        return RoomCommandInput.asCommand(input);
+    }
+
+    public int readRoomNumber() {
+        try {
+            return scanner.nextInt();
+        } catch (InputMismatchException e) {
+            throw new IllegalArgumentException("[ERROR] 올바른 명령어를 입력해주세요.");
         }
     }
 

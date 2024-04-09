@@ -5,25 +5,33 @@ import domain.board.Turn;
 import domain.piece.Color;
 import domain.piece.Piece;
 import domain.position.Position;
+import domain.result.ChessResult;
+import domain.result.ScoreCalculator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Chess {
+
+    private static final int KING_COUNT = 2;
 
     private final Board board;
     private Turn turn;
 
-    public Chess() {
-        this.board = Board.create();
-        this.turn = new Turn(Color.WHITE);
+    public Chess(Board board, Turn turn) {
+        this.board = board;
+        this.turn = turn;
     }
 
-    public void tryMove(Position sourcePosition, Position targetPosition) {
+    public Piece tryMove(Position sourcePosition, Position targetPosition) {
         validateMovement(sourcePosition, targetPosition);
         if (canAttack(sourcePosition, targetPosition)) {
             attack(sourcePosition, targetPosition);
-            return;
+            return board.findPieceByPosition(targetPosition);
         }
         validateCanMove(sourcePosition, targetPosition);
         move(sourcePosition, targetPosition);
+        return board.findPieceByPosition(targetPosition);
     }
 
     private void validateMovement(Position sourcePosition, Position targetPosition) {
@@ -57,13 +65,43 @@ public class Chess {
 
     private void move(Position sourcePosition, Position targetPosition) {
         board.movePiece(sourcePosition, targetPosition);
-        turn = turn.next();
+        turn = turn.opponent();
     }
 
     private void validate(boolean condition, String errorMessage) {
         if (condition) {
             throw new IllegalArgumentException(errorMessage);
         }
+    }
+
+    public boolean canContinue() {
+        return board.countKing() == KING_COUNT;
+    }
+
+    public ChessResult judge() {
+        ScoreCalculator scoreCalculator = new ScoreCalculator();
+        Map<Color, Double> score = new HashMap<>();
+        double own = scoreCalculator.calculate(board, turn);
+        double opponent = scoreCalculator.calculate(board, turn.opponent());
+
+        if (turn.isWhite()) {
+            score.put(Color.WHITE, own);
+            score.put(Color.BLACK, opponent);
+            if (board.countKing() == 1) {
+                List<Piece> aliveKings = board.findKings();
+                Piece aliveKing = aliveKings.get(0);
+                return new ChessResult(score, aliveKing.color().oppositeColor());
+            }
+            return new ChessResult(score, Color.NONE);
+        }
+        score.put(Color.BLACK, own);
+        score.put(Color.WHITE, opponent);
+        if (board.countKing() == 1) {
+            List<Piece> aliveKings = board.findKings();
+            Piece aliveKing = aliveKings.get(0);
+            return new ChessResult(score, aliveKing.color().oppositeColor());
+        }
+        return new ChessResult(score, Color.NONE);
     }
 
     public Board getBoard() {

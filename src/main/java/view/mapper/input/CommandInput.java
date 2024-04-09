@@ -1,4 +1,4 @@
-package view.mapper;
+package view.mapper.input;
 
 import controller.Command;
 import java.util.Arrays;
@@ -7,7 +7,9 @@ public enum CommandInput {
 
     START(Command.START, "start"),
     MOVE(Command.MOVE, "move"),
-    END(Command.END, "end");
+    END(Command.END, "end"),
+    STATUS(Command.STATUS, "status"),
+    ;
 
     private final Command command;
     private final String input;

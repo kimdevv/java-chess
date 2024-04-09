@@ -11,12 +11,16 @@ public class Turn {
         this.color = color;
     }
 
-    public Turn next() {
+    public Turn opponent() {
         return new Turn(color.oppositeColor());
     }
 
     public boolean isNotTurn(Color color) {
         return this.color != color;
+    }
+
+    public boolean hasColor(Color color) {
+        return this.color == color;
     }
 
     public boolean isBlack() {
@@ -25,6 +29,10 @@ public class Turn {
 
     public boolean isWhite() {
         return color.isWhite();
+    }
+
+    public Color color() {
+        return color;
     }
 
     @Override

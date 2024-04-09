@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class SquaresGenerator {
+public class InitBoardGenerator implements BoardGenerator {
 
+    @Override
     public Map<Position, Piece> generate() {
         Map<Position, Piece> squares = new HashMap<>();
-
         initPiece(PiecePosition.PAWN, Pawn::new, squares);
         initPiece(PiecePosition.ROOK, Rook::new, squares);
         initPiece(PiecePosition.KNIGHT, Knight::new, squares);
@@ -31,7 +31,6 @@ public class SquaresGenerator {
         initPiece(PiecePosition.QUEEN, Queen::new, squares);
         initPiece(PiecePosition.KING, King::new, squares);
         initPiece(PiecePosition.NONE, None::new, squares);
-
         return squares;
     }
 

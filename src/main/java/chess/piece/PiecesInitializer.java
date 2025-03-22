@@ -24,14 +24,14 @@ public class PiecesInitializer {
         blackPieces.add(new Knight(DefaultPosition.KNIGHT_RIGHT_BLACK.getPosition()));
         blackPieces.add(new Rook(DefaultPosition.ROOK_LEFT_BLACK.getPosition()));
         blackPieces.add(new Rook(DefaultPosition.ROOK_RIGHT_BLACK.getPosition()));
-        blackPieces.add(new Pawn(DefaultPosition.PAWN_FIRST_BLACK.getPosition()));
-        blackPieces.add(new Pawn(DefaultPosition.PAWN_SECOND_BLACK.getPosition()));
-        blackPieces.add(new Pawn(DefaultPosition.PAWN_THIRD_BLACK.getPosition()));
-        blackPieces.add(new Pawn(DefaultPosition.PAWN_FOURTH_BLACK.getPosition()));
-        blackPieces.add(new Pawn(DefaultPosition.PAWN_FIFTH_BLACK.getPosition()));
-        blackPieces.add(new Pawn(DefaultPosition.PAWN_SIXTH_BLACK.getPosition()));
-        blackPieces.add(new Pawn(DefaultPosition.PAWN_SEVENTH_BLACK.getPosition()));
-        blackPieces.add(new Pawn(DefaultPosition.PAWN_EIGHTH_BLACK.getPosition()));
+        blackPieces.add(new Pawn(DefaultPosition.PAWN_FIRST_BLACK.getPosition(), Team.BLACK));
+        blackPieces.add(new Pawn(DefaultPosition.PAWN_SECOND_BLACK.getPosition(), Team.BLACK));
+        blackPieces.add(new Pawn(DefaultPosition.PAWN_THIRD_BLACK.getPosition(), Team.BLACK));
+        blackPieces.add(new Pawn(DefaultPosition.PAWN_FOURTH_BLACK.getPosition(), Team.BLACK));
+        blackPieces.add(new Pawn(DefaultPosition.PAWN_FIFTH_BLACK.getPosition(), Team.BLACK));
+        blackPieces.add(new Pawn(DefaultPosition.PAWN_SIXTH_BLACK.getPosition(), Team.BLACK));
+        blackPieces.add(new Pawn(DefaultPosition.PAWN_SEVENTH_BLACK.getPosition(), Team.BLACK));
+        blackPieces.add(new Pawn(DefaultPosition.PAWN_EIGHTH_BLACK.getPosition(), Team.BLACK));
         return new Pieces(blackPieces);
     }
 
@@ -45,14 +45,14 @@ public class PiecesInitializer {
         whitePieces.add(new Knight(DefaultPosition.KNIGHT_RIGHT_WHITE.getPosition()));
         whitePieces.add(new Rook(DefaultPosition.ROOK_LEFT_WHITE.getPosition()));
         whitePieces.add(new Rook(DefaultPosition.ROOK_RIGHT_WHITE.getPosition()));
-        whitePieces.add(new Pawn(DefaultPosition.PAWN_FIRST_WHITE.getPosition()));
-        whitePieces.add(new Pawn(DefaultPosition.PAWN_SECOND_WHITE.getPosition()));
-        whitePieces.add(new Pawn(DefaultPosition.PAWN_THIRD_WHITE.getPosition()));
-        whitePieces.add(new Pawn(DefaultPosition.PAWN_FOURTH_WHITE.getPosition()));
-        whitePieces.add(new Pawn(DefaultPosition.PAWN_FIFTH_WHITE.getPosition()));
-        whitePieces.add(new Pawn(DefaultPosition.PAWN_SIXTH_WHITE.getPosition()));
-        whitePieces.add(new Pawn(DefaultPosition.PAWN_SEVENTH_WHITE.getPosition()));
-        whitePieces.add(new Pawn(DefaultPosition.PAWN_EIGHTH_WHITE.getPosition()));
+        whitePieces.add(new Pawn(DefaultPosition.PAWN_FIRST_WHITE.getPosition(), Team.WHITE));
+        whitePieces.add(new Pawn(DefaultPosition.PAWN_SECOND_WHITE.getPosition(), Team.WHITE));
+        whitePieces.add(new Pawn(DefaultPosition.PAWN_THIRD_WHITE.getPosition(), Team.WHITE));
+        whitePieces.add(new Pawn(DefaultPosition.PAWN_FOURTH_WHITE.getPosition(), Team.WHITE));
+        whitePieces.add(new Pawn(DefaultPosition.PAWN_FIFTH_WHITE.getPosition(), Team.WHITE));
+        whitePieces.add(new Pawn(DefaultPosition.PAWN_SIXTH_WHITE.getPosition(), Team.WHITE));
+        whitePieces.add(new Pawn(DefaultPosition.PAWN_SEVENTH_WHITE.getPosition(), Team.WHITE));
+        whitePieces.add(new Pawn(DefaultPosition.PAWN_EIGHTH_WHITE.getPosition(), Team.WHITE));
         return new Pieces(whitePieces);
     }
 }

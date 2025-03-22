@@ -33,7 +33,7 @@ public class Queen extends Piece {
 
     private List<Position> calculateDiagonalRoute(int rowDifference, int columnDifference) {
         if (rowDifference != columnDifference) {
-            throw new IllegalArgumentException("잘못된 이동 요청입니다.");
+            throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");
         }
         List<Position> route = new ArrayList<>();
         while (rowDifference != 0) {

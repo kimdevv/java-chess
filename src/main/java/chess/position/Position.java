@@ -30,6 +30,24 @@ public record Position(
         return column.calculateDifference(position.column());
     }
 
+    public int getRowNumber() {
+        return row.ordinal();
+    }
+
+    public int getColumnNumber() {
+        return column.ordinal();
+    }
+
+    @Override
+    public Column column() {
+        return column;
+    }
+
+    @Override
+    public Row row() {
+        return row;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

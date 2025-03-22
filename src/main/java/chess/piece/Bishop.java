@@ -11,6 +11,11 @@ public class Bishop extends Piece {
     }
 
     @Override
+    public boolean isKing() {
+        return false;
+    }
+
+    @Override
     public List<Position> calculateRouteToDestination(final Position destination) {
         final int rowDifference = destination.calculateRowDifference(position);
         final int columnDifference = destination.calculateColumnDifference(position);

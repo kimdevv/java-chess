@@ -11,6 +11,11 @@ public class Pawn extends Piece {
     }
 
     @Override
+    public boolean isKing() {
+        return false;
+    }
+
+    @Override
     public List<Position> calculateRouteToDestination(final Position destination) {
         final int rowDifference = destination.calculateRowDifference(position);
         final int columnDifference = destination.calculateColumnDifference(position);
@@ -18,10 +23,10 @@ public class Pawn extends Piece {
     }
 
     private List<Position> selectRouteFromDifferences(final int rowDifference, final int columnDifference) {
-        if (Math.abs(rowDifference) == 1) {
+        if (Math.abs(rowDifference) == 1 && Math.abs(columnDifference) == 0) {
             return calculateVerticalRoute(rowDifference);
         }
-        if (Math.abs(columnDifference) != 0) {
+        if (Math.abs(rowDifference) == 0 && Math.abs(columnDifference) == 1) {
             return calculateHorizontalRoute(columnDifference);
         }
         throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");

@@ -60,4 +60,10 @@ public abstract class Piece {
     public boolean isAt(final Position position) {
         return this.position.equals(position);
     }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public abstract boolean isKing();
 }

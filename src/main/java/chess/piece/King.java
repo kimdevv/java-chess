@@ -11,6 +11,11 @@ public class King extends Piece {
     }
 
     @Override
+    public boolean isKing() {
+        return true;
+    }
+
+    @Override
     public List<Position> calculateRouteToDestination(final Position destination) {
         final int rowDifference = destination.calculateRowDifference(position);
         final int columnDifference = destination.calculateColumnDifference(position);

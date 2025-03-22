@@ -1,5 +1,10 @@
 package chess.piece;
 
-public class Bishop {
+import chess.position.Position;
 
+public class Bishop extends Piece {
+
+    public Bishop(final Position position) {
+        super(position);
+    }
 }

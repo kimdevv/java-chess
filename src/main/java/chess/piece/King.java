@@ -1,5 +1,10 @@
 package chess.piece;
 
-public class King {
+import chess.position.Position;
 
+public class King extends Piece {
+
+    public King(final Position position) {
+        super(position);
+    }
 }

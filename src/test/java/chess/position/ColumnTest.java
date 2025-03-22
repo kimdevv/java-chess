@@ -1,5 +1,6 @@
-package chess;
+package chess.position;
 
+import chess.position.Column;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

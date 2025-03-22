@@ -1,4 +1,8 @@
-package chess;
+package chess.position;
+
+import chess.position.Column;
+import chess.position.Position;
+import chess.position.Row;
 
 @SuppressWarnings("unused")
 public final class Fixtures {

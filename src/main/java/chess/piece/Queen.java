@@ -19,13 +19,13 @@ public class Queen extends Piece {
     }
 
     private List<Position> selectRouteFromDifferences(final int rowDifference, final int columnDifference) {
-        if (rowDifference == columnDifference && rowDifference != 0) {
+        if (rowDifference != 0 && columnDifference != 0) {
             return calculateDiagonalRoute(rowDifference, columnDifference);
         }
-        if (rowDifference != 0 && columnDifference == 0) {
+        if (rowDifference != 0) {
             return calculateVerticalRoute(rowDifference);
         }
-        if (rowDifference == 0 && columnDifference != 0) {
+        if (columnDifference != 0) {
             return calculateHorizontalRoute(columnDifference);
         }
         throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");

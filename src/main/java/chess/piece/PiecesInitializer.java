@@ -1,11 +1,20 @@
 package chess.piece;
 
+import chess.player.Team;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class PiecesInitializer {
 
-    public static List<Piece> initializeBlack() {
+    public static Pieces initialize(final Team team) {
+        if (team == Team.BLACK) {
+            return initializeBlack();
+        }
+        return initializeWhite();
+    }
+
+    private static Pieces initializeBlack() {
         List<Piece> blackPieces = new ArrayList<>();
         blackPieces.add(new King(DefaultPosition.KING_BLACK.getPosition()));
         blackPieces.add(new Queen(DefaultPosition.QUEEN_BLACK.getPosition()));
@@ -23,10 +32,10 @@ public class PiecesInitializer {
         blackPieces.add(new Pawn(DefaultPosition.PAWN_SIXTH_BLACK.getPosition()));
         blackPieces.add(new Pawn(DefaultPosition.PAWN_SEVENTH_BLACK.getPosition()));
         blackPieces.add(new Pawn(DefaultPosition.PAWN_EIGHTH_BLACK.getPosition()));
-        return blackPieces;
+        return new Pieces(blackPieces);
     }
 
-    public static List<Piece> initializeWhite() {
+    private static Pieces initializeWhite() {
         List<Piece> whitePieces = new ArrayList<>();
         whitePieces.add(new King(DefaultPosition.KING_WHITE.getPosition()));
         whitePieces.add(new Queen(DefaultPosition.QUEEN_WHITE.getPosition()));
@@ -44,6 +53,6 @@ public class PiecesInitializer {
         whitePieces.add(new Pawn(DefaultPosition.PAWN_SIXTH_WHITE.getPosition()));
         whitePieces.add(new Pawn(DefaultPosition.PAWN_SEVENTH_WHITE.getPosition()));
         whitePieces.add(new Pawn(DefaultPosition.PAWN_EIGHTH_WHITE.getPosition()));
-        return whitePieces;
+        return new Pieces(whitePieces);
     }
 }

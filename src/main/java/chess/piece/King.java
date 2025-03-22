@@ -18,35 +18,14 @@ public class King extends Piece {
     }
 
     private List<Position> selectRouteFromDifferences(final int rowDifference, final int columnDifference) {
-        if (rowDifference != 0 && columnDifference != 0) {
+        if (Math.abs(rowDifference) == 1 && Math.abs(columnDifference) == 1) {
             return calculateDiagonalRoute(rowDifference, columnDifference);
         }
-        if (rowDifference != 0) {
+        if (Math.abs(rowDifference) == 1) {
             return calculateVerticalRoute(rowDifference);
         }
-        if (columnDifference != 0) {
+        if (Math.abs(columnDifference) == 1) {
             return calculateHorizontalRoute(columnDifference);
-        }
-        throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");
-    }
-
-    private List<Position> calculateDiagonalRoute(int rowDifference, int columnDifference) {
-        if (Math.abs(rowDifference) == 1 || Math.abs(columnDifference) == 1) {
-            return List.of(position.moveDiagonal(rowDifference, columnDifference));
-        }
-        throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");
-    }
-
-    private List<Position> calculateVerticalRoute(int rowDifference) {
-        if (rowDifference == 1) {
-            return List.of(position.moveVertical(rowDifference));
-        }
-        throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");
-    }
-
-    private List<Position> calculateHorizontalRoute(int columnDifference) {
-        if (columnDifference == 1) {
-            return List.of(position.moveHorizontal(columnDifference));
         }
         throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");
     }

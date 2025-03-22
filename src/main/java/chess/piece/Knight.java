@@ -2,7 +2,6 @@ package chess.piece;
 
 import chess.position.Position;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Knight extends Piece {
@@ -23,25 +22,5 @@ public class Knight extends Piece {
             return calculateDiagonalRoute(rowDifference, columnDifference);
         }
         throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");
-    }
-
-    private List<Position> calculateDiagonalRoute(int rowDifference, int columnDifference) {
-        if (rowDifference != columnDifference) {
-            throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");
-        }
-        List<Position> route = new ArrayList<>();
-        while (rowDifference != 0) {
-            route.add(position.moveDiagonal(rowDifference, columnDifference));
-            rowDifference = decreaseOneAbsoluteValue(rowDifference);
-            columnDifference = decreaseOneAbsoluteValue(columnDifference);
-        }
-        return route;
-    }
-
-    private int decreaseOneAbsoluteValue(final int number) {
-        if (number < 0) {
-            return number + 1;
-        }
-        return number - 1;
     }
 }

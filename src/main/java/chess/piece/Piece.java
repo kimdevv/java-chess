@@ -13,6 +13,10 @@ public abstract class Piece {
         this.position = position;
     }
 
+    public final void changePosition(final Position position) {
+        this.position = position;
+    }
+
     public abstract List<Position> calculateRouteToDestination(final Position destination);
 
     protected final List<Position> calculateDiagonalRoute(int rowDifference, int columnDifference) {
@@ -51,5 +55,9 @@ public abstract class Piece {
             return number + 1;
         }
         return number - 1;
+    }
+
+    public boolean isAt(final Position position) {
+        return this.position.equals(position);
     }
 }

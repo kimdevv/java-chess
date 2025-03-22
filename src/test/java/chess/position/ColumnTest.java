@@ -1,6 +1,5 @@
 package chess.position;
 
-import chess.position.Column;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -37,14 +36,14 @@ class ColumnTest {
     @DisplayName("A는 왼쪽으로 이동할 수 없다.")
     @Test
     void moveLeft_A() {
-        assertThatThrownBy(Column.A::moveLeft)
+        assertThatThrownBy(Column.A::move)
                 .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("B는 왼쪽으로 이동하면 A다.")
     @Test
     void moveLeft_B() {
-        final var moved = Column.B.moveLeft();
+        final var moved = Column.B.move();
 
         assertThat(moved).isEqualTo(Column.A);
     }
@@ -52,14 +51,14 @@ class ColumnTest {
     @DisplayName("B는 왼쪽으로 2번 이동할 수 없다.")
     @Test
     void moveLeft_2_B() {
-        assertThatThrownBy(() -> Column.B.moveLeft(2))
+        assertThatThrownBy(() -> Column.B.move(2))
                 .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("C는 왼쪽으로 2번 이동하면 A다.")
     @Test
     void moveLeft_2_C() {
-        final var moved = Column.C.moveLeft(2);
+        final var moved = Column.C.move(2);
 
         assertThat(moved).isEqualTo(Column.A);
     }

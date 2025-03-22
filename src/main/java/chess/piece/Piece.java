@@ -2,11 +2,15 @@ package chess.piece;
 
 import chess.position.Position;
 
-public class Piece {
+import java.util.List;
 
-    private Position position;
+public abstract class Piece {
+
+    protected Position position;
 
     public Piece(final Position position) {
         this.position = position;
     }
+
+    public abstract List<Position> calculateRouteToDestination(final Position destination);
 }

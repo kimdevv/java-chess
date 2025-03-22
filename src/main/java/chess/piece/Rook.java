@@ -2,7 +2,6 @@ package chess.piece;
 
 import chess.position.Position;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Rook extends Piece {
@@ -26,23 +25,5 @@ public class Rook extends Piece {
             return calculateVerticalRoute(rowDifference);
         }
         return calculateHorizontalRoute(columnDifference);
-    }
-
-    private List<Position> calculateVerticalRoute(int rowDifference) {
-        List<Position> route = new ArrayList<>();
-        while (rowDifference != 0) {
-            route.add(position.moveVertical(rowDifference));
-            rowDifference--;
-        }
-        return route;
-    }
-
-    private List<Position> calculateHorizontalRoute(int columnDifference) {
-        List<Position> route = new ArrayList<>();
-        while (columnDifference != 0) {
-            route.add(position.moveHorizontal(columnDifference));
-            columnDifference--;
-        }
-        return route;
     }
 }

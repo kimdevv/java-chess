@@ -18,8 +18,17 @@ public class Knight extends Piece {
     }
 
     private List<Position> selectRouteFromDifferences(final int rowDifference, final int columnDifference) {
-        if ((Math.abs(rowDifference) == 2 && Math.abs(columnDifference) == 1) && (Math.abs(rowDifference) == 1 && Math.abs(columnDifference) == 2)) {
-            return calculateDiagonalRoute(rowDifference, columnDifference);
+        if (Math.abs(rowDifference) == 2 && Math.abs(columnDifference) == 1) {
+            Position middlePosition = position.moveVertical(rowDifference);
+            return List.of(
+                    middlePosition,
+                    middlePosition.moveDiagonal(decreaseOneAbsoluteValue(rowDifference), columnDifference));
+        }
+        if (Math.abs(rowDifference) == 1 && Math.abs(columnDifference) == 2) {
+            Position middlePosition = position.moveHorizontal(columnDifference);
+            return List.of(
+                    middlePosition,
+                    middlePosition.moveDiagonal(rowDifference, decreaseOneAbsoluteValue(columnDifference)));
         }
         throw new IllegalArgumentException("해당 기물이 움직일 수 없는 위치입니다.");
     }

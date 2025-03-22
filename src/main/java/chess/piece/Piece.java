@@ -46,7 +46,7 @@ public abstract class Piece {
         return route;
     }
 
-    private final int decreaseOneAbsoluteValue(final int number) {
+    protected final int decreaseOneAbsoluteValue(final int number) {
         if (number < 0) {
             return number + 1;
         }
